@@ -21,6 +21,10 @@
 (setq auto-mode-alist
       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
+; Environment Variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setenv "PATH" (concat ".:/usr/bin:/usr/texbin:/opt/local/bin" (getenv "PATH")))
+(setq exec-path (append exec-path '("/usr/bin" "/usr/texbin" "/opt/local/bin")))
+
 ; Custom Variables, set by Emacs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (custom-set-variables
@@ -29,13 +33,16 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
- '(custom-enabled-themes (quote (manoj-dark)))
+ '(column-number-mode t)
+ '(custom-enabled-themes (quote (whiteboard)))
  '(global-whitespace-mode t)
- '(ns-antialias-text nil)
  '(whitespace-style (quote (face trailing space-before-tab empty space-after-tab lines))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "apple" :family "Monaco")))))
+ '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight thin :height 140 :width normal :foundry "apple" :family "Inconsolata"))))
+ '(font-latex-bold-face ((t (:inherit bold :foreground "DeepSkyBlue4"))))
+ '(font-latex-italic-face ((t (:inherit italic :foreground "DeepSkyBlue4"))))
+ '(font-latex-math-face ((t (:foreground "gray0")))))
