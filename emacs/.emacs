@@ -1,4 +1,3 @@
-;; do not delete this line -- osu-cis-.emacs-version $Revision: 1.4 $
 ; ==============================================================================
 ; Appearance
 ; ==============================================================================
@@ -25,12 +24,37 @@
 ; ==============================================================================
 ; Custom Modes
 ; ==============================================================================
+; Setup custom directories
+(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "~/.emacs.d/auto-complete")
+(add-to-list 'load-path "~/.emacs.d/libc-info")
+
 ; Markdown Mode [12.13.12]
 (add-to-list 'load-path "~/.emacs.d")
 (autoload 'markdown-mode "markdown-mode.el"
   "Major mode for editing Markdown files" t)
 (setq auto-mode-alist
       (cons '("\\.md" . markdown-mode) auto-mode-alist))
+
+; Markdown Mode [12.13.12]
+(autoload 'markdown-mode "markdown-mode.el"
+  "Major mode for editing Markdown files" t)
+(setq auto-mode-alist
+      (cons '("\\.md" . markdown-mode) auto-mode-alist))
+
+; Template Mode [1.20.13]
+(require 'template)
+(template-initialize)
+
+; Auto-Complete [2.06.13]
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/auto-complete/dict")
+(ac-config-default)
+
+; Additions to the Info Manuals [2.06.13]
+(eval-after-load 'info
+  '(progn
+     (push "~/.emacs.d/libc-info" Info-default-directory-list)))
 
 ; ==============================================================================
 ; Environment Variables
@@ -50,12 +74,3 @@
  '(custom-enabled-themes (quote (whiteboard)))
  '(global-whitespace-mode t)
  '(whitespace-style (quote (face trailing space-before-tab empty space-after-tab lines))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight thin :height 140 :width normal :foundry "apple" :family "Inconsolata"))))
- '(font-latex-bold-face ((t (:inherit bold :foreground "DeepSkyBlue4"))))
- '(font-latex-italic-face ((t (:inherit italic :foreground "DeepSkyBlue4"))))
- '(font-latex-math-face ((t (:foreground "gray0")))))
