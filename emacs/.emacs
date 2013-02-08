@@ -1,19 +1,30 @@
+;; do not delete this line -- osu-cis-.emacs-version $Revision: 1.4 $
+; ==============================================================================
+; Appearance
+; ==============================================================================
+; Fonts
+; -----
+(add-to-list 'default-frame-alist '(font . "Inconsolata"))
+
 ; Display Column and Line Numbers
+; -------------------------------
 (setq column-number-mode t)
 (setq line-number-mode t)
 
-;; key bindings (from emacswiki.org/emacs/EmacsForMacOS)
+; key bindings (from emacswiki.org/emacs/EmacsForMacOS)
+; -----------------------------------------------------
 (when (eq system-type 'darwin) ;; mac-specific
   (setq mac-option-modifier 'alt)
-  (setq mac-command-modifier 'meta)
-  (global-set-key [kp-delete] 'delete-char) ;; sets fn-delete to be right-delete
-)
+  (setq mac-command-modifier 'meta))
 
-; Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ==============================================================================
+; Behavior
+; ==============================================================================
 (setq backup-directory-alist `(("." . "~/.backups")))
 
-; Custom Modes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+; ==============================================================================
+; Custom Modes
+; ==============================================================================
 ; Markdown Mode [12.13.12]
 (add-to-list 'load-path "~/.emacs.d")
 (autoload 'markdown-mode "markdown-mode.el"
@@ -21,7 +32,9 @@
 (setq auto-mode-alist
       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
-; Environment Variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ==============================================================================
+; Environment Variables
+; ==============================================================================
 (setenv "PATH" (concat ".:/usr/bin:/usr/texbin:/opt/local/bin" (getenv "PATH")))
 (setq exec-path (append exec-path '("/usr/bin" "/usr/texbin" "/opt/local/bin")))
 
