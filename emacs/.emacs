@@ -51,6 +51,12 @@
 (setq auto-mode-alist
       (cons '("\\.md" . multimarkdown-mode) auto-mode-alist))
 
+; Sage Mode (TODO: Set conditional)
+(add-to-list 'load-path
+	     (expand-file-name "/Applications/Sage.app/Contents/Resources/sage/local/share/emacs"))
+(require 'sage "sage")
+(setq sage-command "/Applications/Sage.app/Contents/Resources/sage/sage")
+
 ; Template Mode [1.20.13]
 (require 'template)
 (template-initialize)
