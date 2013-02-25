@@ -33,5 +33,5 @@ alias js-test='java -jar ~/scripts/JsTestDriver-1.3.5.jar
 # Server Shortcuts
 # -----------------------------------------------
 alias ssh-cse='ssh -X hutcheso@stdlinux.cse.ohio-state.edu'
-alias knuth-away='rdesktop -f knuth.no-ip.org'
-alias knuth-home='rdesktop -f 192.168.1.11'
+alias knuth-away='ssh -XC -c blowfish knuth.no-ip.org'
+alias knuth-home='ssh -XC -c blowfish 192.168.1.11'

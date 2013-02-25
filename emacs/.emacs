@@ -34,7 +34,7 @@
 (when (eq system-type 'darwin) ; mac-specific
   (setq mac-option-modifier 'alt) ;Set 'Option' key to ALT
   (setq mac-command-modifier 'meta) ;Set 'CMD' key to 'M'
-  (add-to-list 'default-frame-alist '(font . "Monaco-9"))
+  (add-to-list 'default-frame-alist '(font . "Monaco-13"))
   (setq mac-allow-anti-aliasing nil))
 
 ; ======================================================================
@@ -44,12 +44,16 @@
 ; Setup custom directories
 (add-to-list 'load-path "~/.emacs.d")           ; Single-file modes
 (add-to-list 'load-path "~/.emacs.d/libc-info")
+(add-to-list 'load-path "~/.emacs.d/scala-mode")
 
 ; Markdown/MMD Mode [2.14.13]
 (load "markdown-mode")
 (load "multimarkdown-mode")
 (setq auto-mode-alist
       (cons '("\\.md" . multimarkdown-mode) auto-mode-alist))
+
+; Scala Mode [2.22.13]
+(require 'scala-mode2)
 
 ; Sage Mode (TODO: Set conditional)
 (add-to-list 'load-path
@@ -120,7 +124,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (deeper-blue)))
+ '(custom-enabled-themes (quote (wombat)))
  '(quack-global-menu-p nil)
  '(whitespace-style (quote (face trailing space-before-tab empty space-after-tab lines))))
 (custom-set-faces
