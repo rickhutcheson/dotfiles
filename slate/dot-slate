@@ -1,0 +1,11 @@
+# Not too many times that we wouldn't want the ops to bind to this screen.
+config defaultToCurrentScreen true
+
+#All Bindings have the following format:
+#bind    <key>:    <modifiers>	 <operation>
+#-------------------------------------------------------------------------------
+bind	 left:ctrl,cmd		push left bar-resize:screenSizeX/2
+bind	 right:ctrl,cmd		push right bar-resize:screenSizeX/2
+bind	 up:ctrl,alt,cmd	move windowSizeX;0 windowSizeX;screenSizeY
+bind	 left:ctrl,alt,cmd	push left
+bind	 right:ctrl,alt,cmd	push right
