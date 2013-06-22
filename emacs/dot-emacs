@@ -1,0 +1,76 @@
+;;; .emacs --- Personal Emacs Customizations
+;; Author: Rick Hutcheson <rick@statemachine.co>
+;; Created: January 2012
+
+;;;; Environment Variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setenv "PATH" (concat ".:/usr/bin:/usr/texbin:/opt/local/bin" (getenv "PATH")))
+(setq exec-path (append exec-path '("/usr/bin"
+				    "/usr/texbin"
+				    "/opt/local/bin"
+				    "/usr/local/bin")))
+
+;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Fonts
+(add-to-list 'default-frame-alist '(font . "Anonymous Pro-13"))
+
+;;; Display Column and Line Numbers
+(setq column-number-mode t)
+(setq line-number-mode t)
+
+;;; Whitespace Display
+(global-whitespace-mode t)          ; enable whitespace-mode
+(setq whitespace-style
+      (quote (face trailing space-before-tab empty space-after-tab lines)))
+
+;;;; Global Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(tool-bar-mode 0)                   ; remove tool bar
+(scroll-bar-mode 0)                 ; remove scroll bar
+(setq inhibit-startup-screen t)     ; remove EMACS splash
+(setq backup-directory-alist
+      `(("." . "~/.backups")))      ; global backup location
+(setq x-super-keysym 'meta)         ; map CMD to META
+
+;;;; Per-Environment Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (eq system-type 'darwin)      ; mac-specific
+  (setq mac-option-modifier 'alt)   ; Set 'Option' key to ALT
+  (setq mac-command-modifier 'meta) ; Set 'CMD' key to 'M'
+  (setq mac-allow-anti-aliasing nil))
+
+;;;; Custom Modes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Add Extra Repositories for easy installs
+(require 'package)
+(add-to-list 'package-archives
+	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+(package-initialize)
+
+; Setup custom directories
+(add-to-list 'load-path "~/.emacs.d") ; Single-file modes
+
+;;; LaTeX-mode
+(setq LaTeX-mode-hook `turn-on-auto-fill)
+
+; markdown-mode / pandoc-mode
+(load "markdown-mode")
+(load "pandoc-mode")
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(setq markdown-enable-math t)
+(add-hook 'markdown-mode-hook 'turn-on-pandoc)
+(add-hook 'markdown-mode-hook 'auto-fill-mode)
+(defun markdown-custom ()
+  "markdown-mode-hook"
+  (setq markdown-command "pandoc --from markdown --mathjax --toc"))
+(add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
+
+; python-mode
+(add-hook 'python-mode-hook 'turn-on-auto-fill)
+(add-hook 'python-mode-hook 'python-indent-offset 4)
+
+;;; resc-mode
+(load "resc-mode")
+(add-hook 'resc-mode-hook 'turn-on-auto-fill)
+
+; tex-mode
+(setq TeX-mode-hook `turn-on-auto-fill)
+
+(setq custom-theme-directory "~/.emacs.d/themes")
+(setq custom-safe-themes t)
