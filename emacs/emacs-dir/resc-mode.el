@@ -62,8 +62,8 @@
 (setq auto-mode-alist
       (append
        (list
-	'("\\.resc$" . resc-mode)
-	'("\\.rh$" . resc-mode))
+	'("\\.c$" . resc-mode)
+	'("\\.h$" . resc-mode))
        auto-mode-alist))
 
 (defun resc-mode ()
