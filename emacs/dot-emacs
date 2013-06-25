@@ -27,6 +27,7 @@
 (scroll-bar-mode 0)                 ; remove scroll bar
 (menu-bar-mode 0)                   ; remove menu
 (setq inhibit-startup-screen t)     ; remove EMACS splash
+(setq visible-bell t)               ; no bell on scroll-end
 (setq backup-directory-alist
       `(("." . "~/.backups")))      ; global backup location
 (setq x-super-keysym 'meta)         ; map CMD to META
@@ -35,7 +36,8 @@
 (when (eq system-type 'darwin)      ; mac-specific
   (setq mac-option-modifier 'super)   ; Set 'Option' key to ALT
   (setq mac-command-modifier 'meta) ; Set 'CMD' key to 'M'
-  (setq mac-allow-anti-aliasing nil))
+  (setq mac-allow-anti-aliasing nil)
+  (add-to-list 'default-frame-alist '(font . "Terminus-14")))
 
 ;;;; Custom Modes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Add Extra Repositories for easy installs
