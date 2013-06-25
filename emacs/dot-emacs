@@ -11,7 +11,7 @@
 
 ;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fonts
-(add-to-list 'default-frame-alist '(font . "Inconsolata-12"))
+(add-to-list 'default-frame-alist '(font . "Terminus-12"))
 
 ;;; Display Column and Line Numbers
 (setq column-number-mode t)
@@ -25,6 +25,7 @@
 ;;;; Global Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (tool-bar-mode 0)                   ; remove tool bar
 (scroll-bar-mode 0)                 ; remove scroll bar
+(menu-bar-mode 0)                   ; remove menu
 (setq inhibit-startup-screen t)     ; remove EMACS splash
 (setq backup-directory-alist
       `(("." . "~/.backups")))      ; global backup location
@@ -32,7 +33,7 @@
 
 ;;;; Per-Environment Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (eq system-type 'darwin)      ; mac-specific
-  (setq mac-option-modifier 'alt)   ; Set 'Option' key to ALT
+  (setq mac-option-modifier 'super)   ; Set 'Option' key to ALT
   (setq mac-command-modifier 'meta) ; Set 'CMD' key to 'M'
   (setq mac-allow-anti-aliasing nil))
 
@@ -58,7 +59,7 @@
 (add-hook 'markdown-mode-hook 'auto-fill-mode)
 (defun markdown-custom ()
   "markdown-mode-hook"
-  (setq markdown-command "pandoc --from markdown --mathjax --toc"))
+  (setq markdown-command "/usr/local/bin/pandoc --from markdown --to html5 --mathjax --toc-depth=2 --css=styles.css --standalone --toc --section-divs"))
 (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
 
 ; python-mode
@@ -73,7 +74,8 @@
 (setq TeX-mode-hook `turn-on-auto-fill)
 
 (add-to-list 'custom-theme-load-path '"~/.emacs.d/themes")
-(setq custom-safe-themes t)
+(setq custom-safe-themes t) ; trust all themes
+(add-to-list 'custom-enabled-themes 'qsimpleq)
 (add-to-list 'custom-enabled-themes 'tango)
 (add-to-list 'custom-enabled-themes 'tango-2)
-(load-theme 'tango-2)
+(load-theme 'qsimpleq)
