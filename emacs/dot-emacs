@@ -49,7 +49,11 @@
 ; Setup custom directories
 (add-to-list 'load-path "~/.emacs.d") ; Single-file modes
 
-;;; LaTeX-mode
+; cweb-mode
+(require 'cweb-mode)
+(setq auto-mode-alist (cons '("\\.w" . cweb-mode) auto-mode-alist))
+
+; LaTeX-mode
 (setq LaTeX-mode-hook `turn-on-auto-fill)
 
 ; markdown-mode / pandoc-mode
@@ -61,14 +65,14 @@
 (add-hook 'markdown-mode-hook 'auto-fill-mode)
 (defun markdown-custom ()
   "markdown-mode-hook"
-  (setq markdown-command "/usr/local/bin/pandoc --from markdown --to html5 --mathjax --toc-depth=2 --css=styles.css --standalone --toc --section-divs"))
+  (setq markdown-command "/usr/local/bin/pandoc --from markdown --to html5 -s --mathjax --toc-depth=2 --css=styles.css --standalone --toc --section-divs"))
 (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
 
 ; python-mode
 (add-hook 'python-mode-hook 'turn-on-auto-fill)
 (add-hook 'python-mode-hook 'python-indent-offset 4)
 
-;;; resc-mode
+; resc-mode
 (load "resc-mode")
 (add-hook 'resc-mode-hook 'turn-on-auto-fill)
 
