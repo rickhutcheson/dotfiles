@@ -1,0 +1,92 @@
+% Work-in-Progress Macros for Notes
+
+%% Count register setup & initialization
+\newcount\sectionno\sectionno=0
+\newcount\subsectionno\subsectionno=0
+\newcount\subsubsectionno\subsubsectionno=0
+\newcount\subsubsubsectionno\subsubsubsectionno=0
+\newcount\topicno\topicno=0
+
+% setup fonts for various document sections
+\font\titlerm=cmr12  scaled \magstep5  \font\titlebf=cmbx12 scaled \magstep5
+\font\titlesl=cmsl12 scaled \magstep5  \font\titleit=cmti12 scaled \magstep5
+\font\titlett=cmtt12 at 34pt
+
+\font\sectionrm=cmr12  at 16pt         \font\sectionbf=cmbx12 at 16pt
+\font\sectionsl=cmsl12 at 16pt         \font\sectionit=cmti12 at 16pt
+\font\sectiontt=cmtt10 at 18pt
+
+\font\subsectionrm=cmr12               \font\subsectionbf=cmbx12
+\font\subsectionsl=cmsl12              \font\subsectionit=cmti12
+\font\subsectiontt=cmtt10 at 13pt
+
+\font\topicrm=cmr10 at 11pt                   \font\topicbf=cmbx10 at 11pt
+\font\topicsl=cmsl10 at 11pt                  \font\topicit=cmti10 at 11pt
+\font\topictt=cmtt10 at 12pt
+
+% Re-define the typewriter font so its size is approximately equal to
+% the size of the rest.
+\font\bodytt=cmtt10 at 11pt
+\def\tt{\fam\ttfam\bodytt}
+
+\def\title#1\par{{
+    \let\rm\titlerm\let\bf\titlebf
+    \let\tt\titlett\let\it\titleit
+    \let\sl\titlesl\rm
+    {\titlestyle{#1}}}\bigskip}
+
+\def\section#1\par{
+    \advance\sectionno by 1
+    \subsectionno=0\topicno=0
+    % Encourages TeX to put on a new page if the subsection would not
+    % have much room to start. (From the TEXBook)
+    \vskip0pt plus 0.3\vsize\penalty-450
+    \vskip0pt plus -0.3\vsize\penalty-450
+    \bigskip\vskip\parskip
+    {\let\rm\sectionrm\let\bf\sectionbf
+    \let\tt\sectiontt\let\it\sectionit
+    \let\sl\sectionsl
+    \rm\sectionstyle{#1}}
+    \nobreak\smallskip\noindent}
+
+\def\subsection#1\par{
+    \advance\subsectionno by 1
+    \vskip0pt plus 0.3\vsize\penalty-250
+    \vskip0pt plus -0.3\vsize\penalty-250
+    \bigskip\vskip\parskip
+    {\let\rm\subsectionrm\let\bf\subsectionbf
+    \let\tt\subsectiontt\let\it\subsectionit
+    \let\sl\subsectionsl
+    \rm\subsectionstyle{#1}}
+    \nobreak\smallskip\noindent}
+
+\def\topic #1. {
+    \advance\topicno by 1
+    \vskip0pt plus 0.05\vsize\penalty-250
+    \vskip0pt plus -0.05\vsize\penalty-250
+    \medskip\vskip\parskip
+    \rm\topicstyle{#1}}
+
+\def\titlestyle#1{\centerline{#1}}
+\def\sectionstyle#1{\leftline{\bf\the\sectionno.\ #1}}
+\def\subsectionstyle#1{\leftline{\bf\the\sectionno.\the\subsectionno.\ #1}}
+\def\topicstyle#1{{\moveleft .5in\vbox{\topicit #1}}\noindent}
+
+% Document Objects
+\def\centertable#1#2{
+    \bigskip
+    \vbox{
+    \centerline{#1} %title
+    \centerline{\vbox{
+    \hrule\smallskip
+    {\tabskip=12pt plus\hsize minus\hsize
+    #2 %halign
+    \smallskip\hrule}
+    \bigskip}}}}
+
+% horizontal rules betwen rows of a table. 2pt spacing used so that
+% rules don't squish text.
+\def\trule{\noalign{\vskip2pt\hrule\vskip2pt}}
+\def\TODO{\hbox{\bf $\star$ TODO $\star$}}
+\def\definition(#1)#2\par{\noindent{\bf DEFINITION}({\it #1}) #2}
+\def\aside #1\par{\it #1 \rm}
