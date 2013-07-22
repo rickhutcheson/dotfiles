@@ -2,8 +2,8 @@
 
 ;; Authors: 2005, 2007 Sergey Poznyakoff,
 ;;;         2013       Rick Hutcheson
-;; Version:  1.1
-;; Keywords: LIT TeX C
+;; Version:  0.1
+;; Keywords: LaTeX TeX Literate
 ;; $Id$
 
 ;; Copyright (C) 2005, 2007 Sergey Poznyakoff,
@@ -24,10 +24,11 @@
 
 ;;; Commentary:
 
-;; This package provides a major mode for editing LIT sources under
-;; GNU Emacs.
+;; This package provides a major mode for editing CWEB and noweb
+;; literate program sources. It is derived from the cweb-mode.el
+;; major mode written by Sergey Ponzyakoff.
 
-;; Since the three major parts of a LIT file (limbo, TeX section and
+;; Since the three major parts of a LIT file (limbo, Doc section and
 ;; C section) differ considerably in their syntax, the mode uses a
 ;; strategy similar to that of po-mode:
 ;;  1. The source file is made read-only,
@@ -73,7 +74,7 @@
   :group 'wp
   :link '(url-link "http://TODO.com/"))
 
-(defcustom lit-base-mode 'tex-mode
+(defcustom lit-base-mode 'doc-mode
   "Basic mode for file navigation, not editing."
   :group 'lit)
 
@@ -81,14 +82,14 @@
   "Mode used for editing program buffers."
   :group 'lit)
 
-(defcustom lit-doc-mode 'tex-mode
+(defcustom lit-doc-mode 'doc-mode
   "Mode used for editing documentation buffers."
   :group 'lit)
 
 (unless lit-mode-map
   (setq lit-mode-map (make-sparse-keymap))
-  (define-key lit-mode-map "\C-c\C-t" 'lit-edit-tex)
-  (define-key lit-mode-map "\C-c\C-c" 'lit-edit-c)
+  (define-key lit-mode-map "\C-c\C-t" 'lit-edit-doc)
+  (define-key lit-mode-map "\C-c\C-c" 'lit-edit-code)
   (define-key lit-mode-map "\C-c\C-m" 'lit-edit-section)
   (define-key lit-mode-map "\C-c\C-n" 'lit-create-section)
   (define-key lit-mode-map "\C-c\C-d" 'lit-remove-section)
@@ -113,7 +114,7 @@
 (defvar lit-subedit-back-pointer)
 
 ;; A list of pending edits. Each entry is of the form:
-;; (BEG END MARKER BUFFER NEW-CONTEXT-TYPE)
+;; (BEG END MARKER BUFFER NEW-CONDOCT-TYPE)
 ;; FIXME: Currently only one entry is allowed
 (defvar lit-pending-edits)
 
@@ -121,9 +122,9 @@
   "Determine current line syntax. Point should stay at the beginning of line."
   (cond
    ((looking-at "[ \t]*@[ *]")
-    'tex-section)
+    'doc-section)
    ((looking-at "[ \t]*@$")
-    'tex-section)
+    'doc-section)
    ((looking-at "[ \t]*@<.*>\+?=")
     'c-section)
    ((looking-at "[ \t]*@c")
@@ -136,8 +137,8 @@
     nil)))
 
 (defun lit-guess-syntax-line ()
-  "Guess current syntax context. Return (cons CONTEXT START), where START is
-the position where the current context started."
+  "Guess current syntax condoct. Return (cons CONDOCT START), where START is
+the position where the current condoct started."
   (save-excursion
     (beginning-of-line)
     (let ((syntax nil))
@@ -148,15 +149,15 @@ the position where the current context started."
       (cons syntax (point)))))
 
 (defun lit-guess-syntax ()
-  "Return syntax context."
+  "Return syntax condoct."
   (car (lit-guess-syntax-line)))
 
 (defun lit-get-syntax-scope (synt)
-  "Get the scope of the current context. SYNT is the return value of
+  "Get the scope of the current condoct. SYNT is the return value of
 (lit-guess-syntax-line).
 
-Return (list CONTEXT START END), where CONTEXT is the context syntax,
-START and END are the context boundaries."
+Return (list CONDOCT START END), where CONDOCT is the condoct syntax,
+START and END are the condoct boundaries."
   (save-excursion
     (cond
      ((null (car synt))
@@ -169,14 +170,14 @@ START and END are the context boundaries."
 	(list nil (cdr synt) end)))
      ((eq (car synt) 'c-section)
       (list (car synt) (cdr synt)
-	    (lit-primitive-find-section 'tex-section 1)))
-     ((eq (car synt) 'tex-section)
+	    (lit-primitive-find-section 'doc-section 1)))
+     ((eq (car synt) 'doc-section)
       (list (car synt) (cdr synt)
 	    (lit-primitive-find-section 'c-section 1))))))
 
 (defun lit-primitive-find-section (type dir &optional end-fun)
-  "Find the nearest context TYPE in direction DIR (1 - forward,
--1 - backward). If the context is found, move point to its
+  "Find the nearest condoct TYPE in direction DIR (1 - forward,
+-1 - backward). If the condoct is found, move point to its
 beginning and return it. Otervise, if END-FUN is given, call it."
   (let ((limit-fun (if (> dir 0) 'eobp 'bobp)))
     (beginning-of-line)
@@ -188,7 +189,7 @@ beginning and return it. Otervise, if END-FUN is given, call it."
     (point)))
 
 (defun lit-find-section (type dir msg)
-  "Move point to the start of the nearest context TYPE in direction DIR. If not found, print MSG."
+  "Move point to the start of the nearest condoct TYPE in direction DIR. If not found, print MSG."
   (let ((here (point)))
     (push-mark nil t)
     (lit-primitive-find-section type dir (function (lambda ()
@@ -241,7 +242,7 @@ and lit-subedit-exit."
 	 (marker (nth 2 back-pointer))
 	 (entry-buffer (marker-buffer marker)))
     (if (null entry-buffer)
-	(error "Corresponding LIT buffer does not exist anymore")
+	(error "Corresponding sub-buffer does not exist anymore")
       (or (one-window-p) (delete-window))
       (switch-to-buffer entry-buffer)
       (goto-char marker)
@@ -254,11 +255,11 @@ and lit-subedit-exit."
   (interactive)
   (lit-primitive-subedit-abort))
 
-(defun get-tex-prologue ()
-  "Get the prologue string for a TeX part."
-  (let ((p (read-from-minibuffer "Tex prologue: "  "@ "))) ; FIXME: use hist
+(defun get-doc-prologue ()
+  "Get the prologue string for a Doc part."
+  (let ((p (read-from-minibuffer "Doc prologue: "  "@ "))) ; FIXME: use hist
     (while (not (string-match "@[ \\*]" p))
-      (setq p (read-from-minibuffer "Please enter Tex prologue: " p)))
+      (setq p (read-from-minibuffer "Please enter Doc prologue: " p)))
     (insert p)))
 
 (defun get-c-prologue ()
@@ -266,7 +267,7 @@ and lit-subedit-exit."
   (let ((p (read-from-minibuffer "C prologue: "  "@c"))) ; FIXME: use hist
     (while (not (or (string-match "@<.*>\+?=\\s *" p)
 		    (string-match "@c\\s *" p)))
-      (setq p (read-from-minibuffer "Please enter C prologue: " p)))
+      (setq p (read-from-minibuffer "Please enter code prologue: " p)))
     (insert p)))
 
 (defun lit-subedit-exit ()
@@ -275,7 +276,7 @@ and lit-subedit-exit."
   (run-hooks 'lit-subedit-exit-hook)
   (let ((string (buffer-string))
 	(back-pointer (lit-primitive-subedit-abort)))
-    (let ((new-context (nth 4 back-pointer))
+    (let ((new-condoct (nth 4 back-pointer))
 	  (buffer-read-only lit-read-only))
 
       ; Prepare for insertion
@@ -284,11 +285,11 @@ and lit-subedit-exit."
       (goto-char (nth 0 back-pointer))
 
       (cond
-       ((eq new-context 'tex-section)
-	(get-tex-prologue)
+       ((eq new-condoct 'doc-section)
+	(get-doc-prologue)
 	(insert string "\n")
 	(lit-edit-scope (list 'c-section (point) (point)) 'c-section))
-       ((eq new-context 'c-section)
+       ((eq new-condoct 'c-section)
 	(get-c-prologue)
 	(newline)
 	(insert string "\n"))
@@ -302,7 +303,7 @@ following structure:
 
    (list SYNTAX BEG END)
 
-where SYNTAX describes the syntax (nil for limbo, 'tex-section or c-section),
+where SYNTAX describes the syntax (nil for limbo, 'doc-section or c-section),
 BEG and END delimit the region to be edited.
 
 If optional NEW is non-nil, the section being edited is new.
@@ -331,7 +332,7 @@ If optional NEW is non-nil, the section being edited is new.
 		    lit-base-mode)
 		   ((eq (car syntax-scope) 'c-section)
 		    lit-code-mode)
-		   ((eq (car syntax-scope) 'tex-section)
+		   ((eq (car syntax-scope) 'doc-section)
 		    lit-doc-mode)))
 	    (edit-buffer (generate-new-buffer
 			  (concat "*" (buffer-name) "*")))
@@ -362,8 +363,8 @@ If optional NEW is non-nil, the section being edited is new.
   (let ((syntax-scope (lit-get-syntax-scope (lit-guess-syntax-line))))
     (lit-edit-scope syntax-scope)))
 
-(defun lit-edit-tex ()
-  "Edit TeX part of the current LIT file section."
+(defun lit-edit-doc ()
+  "Edit Doc part of the current LIT file section."
   (interactive)
   (save-excursion
     (let (fail)
@@ -371,14 +372,14 @@ If optional NEW is non-nil, the section being edited is new.
 	    (syntax (lit-guess-syntax)))
 	(cond
 	 ((null syntax)
-	  (lit-primitive-find-section 'tex-section 1 end-fun))
-	 ((not (eq syntax 'tex-section))
-	  (lit-primitive-find-section 'tex-section -1 end-fun)))
+	  (lit-primitive-find-section 'doc-section 1 end-fun))
+	 ((not (eq syntax 'doc-section))
+	  (lit-primitive-find-section 'doc-section -1 end-fun)))
 	(if fail
-	    (message "Cannot find nearest TeX section")
+	    (message "Cannot find nearest Doc section")
 	  (lit-edit-section))))))
 
-(defun lit-edit-c ()
+(defun lit-edit-code ()
   "Edit C part of the current LIT file section."
   (interactive)
   (save-excursion
@@ -399,7 +400,7 @@ If optional NEW is non-nil, the section being edited is new.
     (interactive)
     (let ((syntax-scope (lit-get-syntax-scope (lit-guess-syntax-line))))
       (let ((start (point)))
-	(lit-edit-scope (list 'tex-section start start) 'tex-section))))
+	(lit-edit-scope (list 'doc-section start start) 'doc-section))))
 
 (defun lit-remove-section ()
   "Remove section surrounding the point."
@@ -413,7 +414,7 @@ If optional NEW is non-nil, the section being edited is new.
 			   (nth 2 syntax-scope))
 	    (goto-char (nth 1 syntax-scope)))
 	   ((eq (car syntax-scope) 'c-section)
-	    ; Remove the preceeding TeX part
+	    ; Remove the preceeding Doc part
 	    (when (eq (lit-line-syntax)  'c-section)
 	      (forward-line -1))
 	    (while (and (not (bobp)) (null (lit-line-syntax)))
@@ -422,16 +423,16 @@ If optional NEW is non-nil, the section being edited is new.
 	    (delete-region (nth 1 syntax-scope)
 			   (nth 2 syntax-scope))
 	    ; Remove the preceeding part
-	    (if (eq (lit-line-syntax) 'tex-section)
+	    (if (eq (lit-line-syntax) 'doc-section)
 		(let ((sc (lit-get-syntax-scope (lit-guess-syntax-line))))
-		  (when (eq (car sc) 'tex-section)
+		  (when (eq (car sc) 'doc-section)
 		    (delete-region (nth 1 sc)
 				   (nth 2 sc))
 		    (goto-char (nth 1 sc))))
 	      (goto-char (nth 1 syntax-scope))))
-	   ((eq (car syntax-scope) 'tex-section)
+	   ((eq (car syntax-scope) 'doc-section)
 	    ; Remove eventual following C part
-	    (when (eq (lit-line-syntax)  'tex-section)
+	    (when (eq (lit-line-syntax)  'doc-section)
 	      (forward-line 1))
 	    (while (and (not (eobp)) (null (lit-line-syntax)))
 	      (forward-line 1))
@@ -501,7 +502,7 @@ If optional NEW is non-nil, the section being edited is new.
     (message "")))
 
 ;;;###autoload
-(define-derived-mode lit-mode text-mode "LITERATE"
+(define-derived-mode lit-mode doct-mode "LITERATE"
   "Major mode for editing lit sources."
   (interactive)
   (kill-all-local-variables)
