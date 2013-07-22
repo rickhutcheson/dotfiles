@@ -313,8 +313,9 @@
 \outer\def\N#1#2#3.{% beginning of starred section
   \ifacro{\toksF={}\makeoutlinetoks#3\outlinedone\outlinedone}\fi
   \gdepth=#1\gtitle={#3}\MN{#2}%
-  \ifon\ifnum#1<\secpagedepth \vfil\eject % force page break if depth is small
-    \else\vfil\penalty-100\vfilneg\vskip\intersecskip\fi\fi
+%  \ifon\ifnum#1<\secpagedepth \vfil\eject % force page break if depth is small
+%    \else\vfil\penalty-100\vfilneg\vskip\intersecskip\fi\fi
+  \vfil\penalty-100\vfilneg\vskip\intersecskip
   \message{*\secno} % progress report
   \def\stripprefix##1>{}\def\gtitletoks{#3}%
   \edef\gtitletoks{\expandafter\stripprefix\meaning\gtitletoks}%
