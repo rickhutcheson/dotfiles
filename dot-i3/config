@@ -6,10 +6,37 @@
 # Mod4 - CMD (Macs)
 set $mod Mod1
 
-# Font for window titles. Will also be used by the bar unless a different font
+## Fonts for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below. ISO 10646 = Unicode
-#font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-font pango:Inconsolata 13
+#
+# Examples:
+# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# font pango:Inconsolata 15px
+
+# colors
+# class                         border  backgr. text
+client.focused			#202020 #315858 #dedeff
+client.unfocused                #202020 #202020 #315858
+client.focused_inactive         #202020 #202020 #666666
+client.urgent                   #212121 #303030 #ee0000
+client.background               #101010f
+font -*-terminus-medium-*-normal-*-18-*-*-*-*-*-*-*
+
+
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+bar {
+    position top
+    status_command i3status -c ~/.i3/i3status.conf
+    colors {
+        background	   #404040
+        statusline	   #dedeff
+        focused_workspace  #dddddd #303030
+	active_workspace   #999999 #202020
+	inactive_workspace #528b8b #202020
+	urgent_workspace   #da6f00 #404040
+    }
+}
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -18,11 +45,12 @@ floating_modifier $mod
 #######################
 bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+space  exec dmenu_run
-# #new dmenu, wrapper around old dmenu
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
-### Operations
-##############
+# new dmenu, wrapper around old dmenu (USE after i3-4.3 released)
+# bindsym $mod+space exec --no-startup-id i3-dmenu-desktop
+
+# Operations
+#############
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -137,9 +165,3 @@ mode "resize" {
 }
 
 bindsym $mod+r mode "resize"
-
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
-bar {
-        status_command i3status
-}
