@@ -11,16 +11,24 @@
 
 ;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fonts
-(add-to-list 'default-frame-alist '(font . "Inconsolata-11"))
+(add-to-list 'default-frame-alist '(font . "Terminus-14"))
 
 ;;; Display Column and Line Numbers
 (setq column-number-mode t)
 (setq line-number-mode t)
 
 ;;; Whitespace Display
-(global-whitespace-mode t)          ; enable whitespace-mode
+(global-whitespace-mode t) ; enable whitespace-mode
 (setq whitespace-style
       (quote (face trailing space-before-tab empty space-after-tab lines)))
+
+;;; Theme (Emacs >24)
+(add-to-list 'custom-theme-load-path '"~/.emacs.d/themes")
+(setq custom-safe-themes t) ; trust all themes
+(add-to-list 'custom-enabled-themes 'qsimpleq)
+(add-to-list 'custom-enabled-themes 'tango)
+(add-to-list 'custom-enabled-themes 'tango-2)
+(load-theme 'tango-dark)
 
 ;;;; Global Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (tool-bar-mode 0)                   ; remove tool bar
@@ -36,7 +44,7 @@
 
 ;;;; Per-Environment Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (eq system-type 'darwin)      ; mac-specific
-  (setq mac-option-modifier 'super)   ; Set 'Option' key to ALT
+  (setq mac-option-modifier 'super) ; Set 'Option' key to ALT
   (setq mac-command-modifier 'meta) ; Set 'CMD' key to 'M'
   (setq mac-allow-anti-aliasing nil)
   (add-to-list 'default-frame-alist '(font . "Terminus-14")))
@@ -55,18 +63,23 @@
 (require 'lit-mode)
 (setq auto-mode-alist (cons '("\\.w" . lit-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.nw" . lit-mode) auto-mode-alist))
-(add-hook 'lit-mode-hook '(lambda() (setq lit-code-mode 'python-mode)))
+(add-hook 'lit-mode-hook '(lambda() (setq lit-code-mode 'c-mode)))
 
 ; markdown-mode / pandoc-mode
 (load "markdown-mode")
 (load "pandoc-mode")
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-(setq markdown-enable-math t)
-(add-hook 'markdown-mode-hook 'turn-on-pandoc)
-(add-hook 'markdown-mode-hook 'auto-fill-mode)
+
+;(add-hook 'markdown-mode-hook 'turn-on-pandoc)
+;(add-hook 'markdown-mode-hook 'auto-fill-mode)
 (defun markdown-custom ()
   "markdown-mode-hook"
-  (setq markdown-command "/usr/local/bin/pandoc --from markdown --to html5 -s --mathjax --toc-depth=2 --css=styles.css --standalone --toc --section-divs"))
+  (interactive)
+  (turn-on-pandoc)
+  (auto-fill-mode)
+  (setq markdown-enable-math t)
+  (setq markdown-command "/usr/local/bin/pandoc
+  --from markdown --to html5 -s --mathjax --section-divs"))
 (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
 
 ; python-mode
@@ -80,10 +93,3 @@
 ; tex-mode
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . plain-tex-mode))
 (add-hook `plain-tex-mode-hook `turn-on-auto-fill)
-
-(add-to-list 'custom-theme-load-path '"~/.emacs.d/themes")
-(setq custom-safe-themes t) ; trust all themes
-(add-to-list 'custom-enabled-themes 'qsimpleq)
-(add-to-list 'custom-enabled-themes 'tango)
-(add-to-list 'custom-enabled-themes 'tango-2)
-(load-theme 'qsimpleq)
