@@ -114,7 +114,7 @@
 (defvar lit-subedit-back-pointer)
 
 ;; A list of pending edits. Each entry is of the form:
-;; (BEG END MARKER BUFFER NEW-CONDOCT-TYPE)
+;; (BEG END MARKER BUFFER NEW-CONTEXT-TYPE)
 ;; FIXME: Currently only one entry is allowed
 (defvar lit-pending-edits)
 
@@ -125,7 +125,7 @@
     'doc-section)
    ((looking-at "[ \t]*@$")
     'doc-section)
-   ((looking-at "[ \t]*@<.*>\+?=")
+   ((looking-at "[ \t]*@<.*@>[+]?=")
     'c-section)
    ((looking-at "[ \t]*@c")
     'c-section)
@@ -137,8 +137,8 @@
     nil)))
 
 (defun lit-guess-syntax-line ()
-  "Guess current syntax condoct. Return (cons CONDOCT START), where START is
-the position where the current condoct started."
+  "Guess current syntax context. Return (cons CONTEXT START), where START is
+the position where the current context started."
   (save-excursion
     (beginning-of-line)
     (let ((syntax nil))
@@ -149,15 +149,15 @@ the position where the current condoct started."
       (cons syntax (point)))))
 
 (defun lit-guess-syntax ()
-  "Return syntax condoct."
+  "Return syntax context."
   (car (lit-guess-syntax-line)))
 
 (defun lit-get-syntax-scope (synt)
-  "Get the scope of the current condoct. SYNT is the return value of
+  "Get the scope of the current context. SYNT is the return value of
 (lit-guess-syntax-line).
 
-Return (list CONDOCT START END), where CONDOCT is the condoct syntax,
-START and END are the condoct boundaries."
+Return (list CONTEXT START END), where CONTEXT is the context syntax,
+START and END are the context boundaries."
   (save-excursion
     (cond
      ((null (car synt))
@@ -176,8 +176,8 @@ START and END are the condoct boundaries."
 	    (lit-primitive-find-section 'c-section 1))))))
 
 (defun lit-primitive-find-section (type dir &optional end-fun)
-  "Find the nearest condoct TYPE in direction DIR (1 - forward,
--1 - backward). If the condoct is found, move point to its
+  "Find the nearest context TYPE in direction DIR (1 - forward,
+-1 - backward). If the context is found, move point to its
 beginning and return it. Otervise, if END-FUN is given, call it."
   (let ((limit-fun (if (> dir 0) 'eobp 'bobp)))
     (beginning-of-line)
@@ -189,7 +189,7 @@ beginning and return it. Otervise, if END-FUN is given, call it."
     (point)))
 
 (defun lit-find-section (type dir msg)
-  "Move point to the start of the nearest condoct TYPE in direction DIR. If not found, print MSG."
+  "Move point to the start of the nearest context TYPE in direction DIR. If not found, print MSG."
   (let ((here (point)))
     (push-mark nil t)
     (lit-primitive-find-section type dir (function (lambda ()
@@ -276,7 +276,7 @@ and lit-subedit-exit."
   (run-hooks 'lit-subedit-exit-hook)
   (let ((string (buffer-string))
 	(back-pointer (lit-primitive-subedit-abort)))
-    (let ((new-condoct (nth 4 back-pointer))
+    (let ((new-context (nth 4 back-pointer))
 	  (buffer-read-only lit-read-only))
 
       ; Prepare for insertion
@@ -285,11 +285,11 @@ and lit-subedit-exit."
       (goto-char (nth 0 back-pointer))
 
       (cond
-       ((eq new-condoct 'doc-section)
+       ((eq new-context 'doc-section)
 	(get-doc-prologue)
 	(insert string "\n")
 	(lit-edit-scope (list 'c-section (point) (point)) 'c-section))
-       ((eq new-condoct 'c-section)
+       ((eq new-context 'c-section)
 	(get-c-prologue)
 	(newline)
 	(insert string "\n"))
@@ -502,7 +502,7 @@ If optional NEW is non-nil, the section being edited is new.
     (message "")))
 
 ;;;###autoload
-(define-derived-mode lit-mode doct-mode "LITERATE"
+(define-derived-mode lit-mode text-mode "LITERATE"
   "Major mode for editing lit sources."
   (interactive)
   (kill-all-local-variables)
