@@ -1,5 +1,4 @@
 ;;; qsimpleq-theme.el --- Based on solarized color theme for Emacs.
-
 ;; Copyright (C) 2011,2012 Bozhidar Batsov, Kirill Babikhin
 
 ;; Author: Kirill Babikhin <mrakobes86@gmail.com>
@@ -27,7 +26,7 @@
 ;;
 ;;; Installation:
 ;;
-;;   Drop the theme in a folder that is on `custom-theme-load-path'
+;; Drop the theme in a folder that is on `custom-theme-load-path'
 ;; and enjoy!
 ;;
 ;; Don't forget that the theme requires Emacs 24.
@@ -206,7 +205,7 @@
    ;; font lock
    `(font-lock-builtin-face ((,class (:foreground ,violet :slant italic))))
    `(font-lock-comment-delimiter-face ((,class (:foreground ,qsimpleq-comments))))
-   `(font-lock-comment-face ((,class (:foreground ,qsimpleq-comments))))
+   `(font-lock-comment-face ((,class (:foreground ,qsimpleq-comments :slant italic))))
    `(font-lock-constant-face ((,class (:foreground ,magenta :weight bold))))
    `(font-lock-doc-face ((,class (:foreground ,cyan :slant italic))))
    `(font-lock-doc-string-face ((,class (:foreground ,blue))))

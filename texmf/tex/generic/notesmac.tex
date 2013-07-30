@@ -88,5 +88,10 @@
 % rules don't squish text.
 \def\trule{\noalign{\vskip2pt\hrule\vskip2pt}}
 \def\TODO{\hbox{\bf $\star$ TODO $\star$}}
-\def\definition(#1)#2\par{\noindent{\bf DEFINITION}({\it #1}) #2}
-\def\aside #1\par{\it #1 \rm}
+\font\eightss=cmss10 at 8pt
+\font\eightssb=cmssbx10 at 8pt
+\font\eightssi=cmssi10 at 8pt
+\def\aside#1\par{
+        {\medskip
+        \hrule\smallskip\noindent\let\bf\eightssb\let\it\eightssi
+        \eightss#1\smallskip\hrule\medskip}}
