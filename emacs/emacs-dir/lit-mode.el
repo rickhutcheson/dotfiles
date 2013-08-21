@@ -62,7 +62,7 @@
   :lighter " literate keys"
   :init-value nil
   :keymap  '(("\C-c\C-c" . lit-subedit-exit)
-	     ("\C-c\C-k" . lit-subedit-abort)))
+             ("\C-c\C-k" . lit-subedit-abort)))
 
 (defvar lit-mode-map ()
   "Keymap used in lit-mode buffers.")
@@ -95,12 +95,12 @@
   (define-key lit-mode-map "\C-c\C-d" 'lit-remove-section)
   (define-key lit-mode-map "\C-c\C-e" 'lit-toggle-editable)
 ; (define-key lit-mode-map "\C-n\C-l" 'lit-create-limbo)
-; Navigational Shortcuts
+;; Navigational Shortcuts
   (define-key lit-mode-map "n" 'lit-next-entry)
   (define-key lit-mode-map "p" 'lit-previous-entry)
   (define-key lit-mode-map "N" 'lit-next-major-entry)
   (define-key lit-mode-map "P" 'lit-previous-major-entry)
-  (define-key lit-mode-map "q" 'lit-confirm-and-quit)
+;  (define-key lit-mode-map "q" 'lit-confirm-and-quit)
   (define-key lit-mode-map "Q" 'lit-quit)
   (define-key lit-mode-map "u" 'lit-undo))
   ;FIXME: menu entries
@@ -131,6 +131,9 @@
     'c-section)
    ((looking-at "[ \t]*@p")
     'c-section)
+   ((looking-at "[ \t]*@(.*@>[+]?=")
+    'c-section)
+; noweb extension
    ((looking-at "[ \t]*<<.*>>=")
     'c-section)
    (t
@@ -145,7 +148,7 @@ the position where the current context started."
       (while (and (null (setq syntax (lit-line-syntax))) (not (bobp)))
 	(forward-line -1))
       (if (and (eq syntax 'c-syntax) (not (bobp)))
-	  (forward-line 1))
+          (forward-line 1))
       (cons syntax (point)))))
 
 (defun lit-guess-syntax ()
@@ -163,17 +166,17 @@ START and END are the context boundaries."
      ((null (car synt))
       ;; Limbo. Find the start of the first section, whatever it is.
       (let ((end (save-excursion
-		   (goto-char (point-min))
-		   (while (and (null (lit-line-syntax)) (not (eobp)))
-		     (forward-line 1))
-		   (point))))
+                   (goto-char (point-min))
+                   (while (and (null (lit-line-syntax)) (not (eobp)))
+                     (forward-line 1))
+                   (point))))
 	(list nil (cdr synt) end)))
      ((eq (car synt) 'c-section)
       (list (car synt) (cdr synt)
-	    (lit-primitive-find-section 'doc-section 1)))
+            (lit-primitive-find-section 'doc-section 1)))
      ((eq (car synt) 'doc-section)
       (list (car synt) (cdr synt)
-	    (lit-primitive-find-section 'c-section 1))))))
+            (lit-primitive-find-section 'c-section 1))))))
 
 (defun lit-primitive-find-section (type dir &optional end-fun)
   "Find the nearest context TYPE in direction DIR (1 - forward,
@@ -193,9 +196,9 @@ beginning and return it. Otervise, if END-FUN is given, call it."
   (let ((here (point)))
     (push-mark nil t)
     (lit-primitive-find-section type dir (function (lambda ()
-						      (pop-mark)
-						      (goto-char here)
-						      (message msg))))))
+                                                      (pop-mark)
+                                                      (goto-char here)
+                                                      (message msg))))))
 
 (defun lit-clean-out-killed-edits nil
   "Clean out any edit from lit-pending-edits whose edit buffer has been killed."
@@ -204,7 +207,7 @@ beginning and return it. Otervise, if END-FUN is given, call it."
       (let ((slot (car cursor)))
 	(setq cursor (cdr cursor))
 	(unless (buffer-name (nth 3 slot))
-	  (setq lit-pending-edits (delete slot lit-pending-edits)))))))
+          (setq lit-pending-edits (delete slot lit-pending-edits)))))))
 
 (defun lit-check-for-pending-edit (position)
   "Resume any pending edit at POSITION.  Return nil if such edit exists."
@@ -238,9 +241,9 @@ beginning and return it. Otervise, if END-FUN is given, call it."
   "Exit the subedit buffer and discard its contents. Used by lit-subedit-abort
 and lit-subedit-exit."
   (let* ((edit-buffer (current-buffer))
-	 (back-pointer lit-subedit-back-pointer)
-	 (marker (nth 2 back-pointer))
-	 (entry-buffer (marker-buffer marker)))
+         (back-pointer lit-subedit-back-pointer)
+         (marker (nth 2 back-pointer))
+         (entry-buffer (marker-buffer marker)))
     (if (null entry-buffer)
 	(error "Corresponding sub-buffer does not exist anymore")
       (or (one-window-p) (delete-window))
@@ -265,8 +268,11 @@ and lit-subedit-exit."
 (defun get-c-prologue ()
   "Get the prologue string for a C part."
   (let ((p (read-from-minibuffer "C prologue: "  "@c"))) ; FIXME: use hist
-    (while (not (or (string-match "@<.*>\+?=\\s *" p)
-		    (string-match "@c\\s *" p)))
+    (while (not (or (string-match "@<.*@>[+]?=\\s *" p)
+                    (string-match "@c\\s *" p)
+                    (string-match "@p\\s *" p)
+                    (string-match "@(.*@>[+]?=\\s *" p)
+                    (string-match "<<.*>>=\\s *" p))); noweb extension
       (setq p (read-from-minibuffer "Please enter code prologue: " p)))
     (insert p)))
 
@@ -277,11 +283,11 @@ and lit-subedit-exit."
   (let ((string (buffer-string))
 	(back-pointer (lit-primitive-subedit-abort)))
     (let ((new-context (nth 4 back-pointer))
-	  (buffer-read-only lit-read-only))
+          (buffer-read-only lit-read-only))
 
       ; Prepare for insertion
       (delete-region (nth 0 back-pointer)
-		     (nth 1 back-pointer))
+                     (nth 1 back-pointer))
       (goto-char (nth 0 back-pointer))
 
       (cond
@@ -310,41 +316,42 @@ If optional NEW is non-nil, the section being edited is new.
 "
   (if (lit-check-for-pending-edit (nth 1 syntax-scope))
       (let* ((beg (let ((start (nth 1 syntax-scope)))
-		    (if (and (not new) (eq (car syntax-scope) 'c-section))
+                    (if (and (not new) (eq (car syntax-scope) 'c-section))
 			(save-excursion
-			  (goto-char start)
-			  (let ((bound (save-excursion
-					 (forward-line 1)
-					 (point))))
-			    (or
-			     (re-search-forward "[ \t]*@<.*>\+?=[ \t]*"
-						bound t)
-			     (re-search-forward "[ \t]*@c[ \t]*" bound t)
-			     start)))
-		      start)))
-	     (pos (+ (- (point) beg) 1))
-	     (marker (make-marker))
-	     (string (buffer-substring
-		      beg
-		      (nth 2 syntax-scope)))
-	    (mode (cond
-		   ((null (car syntax-scope))
-		    lit-base-mode)
-		   ((eq (car syntax-scope) 'c-section)
-		    lit-code-mode)
-		   ((eq (car syntax-scope) 'doc-section)
-		    lit-doc-mode)))
-	    (edit-buffer (generate-new-buffer
-			  (concat "*" (buffer-name) "*")))
-	    (edit-coding buffer-file-coding-system)
-	    (buffer (current-buffer))
-	    slot)
+                          (goto-char start)
+                          (let ((bound (save-excursion
+                                         (forward-line 1)
+                                         (point))))
+                            (or
+                             (re-search-forward "[ \t]*@<.*>\+?=[ \t]*"	bound t)
+                             (re-search-forward "[ \t]*@c[ \t]*" bound t)
+                             (re-search-forward "[ \t]*@p\\s *"  bound t)
+                             (re-search-forward "[ \t]*<<.*>>=\\s *"  bound t)
+                             start)))
+                      start)))
+             (pos (+ (- (point) beg) 1))
+             (marker (make-marker))
+             (string (buffer-substring
+                      beg
+                      (nth 2 syntax-scope)))
+            (mode (cond
+                   ((null (car syntax-scope))
+                    lit-base-mode)
+                   ((eq (car syntax-scope) 'c-section)
+                    lit-code-mode)
+                   ((eq (car syntax-scope) 'doc-section)
+                    lit-doc-mode)))
+            (edit-buffer (generate-new-buffer
+                          (concat "*" (buffer-name) "*")))
+            (edit-coding buffer-file-coding-system)
+            (buffer (current-buffer))
+            slot)
 
 	(set-marker marker (point))
 	(setq slot
-	      (append (list beg)
-		      (cddr syntax-scope)
-		      (list marker edit-buffer new)))
+              (append (list beg)
+                      (cddr syntax-scope)
+                      (list marker edit-buffer new)))
 	(setq lit-pending-edits (cons slot lit-pending-edits))
 	(pop-to-buffer edit-buffer)
 	(erase-buffer)
@@ -369,15 +376,15 @@ If optional NEW is non-nil, the section being edited is new.
   (save-excursion
     (let (fail)
       (let ((end-fun (function (lambda () (setq fail t))))
-	    (syntax (lit-guess-syntax)))
+            (syntax (lit-guess-syntax)))
 	(cond
-	 ((null syntax)
-	  (lit-primitive-find-section 'doc-section 1 end-fun))
-	 ((not (eq syntax 'doc-section))
-	  (lit-primitive-find-section 'doc-section -1 end-fun)))
+         ((null syntax)
+          (lit-primitive-find-section 'doc-section 1 end-fun))
+         ((not (eq syntax 'doc-section))
+          (lit-primitive-find-section 'doc-section -1 end-fun)))
 	(if fail
-	    (message "Cannot find nearest Doc section")
-	  (lit-edit-section))))))
+            (message "Cannot find nearest Doc section")
+          (lit-edit-section))))))
 
 (defun lit-edit-code ()
   "Edit C part of the current LIT file section."
@@ -385,15 +392,15 @@ If optional NEW is non-nil, the section being edited is new.
   (save-excursion
     (let (fail)
       (let ((end-fun (function (lambda () (setq fail t))))
-	    (syntax (lit-guess-syntax)))
+            (syntax (lit-guess-syntax)))
 	(cond
-	 ((null syntax)
-	  (lit-primitive-find-section 'c-section 1 end-fun))
-	 ((not (eq syntax 'c-section))
-	  (lit-primitive-find-section 'c-section 1 end-fun)))
+         ((null syntax)
+          (lit-primitive-find-section 'c-section 1 end-fun))
+         ((not (eq syntax 'c-section))
+          (lit-primitive-find-section 'c-section 1 end-fun)))
 	(if fail
-	    (message "Cannot find nearest C section")
-	  (lit-edit-section))))))
+            (message "Cannot find nearest C section")
+          (lit-edit-section))))))
 
 (defun lit-create-section ()
     "Create a new section."
@@ -408,42 +415,42 @@ If optional NEW is non-nil, the section being edited is new.
   (if (y-or-n-p "Remove current section? ")
       (let ((buffer-read-only lit-read-only))
 	(let ((syntax-scope (lit-get-syntax-scope (lit-guess-syntax-line))))
-	  (cond
-	   ((null (car syntax-scope))
-	    (delete-region (nth 1 syntax-scope)
-			   (nth 2 syntax-scope))
-	    (goto-char (nth 1 syntax-scope)))
-	   ((eq (car syntax-scope) 'c-section)
-	    ; Remove the preceeding Doc part
-	    (when (eq (lit-line-syntax)  'c-section)
-	      (forward-line -1))
-	    (while (and (not (bobp)) (null (lit-line-syntax)))
-	      (forward-line -1))
-	    ; Delete the part in question
-	    (delete-region (nth 1 syntax-scope)
-			   (nth 2 syntax-scope))
-	    ; Remove the preceeding part
-	    (if (eq (lit-line-syntax) 'doc-section)
+          (cond
+           ((null (car syntax-scope))
+            (delete-region (nth 1 syntax-scope)
+                           (nth 2 syntax-scope))
+            (goto-char (nth 1 syntax-scope)))
+           ((eq (car syntax-scope) 'c-section)
+            ; Remove the preceeding Doc part
+            (when (eq (lit-line-syntax)  'c-section)
+              (forward-line -1))
+            (while (and (not (bobp)) (null (lit-line-syntax)))
+              (forward-line -1))
+            ; Delete the part in question
+            (delete-region (nth 1 syntax-scope)
+                           (nth 2 syntax-scope))
+            ; Remove the preceeding part
+            (if (eq (lit-line-syntax) 'doc-section)
 		(let ((sc (lit-get-syntax-scope (lit-guess-syntax-line))))
-		  (when (eq (car sc) 'doc-section)
-		    (delete-region (nth 1 sc)
-				   (nth 2 sc))
-		    (goto-char (nth 1 sc))))
-	      (goto-char (nth 1 syntax-scope))))
-	   ((eq (car syntax-scope) 'doc-section)
-	    ; Remove eventual following C part
-	    (when (eq (lit-line-syntax)  'doc-section)
-	      (forward-line 1))
-	    (while (and (not (eobp)) (null (lit-line-syntax)))
-	      (forward-line 1))
-	    (when (eq (lit-line-syntax) 'c-section)
-	      (let ((sc (lit-get-syntax-scope (lit-guess-syntax-line))))
+                  (when (eq (car sc) 'doc-section)
+                    (delete-region (nth 1 sc)
+                                   (nth 2 sc))
+                    (goto-char (nth 1 sc))))
+              (goto-char (nth 1 syntax-scope))))
+           ((eq (car syntax-scope) 'doc-section)
+            ; Remove eventual following C part
+            (when (eq (lit-line-syntax)  'doc-section)
+              (forward-line 1))
+            (while (and (not (eobp)) (null (lit-line-syntax)))
+              (forward-line 1))
+            (when (eq (lit-line-syntax) 'c-section)
+              (let ((sc (lit-get-syntax-scope (lit-guess-syntax-line))))
 		(delete-region (nth 1 sc)
-			       (nth 2 sc))))
-	    ; Remove the part in question
-	    (delete-region (nth 1 syntax-scope)
-			   (nth 2 syntax-scope))
-	    (goto-char (nth 1 syntax-scope))))))))
+                               (nth 2 sc))))
+            ; Remove the part in question
+            (delete-region (nth 1 syntax-scope)
+                           (nth 2 syntax-scope))
+            (goto-char (nth 1 syntax-scope))))))))
 
 (defun lit-undo ()
   "Undo the last change to the LIT file."
@@ -497,7 +504,7 @@ If optional NEW is non-nil, the section being edited is new.
   "Confirm if quit should be attempted and then, do it."
   (when (lit-check-all-pending-edits)
     (if (and (buffer-modified-p)
-	     (y-or-n-p "Really quit editing this file? "))
+             (y-or-n-p "Really quit editing this file? "))
 	(lit-quit))
     (message "")))
 
@@ -509,8 +516,8 @@ If optional NEW is non-nil, the section being edited is new.
   (setq major-mode 'lit-mode mode-name "LITERATE")
   (set (make-local-variable 'lit-read-only) buffer-read-only)
   (set (make-local-variable 'lit-code-mode) 'c-mode)
-  (set (make-local-variable 'lit-base-mode) 'tex-mode)
   (set (make-local-variable 'lit-doc-mode) 'tex-mode)
+  (set (make-local-variable 'lit-base-mode) 'lit-doc-mode)
   (setq buffer-read-only t)
   (set (make-local-variable 'lit-pending-edits) nil)
   (use-local-map lit-mode-map)
