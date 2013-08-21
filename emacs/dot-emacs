@@ -3,15 +3,17 @@
 ;; Created: January 2012
 
 ;;;; Environment Variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setenv "PATH" (concat ".:/usr/bin:/usr/local/bin:/usr/texbin:/opt/local/bin" (getenv "PATH")))
+(setenv "PATH" (concat ".:/usr/bin:/usr/local/bin:" (getenv "PATH")))
+(setenv "PATH" (concat ".:/usr/local/noweb:" (getenv "PATH")))
 (setq exec-path (append exec-path '("/usr/bin"
-				    "/usr/texbin"
-				    "/opt/local/bin"
-				    "/usr/local/bin")))
+                                    "/usr/texbin"
+                                    "/opt/local/bin"
+                                    "/usr/local/bin")))
 
 ;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Fonts
-(add-to-list 'default-frame-alist '(font . "Latin Modern Mono-11"))
+;(add-to-list 'default-frame-alist '(font . "Latin Modern Mono-10"))
+(add-to-list 'default-frame-alist '(font . "Inconsolata-10"))
 
 ;;; Display Column and Line Numbers
 (setq column-number-mode t)
@@ -25,23 +27,23 @@
 ;;; Theme (Emacs >24)
 (add-to-list 'custom-theme-load-path '"~/.emacs.d/themes")
 (setq custom-safe-themes t) ; trust all themes
-(add-to-list 'custom-enabled-themes 'qsimpleq)
-(add-to-list 'custom-enabled-themes 'tango)
-(add-to-list 'custom-enabled-themes 'tango-2)
-; current startup theme
-(load-theme 'qsimpleq)
+(add-to-list 'custom-enabled-themes 'assemblage) ; good dark theme
 
 ;;;; Global Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (tool-bar-mode 0)                   ; remove tool bar
 (scroll-bar-mode 0)                 ; remove scroll bar
-(menu-bar-mode 0)                   ; remove menu
+;(menu-bar-mode 0)                   ; remove menu
 (setq inhibit-startup-screen t)     ; remove EMACS splash
 (setq visible-bell t)               ; no bell on scroll-end
 (setq backup-directory-alist
       `(("." . "~/.backups")))      ; global backup location
 (setq x-super-keysym 'meta)         ; map CMD to META
-(setq tab-width 2);
-(setq tab-width 2);
+(global-set-key "\C-x\C-m" 'execute-extended-command) ; Use C-x C-m for M-x
+(global-set-key "\C-w" 'backward-kill-word)
+(global-set-key "\C-x\C-k" 'kill-region)
+(setq-default indent-tabs-mode nil)
+; set tab stops for when indent-relative fails
+(setq tab-stop-list (number-sequence 4 120 4))
 
 ;;;; Per-Environment Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (eq system-type 'darwin)      ; mac-specific
@@ -54,7 +56,7 @@
 ;;; Add Extra Repositories for easy installs
 (require 'package)
 (add-to-list 'package-archives
-	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
 (package-initialize)
 
 ; Setup custom directories
@@ -64,6 +66,7 @@
 (require 'lit-mode)
 (setq auto-mode-alist (cons '("\\.w" . lit-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.nw" . lit-mode) auto-mode-alist))
+(add-hook 'lit-mode-hook '(lambda() (setq lit-base-mode 'tex-mode)))
 (add-hook 'lit-mode-hook '(lambda() (setq lit-code-mode 'c-mode)))
 (add-hook 'lit-mode-hook '(lambda() (setq lit-doc-mode 'tex-mode)))
 
@@ -81,13 +84,33 @@
   (auto-fill-mode)
   (setq markdown-enable-math t)
   (setq markdown-command "/usr/local/bin/pandoc
-  --from markdown --to html5 -s --mathjax --section-divs"))
+  --from markdown --to html5 -s --mathjax"))
 (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
 
 ; python-mode
-(add-hook 'python-mode-hook 'turn-on-auto-fill)
-(setq python-indent-offset 4)
+;(setq python-indent-offset 4) ; it wasn't very effective!
+(setq py-install-directory "~/.emacs.d")
+(setq py-shell-name "python3")
+ ; block code-folding
+(add-hook 'python-mode-hook 'hs-minor-mode)
+(add-hook 'python-mode-hook 'set-hs-keys)
 
+; use flymake-mode to auto-run pylint
+; from: http://www.emacswiki.org/emacs/PythonProgrammingInEmacs
+(when (load "flymake" t) ; only load when flymake loaded
+  (defun flymake-pylint-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list "epylint" (list local-file))))
+  (add-to-list 'flymake-allowed-file-name-masks
+             '("\\.py\\'" flymake-pylint-init)))
+
+(defun set-hs-keys ()
+  (local-set-key (kbd "C-c C-h") 'hs-hide-block)
+  (local-set-key (kbd "C-c C-s") 'hs-show-block))
 ; resc-mode
 (load "resc-mode")
 (add-hook 'resc-mode-hook 'turn-on-auto-fill)
