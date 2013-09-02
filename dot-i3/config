@@ -1,6 +1,9 @@
 # i3 config file
 #
 
+# EXCEPTIONS!!!!!!
+for_window [class="^Xfce4-notifyd$"] floating enable; border none; focus mode_toggle
+
 # Set global modifier key
 # Mod1 - ALT
 # Mod4 - CMD (Macs)
@@ -20,21 +23,21 @@ client.unfocused                #202020 #202020 #2288BB
 client.focused_inactive         #202020 #202020 #666666
 client.urgent                   #212121 #303030 #ee0000
 client.background               #101010
-#font -*-terminus-medium-*-normal-*-18-*-*-*-*-*-*-*
-font -*-bitstream charter-medium-r-*-17-*-*-*-*-*-*-*
+#font -*-inconsolata-medium-r-*-17-*-*-*-*-*-*-*
+font pango:Inconsolata 13px
 
 #i3bar config
 bar {
-    position top
+    position bottom
     status_command i3status -c ~/.i3/i3status.conf
-    colors {
-        background	   #404040
-        statusline	   #eeeeee
-        focused_workspace  #3399CC #000000
-	active_workspace   #999999 #202020
-	inactive_workspace #3399CC #202020
-	urgent_workspace   #da6f00 #404040
-    }
+#    colors {
+#        background         #202020
+#        statusline         #eeeeee
+#        focused_workspace  #3399CC #000000
+#	active_workspace   #999999 #202020
+#	inactive_workspace #3399CC #202020
+#	urgent_workspace   #da6f00 #404040
+#    }
 }
 
 # Use Mouse+$mod to drag floating windows to their wanted position
@@ -43,10 +46,12 @@ floating_modifier $mod
 # Application Launching
 #######################
 bindsym $mod+Return exec i3-sensible-terminal
-bindsym $mod+space  exec `dmenu_run -b -i -nb '#404040' -nf '#dedeff' -fn '-*-bitstream charter-medium-r-*-17-*-*-*-*-*-*-*'`
+
+# old dmenu
+# bindsym $mod+space  exec `dmenu_run -i -nb '#404040' -nf '#dedeff' -fn 'Inconsolata13px'`
 
 # new dmenu, wrapper around old dmenu (USE after i3-4.3 released)
-# bindsym $mod+space exec --no-startup-id i3-dmenu-desktop
+bindsym $mod+space exec --no-startup-id i3-dmenu-desktop --entry-type=command --dmenu="dmenu_run -i -nb '#202020' -nf '#dedeff' -fn 'Inconsolata-11'"
 
 # Operations
 #############
