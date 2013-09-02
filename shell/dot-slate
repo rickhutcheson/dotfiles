@@ -1,0 +1,578 @@
+######################### TABLE OF CONTENTS ############################
+###
+###  CONFIG   -- global configuration settings
+###  ALIAS    -- alias variables for later usage
+###  LAYOUT   -- application-specific(!) layout configuration
+###  DEFAULT  -- default specific screen configurations to layouts
+###  BIND     -- key bindings for window movement, etc.
+###  SOURCE   -- load configurations from other files
+###  APPENDIX -- documentation for modifying file
+###
+########################################################################
+# This is going to be heavily commented, since I really don't wanna
+# remember this stuff.
+########################################################################
+
+                          ##### CONFIG #####
+
+config defaultToCurrentScreen true
+
+# We want windows to resize consistently, not proportionately to their
+# current size.
+config resizePercentOf        screenSize
+
+# We'd really like the "focus X" commands to work correctly
+# regardless of distance, so  I'm gping to extend the "bounding box"
+# that we use to seach for nearby windows.
+
+config focusCheckWidthMax 1000
+
+                           ##### BIND #####
+
+# NOTE: ####
+# All bind commands are in the format:
+#                          bind key:modifiers operation
+#                                    (OR)
+#                          bind key:modal-key operation
+
+
+# With ALT + Arrows, just switch focus
+bind up:alt               focus up
+bind down:alt             focus down
+bind left:alt             focus left
+bind right:alt            focus right
+
+
+# With ALT + SHIFT + Arrows, we move the window to the desired edge
+bind up:alt,shift         push top
+bind down:alt,shift       push bottom
+bind left:alt,shift       corner top-left    resize:windowSizeX;screenSizeY
+bind right:alt,shift      corner top-right   resize:windowSizeX;screenSizeY
+
+# With CMD + SHIFT + Arrows, we move the window AND resize it to 1/2 the screen
+bind up:cmd,shift         corner top-left    resize:screenSizeX;0.5*screenSizeY
+bind down:cmd,shift       corner bottom-left resize:screenSizeX;0.5*screenSizeY
+bind left:cmd,shift       corner top-left    resize:0.5*screenSizeX;screenSizeY
+bind right:cmd,shift      corner top-right   resize:0.5*screenSizeX;screenSizeY
+
+# With ALT + CMD + SHIFT + Arrows, we can adjust window size
+bind up:cmd,alt,shift     resize 100%  105%  top-left
+bind down:cmd,alt,shift   resize 100%   -5%  top-left
+bind left:cmd,alt,shift   resize -5%   100%  top-left
+bind right:cmd,alt,shift  resize 105%   100% top-left
+
+## Switching Focus
+bind pad2:alt              focus down
+bind pad4:alt              focus left
+bind pad6:alt              focus right
+bind pad8:alt              focus up
+
+## Keypad is the key to our window management
+bind pad1:alt,shift corner   bottom-left  resize:0.5*screenSizeX;0.5*screenSizeY
+bind pad2:alt,shift corner   bottom-left  resize:screenSizeX;0.5*screenSizeY
+bind pad3:alt,shift corner   bottom-right resize:0.5*screenSizeX;0.5*screenSizeY
+bind pad4:alt,shift corner   top-left     resize:0.5*screenSizeX;screenSizeY
+bind pad5:alt,shift corner   top-left     resize:screenSizeX;screenSizeY
+bind pad6:alt,shift corner   top-right    resize:0.5*screenSizeX;screenSizeY
+bind pad7:alt,shift corner   top-left     resize:0.5*screenSizeX;0.5*screenSizeY
+bind pad8:alt,shift corner   top-left     resize:screenSizeX;0.5*screenSizeY
+bind pad9:alt,shift corner   top-right    resize:0.5*screenSizeX;0.5*screenSizeY
+
+## Application Hiding and app switcher
+
+bind pad.:alt       sequence hide 'current' | hint
+
+# If the app-switcher actually worked, I'd have it mapped to alt-tab.
+# Unfortunately, it really doesn't.
+# bind tab:alt switch
+
+########################################################################
+############################## APPENDIX ################################
+########################################################################
+
+* Directives
+**  Config
+* Operations
+* Configuration
+**  Global Configuration
+**  Operation-Specific Configuration
+* Expressions
+**  Variables
+**  Operators
+
+############################# OPERATIONS ###############################
+# ACTIVATE-SNAPSHOT: Load a snapshot onto screen
+# >>> activate-snapshot snap_name [delete]
+# snap_name: the name of the snapshot to activate
+# delete:    IF delete EXISTS: removes snapshot after loading
+#=======================================================================
+# CHAIN: chains multiple operations to MULTIPLE PRESSES
+#              of a single binding (press once for first, twice for
+#              2nd, etc.)
+# >>> chain op1 | op2 | ... | opN
+# opI: any other operation EXCEPT: SEQUENCE, HINT or GRID
+#=======================================================================
+# CORNER: move and/or resize the window into a corner:
+# >>> corner dir_choice [style_expr] [screen_ref]
+# dir_choice: CHOICES: top-left, top-right, bottom-left, bottom-right
+# style_expr: resize:x_expr;y_expr
+#               IF NONE: no resizing occurs
+#=======================================================================
+# DELETE_SNAPSNOT: delete a STACKED snapshot
+# >>> delete-snapshot snap_name [all]
+# name: = the name of the snapshot to delete
+# all: IF all EXISTS: then all snapshots in stack are deleted.
+#       ELSE:          only top snapshot deleted
+#=======================================================================
+# FOCUS: Focus window by DIRECTION or APPLICATION NAME
+# >>> focus [dir_choice OR app_name]
+# direction right, left, up, above, down, below, behind
+# app_name: QUOTED application name
+#=======================================================================
+# GRID: Show a grid to allow resizing and moving windows
+# >>> grid [padding:<int>] [screen_ref OR screen_res]:[x_cells,y_cells]
+#=======================================================================
+# HIDE: Hide one or more applications
+# >>> hide app_list
+# app_list - A list of comma-separated, QUOTED application names.
+#            ALSO: Can use `current`, `all`, and `all-but`:'APP_NAME'`
+#=======================================================================
+# HINT: Show window hints for easy window switching
+# >>> hint [char_string]
+# char_string: A subset of:
+#     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+#              Only these characters will be used for hints.
+#=======================================================================
+# LAYOUT: Activate given layout
+# >>> layout layout_str
+# layout_str: name of desired layout
+#=======================================================================
+# MOVE: move or resize a window
+# >>> move X_expr;Y_expr width_expr;height_expr [screen_ref]
+#=======================================================================
+# NUDGE: Move a WINDOW by some numeric amount
+# >>> nudge x-change y-change
+# x-change: PERCENT or CONSTANT
+# y-change: PERCENT or CONSTANT
+#=======================================================================
+# PUSH: Pushes window a screen edge
+# >>> push dir_choice [style_choice] [screen_ref]
+# dir_choice:   top, up, bottom, down, left, right
+# style_choice: none, center, bar, bar-resize:resize_expr
+#=======================================================================
+# RELAUNCH: Relaunch Slate and reload config
+# >>> relaunch
+#=======================================================================
+# RESIZE: Resize the window, holding position of "anchor" corner
+# >>> resize width_change height_change [anchor_choice]
+# width-change:  PERCENT or CONSTANT
+# height-change: PERCENT or CONSTANT
+# anchor:        CHOICES: top-left, top-right, bottom-left, bottom-right
+#=======================================================================
+# SEQUENCE: set operation sequence to single key-binding
+# >>> sequence op1 [SEP op2] [SEP op3]
+# SEP: EITHER * OR >
+# IF SEP IS |: op is performed on CURRENTLY FOCUSED WINDOW
+# IF SEP IS >: op is performed on WINDOW FOCUSED AT START  OF > CHAIN
+# opN: any of the above operation strings EXCEPT: CHAIN, GRID
+#      IF uses HINT, it must be last
+#=======================================================================
+# SHELL: Executes shell command
+# >>> shell [option_choice] 'cmd'
+# option_choice:
+#   * wait
+#   * path:path_str
+#   * wait path:path_str
+# NOTES:
+#   * path_str - path of directory to start cmd in.
+#   * path_str DOES NOT USE QUOTES
+#   * wait - use to block slate until cmd completes
+#=======================================================================
+# SHOW: Show one or more applications
+# >>> show app_list
+# app_list - A list of comma-separated, QUOTED application names.
+#            ALSO: Can use `current`, `all`, and `all-but`:'APP_NAME'`
+#=======================================================================
+# SNAPSHOT save current window locations
+# >>> snapshot snap_name [options]
+# snap_name: string name of saved snapshot
+# options:
+#   * save-to-disk
+#   * stack
+#   * save-to-disk;stack
+# NOTES:
+# IF stack used in options, then we can use the bound operation
+# multiple times to create a stack of snapshots
+#=======================================================================
+# SWITCH: an application switcher
+# >>> switch
+# NOTE: If bound to CMD-tab, REPLACES the OS X switcher
+#=======================================================================
+# THROW: Move a WINDOW to a SCREEN's origin
+# >>> throw screen_ref [style_choice]
+#   style_choice: CHOICES: resize, resize:x_expr;y_expr
+#                 IF NONE: no resizing occurs
+#=======================================================================
+# TOGGLE: Toggle the visibility of one or more applications
+# >>> toggle app_list
+# app_list - A list of comma-separated, QUOTED application names.
+#            ALSO: Can use `current`, `all`, and `all-but`:'APP_NAME'`
+# NOTES: DO NOT USE `current` IN app_list FOR THIS OPERATION
+#=======================================================================
+# UNDO: Undo Last Operation
+# >>> undo
+#=======================================================================
+
+########################### CONFIGURATION ##############################
+
+######################## GLOBAL CONFIGURATION ##########################
+# defaultToCurrentScreen (boolean)
+#   IF TRUE:  Any LAYOUT directive or another directive that
+#             references a screen not currently attached to the system
+#             will INSTEAD be bound to the current screen.
+#
+#   IF FALSE: These directives do nothing.
+# ----------------------------------------------------------------------
+# checkDefaultsOnLoad (boolean)
+#     check & trigger 'default's after config load.
+# ----------------------------------------------------------------------
+# orderScreensLeftToRight (boolean)
+#     IF TRUE:  Monitors ordered LEFT TO RIGHT BY X COORDINATE.
+#
+#     IF FALSE: Uses internal OS X ordering, by PLUGIN time. OR you can
+#               force ordering of screens by prefixing screen ID with
+#               the "ordered:" flag.
+# ----------------------------------------------------------------------
+# keyboardLayout (string)
+#     CHOICES: "dvorak", "colemak", "azerty", "qwerty"
+# ----------------------------------------------------------------------
+# modalEscapeKey (string)
+#     keystroke that starts and ends modal mode. FOR THIS STRING ONLY: A
+#     "modifier-only" keystroke may be used, such as "ctrl" or "alt"
+# ----------------------------------------------------------------------
+# repeatOnHoldOps (string)
+#     operations to repeat when holding hotkey.
+# ----------------------------------------------------------------------
+# secondsBeforeRepeat (float)
+#     seconds to hold key before repeating starts
+# ----------------------------------------------------------------------
+# secondsBetweenRepeat (float)
+#     seconds between repeats
+########################################################################
+
+
+################## OPERATION-SPECIFIC CONFIGURATION ####################
+# FOCUS
+########################################################################
+# focusCheckWidth (int)
+#     Only used for RIGHT, LEFT, UP, ABOVE, DOWN, and BELOW
+#     The width (in pixels) of the rectangle used for checking for
+#     adjacent windows
+#-----------------------------------------------------------------------
+# focusCheckWidthMax (int)
+#     Check-adjacent rectangle expanded from focusCheckWidth to
+#     focusCheckWidthMax when searching for adjacent windows.
+#-----------------------------------------------------------------------
+# focusPreferSameApp (boolean)
+#     if two adjacents found, choose one of same type
+########################################################################
+# GRID
+########################################################################
+# gridBackgroundColor (rgba-string)
+#-----------------------------------------------------------------------
+# gridRoundedCornerSize (int)
+#     size in pixels of rounded corners of grid operation's background.
+#-----------------------------------------------------------------------
+# gridCellBackgroundColor (rgba-string)
+#-----------------------------------------------------------------------
+# gridCellSelectedColor (rgba-string)
+#-----------------------------------------------------------------------
+# gridCellRoundedCornerSize (int)
+#     size in pixels of rounded corners of grid operation's cells
+########################################################################
+# HINT
+########################################################################
+# windowHintsBackgroundColor (rgba string)
+#-----------------------------------------------------------------------
+# windowHintsWidth (expression string)
+#     width of the Window Hints ovelay in pixels.
+#-----------------------------------------------------------------------
+# windowHintsHeight (expression string)
+#     height of the Window Hints ovelay in pixels.
+#-----------------------------------------------------------------------
+# windowHintsFontColor (rgba-string)
+#-----------------------------------------------------------------------
+# windowHintsFontName (string)
+#-----------------------------------------------------------------------
+# windowHintsFontSize (int)
+#-----------------------------------------------------------------------
+# windowHintsDuration (int)
+#     duration of window hints in seconds
+#-----------------------------------------------------------------------
+# windowHintsRoundedCornerSize (int)
+#     Size in pixels.
+#     NOTE: VALUE OF 0 REMOVES ROUNDED CORNERS.
+#-----------------------------------------------------------------------
+# windowHintsIgnoreHiddenWindows (boolean)
+#     type: Boolean
+#     default: true
+#-----------------------------------------------------------------------
+# windowHintsTopLeftX (String format: "expr;expr")
+#     The X offset for window hints from the window's top left point
+#-----------------------------------------------------------------------
+# windowHintsTopLeftY (String format: "expr;expr")
+#     The Y offset for window hints from the window's top left point
+#-----------------------------------------------------------------------
+# windowHintsOrder (string)
+#     CHOICES: "none", "persist", "leftToRight", or "rightToLeft".
+#-----------------------------------------------------------------------
+# windowHintsShowIcons (boolean)
+#     Use application's icon for background instead of rectangle?
+#-----------------------------------------------------------------------
+# windowHintsSpread (boolean)
+#     Spread hints vertically if in same place?
+#-----------------------------------------------------------------------
+# windowHintsSpreadSearchWidth (int)
+#     Width in pixels of rectangle to search for "hint box collisions"
+#-----------------------------------------------------------------------
+# windowHintsSpreadSearchHeight (int)
+#     Height in pixels of rectangle to search for "hint box collisions"
+#-----------------------------------------------------------------------
+# windowHintsSpreadPadding (int)
+#     Amount of padding that should be between SPREAD hint boxes.
+########################################################################
+# LAYOUT
+########################################################################
+# layoutFocusOnActivate (boolean)
+#     IF TRUE:  layout activations focuses all windows of layout
+#               The ORDER of focus is the ORDER LISTED IN ".SLATE" FILE.
+#     IF FALSE: NO activations occur
+########################################################################
+# NUDGE
+########################################################################
+# nudgePercentOf (string)
+#     CHOICES: "windowSize", "screenSize"
+########################################################################
+# RESIZE
+########################################################################
+# resizePercentOf (string)
+#     CHOICES: "windowSize", "screenSize"
+########################################################################
+# SNAPSHOT
+########################################################################
+# snapshotTitleMatch (string)
+#     CHOICES: "levenshtein" or "sequential".
+#     IF "levenshtein": title matches lowest "Levenshtein distance".
+#     IF "sequential":  title matches maximum common prefix length.
+#-----------------------------------------------------------------------
+# snapshotMaxStackSize (int)
+#    Stack frames to keep when using STACK option.
+#    NOTE: If <0, assumes UNLIMITED
+########################################################################
+# SWITCH
+########################################################################
+# switchIconSize (int)
+#     size in pixels of the SWITCH operation's application icons
+#-----------------------------------------------------------------------
+# switchIconPadding (int)
+#     size in pixels of padding for SWITCH operation's icons.
+#-----------------------------------------------------------------------
+# switchBackgroundColor (rgba-string)
+#-----------------------------------------------------------------------
+# switchSelectedBackgroundColor (rgba-string)
+#-----------------------------------------------------------------------
+# switchSelectedBorderColor (rgba-string)
+#-----------------------------------------------------------------------
+# switchSelectedBorderSize (int)
+#    The size in pixels of SWITCH's selected border.
+#    NOTE: Use 0 for NO BORDER
+#-----------------------------------------------------------------------
+# switchRoundedCornerSize (int)
+#     size in pixels of SWITCH's rounded corners
+#     NOTE: Set to 0 FOR NO ROUNDED CORNERS
+#-----------------------------------------------------------------------
+# switchOrientation (string)
+#     CHOICES: "horiztonal" or "vertical".
+#     Direction in which to GROW the switcher.
+#-----------------------------------------------------------------------
+# switchSecondsBeforeRepeat (float)
+#-----------------------------------------------------------------------
+# switchSecondsBetweenRepeat (float)
+#-----------------------------------------------------------------------
+# switchStopRepeatAtEdge
+#     IF TRUE:  SWITCH will STOP at the end of the list.
+#     IF FALSE: SWITCH will CYCLE to the other end
+#-----------------------------------------------------------------------
+# switchOnlyFocusMainWindow
+#     Apps with multiple windows will only have their main window
+#     focused by SWITCH.
+#-----------------------------------------------------------------------
+# switchShowTitles
+#-----------------------------------------------------------------------
+# switchFontColor (rgba-string)
+#-----------------------------------------------------------------------
+# switchFontName (string)
+#-----------------------------------------------------------------------
+# switchFontSize (int)
+#-----------------------------------------------------------------------
+# switchSelectedPadding (int)
+#     Padding in pixels betweeen switch window edge and selected app
+########################################################################
+# UNDO
+########################################################################
+# undoMaxStackSize (int)
+#     Stack frames to keep when UNDO-ing.
+#     NOTE: If <0, slate WILL STORE ALL OPERATIONS.
+#-----------------------------------------------------------------------
+# undoOps (string)
+#     List of undoable operations. Each of these will trigger
+#     auto-snapshots for UNDO when used.
+########################################################################
+
+
+############################ EXPRESSIONS ###############################
+
+# Expressions are made up of VARIABLES and CONSTANTS, and are used
+# to specify POSITIONS and SIZES.
+#           !!!  THERE MAY BE NO SPACES IN AN EXPRESSION  !!!
+
+############################# VARIABLES ################################
+# We can access information about both the SIZE and LOCATION of
+# the current SCREEN and WINDOW, using:
+########################################################################
+# LOCATION VARIABLES
+########################################################################
+# screenOriginX
+#      screen's top left x (undefined in Window Hints)
+#-----------------------------------------------------------------------
+# screenOriginY
+#      screen's top left y (undefined in Window Hints)
+#-----------------------------------------------------------------------
+# windowTopLeftX
+#      window's current top left x (undefined in Window Hints)
+#-----------------------------------------------------------------------
+# windowTopLeftY
+#      window's current top left y (undefined in Window Hints)
+########################################################################
+# SIZE VARIABLES
+########################################################################
+# screenSizeX
+#     target screen's width
+#-----------------------------------------------------------------------
+# screenSizeY
+#     target screen's height
+#-----------------------------------------------------------------------
+# windowSizeX:
+#     window's width
+#-----------------------------------------------------------------------
+# windowSizeY:
+#     window's height
+########################################################################
+# OPERATOR-SPECIFIC VARIABLES
+########################################################################
+# newWindowSizeX = WINDOW width AFTER resize,
+# ONLY IN: Any operation's topLeftX and topLeftY settings
+# NOT IN:  config settings, since no ops performed yet
+#-----------------------------------------------------------------------
+# newWindowSizeY = WINDOW width AFTER resize,
+# ONLY IN: Any operations topLeftX and topLeftY settings
+# NOT IN:  config settings, since no ops performed yet
+#-----------------------------------------------------------------------
+# windowHintsWidth = value of windowHintsWidth:
+# ONLY IN: windowHintsTopLeftX and windowHintsTopLeftY
+#-----------------------------------------------------------------------
+# windowHintsHeight = value of the windowHintsHeight config
+# ONLY IN: windowHintsTopLeftX and windowHintsTopLeftY)
+########################################################################
+
+############################# OPERATORS ################################
+# Operators can be used in expressions, with either VARIABLES
+# or CONSTANTS.
+### NOTE
+# The SEQUENCE OPERATORS must be wrapped in BOTH PARENTHESES
+# and BRACES (for some reason). Thus, a call to any SEQUENCE
+# operator must look like:
+#                 abs({12, screenOriginX, 1.23123})
+# in order to work correctly
+########################################################################
+# INFIX OPERATORS:    + , - , * , / , **
+# PREFIX OPERATORS:   abs, ceiling, exp, floor, ln, log, sqrt, trunc
+# SEQUENCE OPERATORS: average, count, median, min, max, sum, stddev,
+# RANDOM OPERATATORS:
+#     * random()   -- rand float between 0 and 1
+#     * randomn(n) -- rand int between 1 and (n-1)
+########################################################################
+
+
+################################ KEYS ##################################
+
+# MODIFIERS: alt, cmd, ctrl, shift
+#
+# KEYS: abcdefghijklmnopqrstuvwxyz, 0123456789, mute
+#
+# AND ANY LABELLED KEY BELOW:
+# +--------------------------------------------------------------+
+# |   |                                                          |
+# |esc|                     ( f1 - f20 )                         |
+# +--------------------------------------------------------------+
+# +--------------------------------------------------------------+
+# |    |                                |    |    |              |
+# | `  |                                | -  | =  |delete        |
+# +--------------------------------------------------------------+
+# |       |                                |    |    |           |
+# |tab    |                                | [  | ]  |  backslash|
+# +--------------------------------------------------------------+
+# |        |                                  |    |    |        |
+# |caps    |                                  | ;  | '  | return |
+# +--------------------------------------------------------------+
+# |               |                   |    |    |    |           |
+# |     shift     |                   | ,  | .  | /  |  shift    |
+# +--------------------------------------------------------------+
+# |       |    |    |                         |    |    |        |
+# |ctrl   |alt |cmd |          space          |cmd |alt |   ctrl |
+# +--------------------------------------------------------------+
+#
+#
+# +-----------------------------+
+# |         |         |         |
+# |         |         |         |
+# |help     |home     |pageUp   |
+# |---------+---------+---------+
+# |         |         |         |
+# |         |         |         |
+# |delete   |end      |pageDown |
+# +---------+---------+---------+
+#
+#
+#           +---------+
+#           |         |
+#           |         |
+#           |   up    |
+# +---------+---------+---------+
+# |         |         |         |
+# |         |         |         |
+# |  left   |  down   |  right  |
+# +---------+---------+---------+
+#
+#
+# +---------------------------------------+
+# |         |         |         |         |
+# |         |         |         |         |
+# |padClear |pad=     |pad/     |pad*     |
+# |---------+---------+----------+--------|
+# |         |         |         |         |
+# |         |         |         |         |
+# |pad7     |pad8     |pad9     |pad-     |
+# |---------+---------+---------+---------|
+# |         |         |         |         |
+# |         |         |         |         |
+# |pad4     |pad5     |pad6     |pad+     |
+# |---------+---------+---------+---------|
+# |         |         |         |         |
+# |         |         |         |         |
+# |pad1     |pad2     |pad3     |         |
+# |-------------------+---------|         |
+# |                   |         |         |
+# |                   |         |         |
+# |pad0               |pad.     |padEnter |
+# +---------------------------------------+
