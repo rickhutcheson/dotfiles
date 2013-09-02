@@ -47,10 +47,10 @@
 
 ;;;; Per-Environment Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (eq system-type 'darwin)      ; mac-specific
-  (setq mac-option-modifier 'super) ; Set 'Option' key to ALT
-  (setq mac-command-modifier 'meta) ; Set 'CMD' key to 'M'
-  (setq mac-allow-anti-aliasing nil)
-  (add-to-list 'default-frame-alist '(font . "Terminus-14")))
+  (setq mac-option-modifier 'super) ; Set 'Option' key to SUPER
+  (setq mac-command-modifier 'meta)) ; Set 'CMD' key to 'Meta'
+;  (setq mac-allow-anti-aliasing nil))
+
 
 ;;;; Custom Modes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Add Extra Repositories for easy installs
