@@ -1,0 +1,13 @@
+[user]
+	name = Rick Hutcheson
+	email = rick@statemachine.co
+[color]
+	ui = true
+[core]
+	editor = emacs
+[credential]
+	helper = cache --timeout=7200
+[github]
+	user = rickhutcheson
+[push]
+	default = matching
