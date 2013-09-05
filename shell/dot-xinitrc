@@ -1,1 +1,3 @@
 [[ -f ~/.Xresources ]] && xrdb -merge ~/.Xresources
+dropboxd &
+exec i3
