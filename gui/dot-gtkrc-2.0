@@ -1,0 +1,21 @@
+
+## Icon View Text Appearance
+#
+style "xfdesktop-icon-view" {
+
+    ## transparency (alpha) factor
+    # original: XfdesktopIconView::label-alpha = 75
+    # set transparency of icon text background to 100%
+    XfdesktopIconView::label-alpha = 0
+
+    # background colors
+    base[NORMAL] = "#C5C5C5"
+    base[SELECTED] = "#C5C5C5"
+    base[ACTIVE] = "#C5C5C5"
+
+    # foreground colors
+    fg[NORMAL] = "#FFFFFF"
+    fg[SELECTED] = "#000000"
+    fg[ACTIVE] = "#000000"
+}
+widget_class "*XfdesktopIconView*" style "xfdesktop-icon-view"

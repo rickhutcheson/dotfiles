@@ -1,3 +1,7 @@
 [[ -f ~/.Xresources ]] && xrdb -merge ~/.Xresources
+sh /home/rick/.scripts/changekeys.sh
+
+xfce4-session
+wicd-gtk &
 dropboxd &
-exec i3
+VBoxClient-all &
