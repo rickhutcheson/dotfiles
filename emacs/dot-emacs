@@ -1,121 +1,126 @@
-;;; .emacs --- Personal Emacs Customizations
-;; Author: Rick Hutcheson <rick@statemachine.co>
-;; Created: January 2012
+(add-to-list 'load-path "/Users/rick/.emacs.d/tern-emacs/tern/emacs/")
 
-;;;; Environment Variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setenv "PATH" (concat ".:/usr/bin:/usr/local/bin:" (getenv "PATH")))
-(setenv "PATH" (concat ".:/usr/local/noweb:" (getenv "PATH")))
-(setq exec-path (append exec-path '("/usr/bin"
-                                    "/usr/texbin"
-                                    "/opt/local/bin"
-                                    "/usr/local/bin")))
+(defun set-exec-path-from-shell-PATH ()
+  "Set up Emacs' `exec-path' and PATH environment variable to match that used by the user's shell."
+  (interactive)
+  (let ((path-from-shell (replace-regexp-in-string "[ \t\n]*$" ""(shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+    (setenv "PATH" path-from-shell)
+    (setq exec-path (split-string path-from-shell path-separator))))
+(set-exec-path-from-shell-PATH)
 
-;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Fonts
-;(add-to-list 'default-frame-alist '(font . "Latin Modern Mono-10"))
-(add-to-list 'default-frame-alist '(font . "Inconsolata-10"))
-
-;;; Display Column and Line Numbers
-(setq column-number-mode t)
-(setq line-number-mode t)
-
-;;; Whitespace Display
-(global-whitespace-mode t) ; enable whitespace-mode
-(setq whitespace-style
-      (quote (face trailing space-before-tab empty space-after-tab lines)))
-
-;;; Theme (Emacs >24)
-(add-to-list 'custom-theme-load-path '"~/.emacs.d/themes")
-(setq custom-safe-themes t) ; trust all themes
-(add-to-list 'custom-enabled-themes 'assemblage) ; good dark theme
-(add-to-list 'custom-enabled-themes 'whiteboard) ; good light theme
-(load-theme 'whiteboard)
-;;;; Global Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(tool-bar-mode 0)                   ; remove tool bar
-(scroll-bar-mode 0)                 ; remove scroll bar
-;(menu-bar-mode 0)                   ; remove menu
-(setq inhibit-startup-screen t)     ; remove EMACS splash
-(setq visible-bell t)               ; no bell on scroll-end
-(setq backup-directory-alist
-      `(("." . "~/.backups")))      ; global backup location
-(setq x-super-keysym 'meta)         ; map CMD to META
-(global-set-key "\C-x\C-m" 'execute-extended-command) ; Use C-x C-m for M-x
-(global-set-key "\C-w" 'backward-kill-word)
-(global-set-key "\C-x\C-k" 'kill-region)
-(setq-default indent-tabs-mode nil)
-; set tab stops for when indent-relative fails
-(setq tab-stop-list (number-sequence 4 120 4))
-
-;;;; Per-Environment Behavior ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (eq system-type 'darwin)      ; mac-specific
-  (setq mac-option-modifier 'super) ; Set 'Option' key to SUPER
-  (setq mac-command-modifier 'meta)) ; Set 'CMD' key to 'Meta'
-;  (setq mac-allow-anti-aliasing nil))
-
-
-;;;; Custom Modes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Add Extra Repositories for easy installs
 (require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
+
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+
+;; list the packages you want
+(setq required-package-list '(web-beautify js2-mode nodejs-repl less-css-mode spacegray-theme))
+
+;; activate all the packages (in particular autoloads)
 (package-initialize)
 
-; Setup custom directories
-(add-to-list 'load-path "~/.emacs.d") ; Single-file modes
+;; fetch the list of packages available
+(unless (file-exists-p package-user-dir)
+  (package-refresh-contents))
 
-; lit-mode
-(require 'lit-mode)
-(setq auto-mode-alist (cons '("\\.w" . lit-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.nw" . lit-mode) auto-mode-alist))
-(add-hook 'lit-mode-hook '(lambda() (setq lit-base-mode 'tex-mode)))
-(add-hook 'lit-mode-hook '(lambda() (setq lit-code-mode 'c-mode)))
-(add-hook 'lit-mode-hook '(lambda() (setq lit-doc-mode 'tex-mode)))
+;; install the missing packages
+(dolist (package required-package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
 
-; markdown-mode / pandoc-mode
-(load "markdown-mode")
-(load "pandoc-mode")
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(if (eq system-type 'darwin)
+    (set-frame-font "Menlo-12")
+    (set-frame-font "Monaco-11"))
 
-;(add-hook 'markdown-mode-hook 'turn-on-pandoc)
-;(add-hook 'markdown-mode-hook 'auto-fill-mode)
-(defun markdown-custom ()
-  "markdown-mode-hook"
-  (interactive)
-  (turn-on-pandoc)
-  (auto-fill-mode)
-  (setq markdown-enable-math t)
-  (setq markdown-command "/usr/local/bin/pandoc
-  --from markdown --to html5 -s --mathjax"))
-(add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
+;; fits height at 1920x1080 (with  Monaco-11 font on  OS X)
+(add-to-list 'default-frame-alist '(height . 66))
+(setq-default line-spacing 0.10)
 
-; python-mode
-;(setq python-indent-offset 4) ; it wasn't very effective!
-(setq py-install-directory "~/.emacs.d")
-(setq py-shell-name "python3")
- ; block code-folding
-(add-hook 'python-mode-hook 'hs-minor-mode)
-(add-hook 'python-mode-hook 'set-hs-keys)
+;; 80 chars + room for fringe
+(add-to-list 'default-frame-alist '(width . 88))
 
-; use flymake-mode to auto-run pylint
-; from: http://www.emacswiki.org/emacs/PythonProgrammingInEmacs
-(when (load "flymake" t) ; only load when flymake loaded
-  (defun flymake-pylint-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-           (local-file (file-relative-name
-                        temp-file
-                        (file-name-directory buffer-file-name))))
-      (list "epylint" (list local-file))))
-  (add-to-list 'flymake-allowed-file-name-masks
-             '("\\.py\\'" flymake-pylint-init)))
+;; Use this instead for disabling anti-aliasing
+;;defaults write org.gnu.Emacs AppleAntiAliasingThreshold 999
+;; In order for this to take effect, you must use the following command:
+;defaults write org.gnu.Emacs FontBackend ns
+;(setq mac-allow-anti-aliasing nil)
 
-(defun set-hs-keys ()
-  (local-set-key (kbd "C-c C-h") 'hs-hide-block)
-  (local-set-key (kbd "C-c C-s") 'hs-show-block))
-; resc-mode
-(load "resc-mode")
-(add-hook 'resc-mode-hook 'turn-on-auto-fill)
+;; Light Theme
+;; (load-theme 'sanityinc-tomorrow-day t)
+;; (load-theme 'leuven t)
+;;(load-theme 'tango t)
+(load-theme 'spacegray t)
+;; (load-theme 'soft-morning t)
 
-; tex-mode
-(add-to-list 'auto-mode-alist '("\\.tex\\'" . plain-tex-mode))
-(add-hook `plain-tex-mode-hook `turn-on-auto-fill)
+(setq backup-by-copying t               ; don't clobber symlinks
+      backup-directory-alist '(("." . "~/.emacs.d/backups"))
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)                ; use versioned backups
+
+;; no bells
+(setq visible-bell t)
+
+;; Doesn't work on OS X
+;; (setq ring-bell-function (lambda () (play-sound-file ".emacs.d/sounds/goron_oop.au")))
+
+;; naked emacs
+(scroll-bar-mode 0)
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+(set-default 'cursor-type '(hbar . 1))
+
+;; Prevent the cursor from blinking
+(global-linum-mode t)
+(column-number-mode t)
+ 
+;; Don't use messages that you don't read
+(setq initial-scratch-message "")
+(setq inhibit-startup-message t)
+
+;; SPACES / TABS
+(setq-default indent-tabs-mode nil)
+;; web-beautify specifics
+
+;; This constant is internal to web-beautify, but I haven't found
+;; another way to define options *globally*
+(require 'web-beautify)
+(defconst web-beautify-args '("-s" "2" "-w" "80" "-f" "-"))
+
+;; css-mode specifics
+(setq css-indent-offset 2)
+
+;; helm specifics
+;(add-to-list 'load-path "/Users/rick/.emacs.d/helm/emacs-async")
+;(add-to-list 'load-path "/Users/rick/.emacs.d/helm/emacs-helm")
+;(require 'helm-config)
+;; js2-mode specifics
+;; basic options
+
+;; associate with '.js' files
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.emacs\\'" . emacs-lisp-mode))
+(setq js2-basic-offset 2)
+
+;; auto-beautify on save
+(eval-after-load 'js2-mode
+  (lambda ()
+    (require 'nodejs-repl)
+    (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)
+    (linum-mode)))
+
+(eval-after-load 'html-mode
+  (lambda ()
+    (define-key html-mode-map (kbd "C-c b") 'web-beautify-html)
+    (linum-mode)))
+
+(eval-after-load 'css-mode
+  (lambda ()
+    (define-key css-mode-map (kbd "C-c b") 'web-beautify-css)
+    (linum-mode)))
+
+(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+;; add support for tern
+
+(autoload 'tern-mode "tern.el" nil t)
+
