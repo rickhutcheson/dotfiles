@@ -13,34 +13,40 @@
 # remember this stuff.
 ########################################################################
 
-                          ##### CONFIG #####
+
+                          ######################
+                          #       CONFIG       #
+                          ######################
 
 config defaultToCurrentScreen true
 
 # We want windows to resize consistently, not proportionately to their
 # current size.
+
 config resizePercentOf        screenSize
 
-# We'd really like the "focus X" commands to work correctly
-# regardless of distance, so  I'm gping to extend the "bounding box"
-# that we use to seach for nearby windows.
+# We'd really like the "focus X" commands to work correctly regardless
+# of distance, so I'm gping to extend the "bounding box" that we use
+# to seach for nearby windows.
 
 config focusCheckWidthMax 1000
 
-                           ##### BIND #####
 
-# NOTE: ####
+                        ######################
+                        #        BIND        #
+                        ######################
+
 # All bind commands are in the format:
-#                          bind key:modifiers operation
-#                                    (OR)
-#                          bind key:modal-key operation
-
+#
+#   bind key:modifiers operation
+#              (OR)
+#   bind key:modal-key operation
 
 # With ALT + Arrows, just switch focus
-bind up:alt               focus up
-bind down:alt             focus down
-bind left:alt             focus left
-bind right:alt            focus right
+bind pad8:cmd             focus up
+bind pad2:cmd             focus down
+bind pad4:cmd             focus left
+bind pad6:cmd             focus right
 
 
 # With ALT + SHIFT + Arrows, we move the window to the desired edge
@@ -49,56 +55,49 @@ bind down:alt,shift       push bottom
 bind left:alt,shift       corner top-left    resize:windowSizeX;screenSizeY
 bind right:alt,shift      corner top-right   resize:windowSizeX;screenSizeY
 
-# With CMD + SHIFT + Arrows, we move the window AND resize it to 1/2 the screen
-bind up:cmd,shift         corner top-left    resize:screenSizeX;0.5*screenSizeY
-bind down:cmd,shift       corner bottom-left resize:screenSizeX;0.5*screenSizeY
-bind left:cmd,shift       corner top-left    resize:0.5*screenSizeX;screenSizeY
-bind right:cmd,shift      corner top-right   resize:0.5*screenSizeX;screenSizeY
 
-# With ALT + CMD + SHIFT + Arrows, we can adjust window size
-bind up:cmd,alt,shift     resize 100%  105%  top-left
-bind down:cmd,alt,shift   resize 100%   -5%  top-left
-bind left:cmd,alt,shift   resize -5%   100%  top-left
-bind right:cmd,alt,shift  resize 105%   100% top-left
+## Corners
+bind pad1:cmd,shift corner   bottom-left  resize:0.5*screenSizeX;0.5*screenSizeY
+bind pad2:cmd,shift corner   bottom-left  resize:screenSizeX;0.5*screenSizeY
+bind pad3:cmd,shift corner   bottom-right resize:0.5*screenSizeX;0.5*screenSizeY
+bind pad4:cmd,shift corner   top-left     resize:0.5*screenSizeX;screenSizeY
+bind pad5:cmd,shift corner   top-left     resize:screenSizeX;screenSizeY
+bind pad6:cmd,shift corner   top-right    resize:0.5*screenSizeX;screenSizeY
+bind pad7:cmd,shift corner   top-left     resize:0.5*screenSizeX;0.5*screenSizeY
+bind pad8:cmd,shift corner   top-left     resize:screenSizeX;0.5*screenSizeY
+bind pad9:cmd,shift corner   top-right    resize:0.5*screenSizeX;0.5*screenSizeY
 
-## Switching Focus
-bind pad2:alt              focus down
-bind pad4:alt              focus left
-bind pad6:alt              focus right
-bind pad8:alt              focus up
 
-## Keypad is the key to our window management
-bind pad1:alt,shift corner   bottom-left  resize:0.5*screenSizeX;0.5*screenSizeY
-bind pad2:alt,shift corner   bottom-left  resize:screenSizeX;0.5*screenSizeY
-bind pad3:alt,shift corner   bottom-right resize:0.5*screenSizeX;0.5*screenSizeY
-bind pad4:alt,shift corner   top-left     resize:0.5*screenSizeX;screenSizeY
-bind pad5:alt,shift corner   top-left     resize:screenSizeX;screenSizeY
-bind pad6:alt,shift corner   top-right    resize:0.5*screenSizeX;screenSizeY
-bind pad7:alt,shift corner   top-left     resize:0.5*screenSizeX;0.5*screenSizeY
-bind pad8:alt,shift corner   top-left     resize:screenSizeX;0.5*screenSizeY
-bind pad9:alt,shift corner   top-right    resize:0.5*screenSizeX;0.5*screenSizeY
+# Resizing
+bind pad8:cmd,alt,shift   resize 100%  102%  top-left
+bind pad2:cmd,alt,shift   resize 100%   -2%  top-left
+bind pad4:cmd,alt,shift   resize  -2%  100%  top-left
+bind pad6:cmd,alt,shift   resize 102%  100%  top-left
 
-## Application Hiding and app switcher
 
-bind pad.:alt       sequence hide 'current' | hint
+# App Hiding & Switching
+bind pad.:cmd sequence hide 'current' | hint
 
 # If the app-switcher actually worked, I'd have it mapped to alt-tab.
 # Unfortunately, it really doesn't.
 # bind tab:alt switch
 
-########################################################################
-############################## APPENDIX ################################
-########################################################################
 
-* Directives
-**  Config
-* Operations
-* Configuration
-**  Global Configuration
-**  Operation-Specific Configuration
-* Expressions
-**  Variables
-**  Operators
+############################################################################
+#                                                                          #
+#                                APPENDIX                                  #
+#                                                                          #
+############################################################################
+
+# > Directives
+# --> Config
+# > Operations
+# > Configuration
+# --> Global Configuration
+# --> Operation-Specific Configuration
+# > Expressions
+# --> Variables
+# --> Operators
 
 ############################# OPERATIONS ###############################
 # ACTIVATE-SNAPSHOT: Load a snapshot onto screen
