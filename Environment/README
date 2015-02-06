@@ -1,0 +1,8 @@
+# Run the following to install
+./Environment/Install.sh
+
+# Add the following lines to your login shell dotfile
+# (.bash_profile on OS X or .bashrc on Linux)
+
+$USER_ENV_HOME=~/Environment
+$USER_ENV_HOME/Startup.sh

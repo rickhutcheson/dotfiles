@@ -1,0 +1,2 @@
+cd 
+wget http://nodejs.org/dist/v0.10.36/node-v0.10.36-darwin-x64.tar.gz
