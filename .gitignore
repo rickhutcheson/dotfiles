@@ -1,5 +1,3 @@
 .DS_Store
-emacs/emacs-dir/auto-save-list
-emacs/emacs-dir/tramp
-emacs/emacs-dir/eshell
 Environment/Utilities/
+Environment/Variables/Udemy.sh

@@ -47,23 +47,36 @@ bind pad8:cmd             focus up
 bind pad2:cmd             focus down
 bind pad4:cmd             focus left
 bind pad6:cmd             focus right
+bind down:cmd             focus down
+bind left:cmd             focus left
+bind right:cmd             focus right
+bind up:cmd            focus up
 
 ## Moving w/o resizing
 
-bind pad8:cmd,alt,shift  push up none
-bind pad2:cmd,alt,shift  push down none
-bind pad4:cmd,alt,shift  push left none
-bind pad6:cmd,alt,shift  push right none
+bind pad8:cmd,alt  push up none
+bind pad2:cmd,alt  push down none
+bind pad4:cmd,alt  push left none
+bind pad6:cmd,alt  push right none
+
+bind up:cmd,alt  push up none
+bind down:cmd,alt  push down none
+bind left:cmd,alt  push left none
+bind right:cmd,alt  push right none
 
 ## Corners
 bind pad1:cmd,shift corner   bottom-left  resize:0.5*screenSizeX;0.5*screenSizeY
 bind pad2:cmd,shift corner   bottom-left  resize:screenSizeX;0.5*screenSizeY
+bind down:cmd,shift corner   bottom-left  resize:screenSizeX;0.5*screenSizeY
 bind pad3:cmd,shift corner   bottom-right resize:0.5*screenSizeX;0.5*screenSizeY
 bind pad4:cmd,shift corner   top-left     resize:0.5*screenSizeX;screenSizeY
+bind left:cmd,shift corner   top-left     resize:0.5*screenSizeX;screenSizeY
 #bind pad5:cmd,shift push     center       resize:screenSizeX;screenSizeY
 bind pad6:cmd,shift corner   top-right    resize:0.5*screenSizeX;screenSizeY
+bind right:cmd,shift corner   top-right    resize:0.5*screenSizeX;screenSizeY
 bind pad7:cmd,shift corner   top-left     resize:0.5*screenSizeX;0.5*screenSizeY
 bind pad8:cmd,shift corner   top-left     resize:screenSizeX;0.5*screenSizeY
+bind up:cmd,shift corner   top-left     resize:screenSizeX;0.5*screenSizeY
 bind pad9:cmd,shift corner   top-right    resize:0.5*screenSizeX;0.5*screenSizeY
 bind pad+:cmd,shift corner   top-left     resize:screenSizeX;screenSizeY
 
@@ -74,9 +87,14 @@ bind pad2:cmd,alt,shift   resize 100%   -2%  top-left
 bind pad4:cmd,alt,shift   resize  -2%  100%  top-left
 bind pad6:cmd,alt,shift   resize 102%  100%  top-left
 
+bind up:cmd,alt,shift   resize 100%  102%  top-left
+bind down:cmd,alt,shift   resize 100%   -2%  top-left
+bind left:cmd,alt,shift   resize  -2%  100%  top-left
+bind right:cmd,alt,shift   resize 102%  100%  top-left
 
 # App Hiding & Switching
 bind pad.:cmd sequence hide 'current' | hint
+bind .:cmd sequence hide 'current' | hint
 
 # If the app-switcher actually worked, I'd have it mapped to alt-tab.
 # Unfortunately, it really doesn't.
