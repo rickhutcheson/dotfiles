@@ -1,4 +1,7 @@
-(add-to-list 'load-path "~/.emacs.d/tern/emacs")
+(add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
+(add-to-list 'load-path "~/Environment/Utilities/Emacs/helm")
+(add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
+
 
 (defun set-exec-path-from-shell-PATH ()
   "Set up Emacs' `exec-path' and PATH environment variable to match that used by the user's shell."
@@ -13,8 +16,7 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 
 ;; list the packages you want
-(setq required-package-list '(web-beautify js2-mode nodejs-repl less-css-mode spacegray-theme))
-
+(setq required-package-list '(web-beautify js2-mode nodejs-repl less-css-mode spacegray-theme simp))
 ;; activate all the packages (in particular autoloads)
 (package-initialize)
 
@@ -22,17 +24,19 @@
 (unless (file-exists-p package-user-dir)
   (package-refresh-contents))
 
+(require 'helm)
+(require 'helm-config)
+(require 'simp)
+
 ;; install the missing packages
 (dolist (package required-package-list)
   (unless (package-installed-p package)
     (package-install package)))
 
 (if (eq system-type 'darwin)
-    (set-frame-font "Menlo-12")
+    (set-frame-font "Bitstream Vera Sans Mono-11")
     (set-frame-font "Ubuntu Mono-15"))
 
-;; fits height at 1920x1080 (with  Monaco-11 font on  OS X)
-(add-to-list 'default-frame-alist '(height . 66))
 (setq-default line-spacing 0.10)
 
 ;; 80 chars + room for fringe
@@ -48,7 +52,7 @@
 ;; (load-theme 'sanityinc-tomorrow-day t)
 ;; (load-theme 'leuven t)
 ;;(load-theme 'tango t)
-(load-theme 'spacegray t)
+(load-theme 'tango t)
 ;; (load-theme 'soft-morning t)
 
 (setq backup-by-copying t               ; don't clobber symlinks
@@ -89,16 +93,13 @@
 
 ;; css-mode specifics
 (setq css-indent-offset 2)
-
-;; helm specifics
-;(add-to-list 'load-path "/Users/rick/.emacs.d/helm/emacs-async")
-;(add-to-list 'load-path "/Users/rick/.emacs.d/helm/emacs-helm")
-;(require 'helm-config)
 ;; js2-mode specifics
 ;; basic options
 
 ;; associate with '.js' files
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.emacs\\'" . emacs-lisp-mode))
 (setq js2-basic-offset 2)
 
@@ -124,3 +125,43 @@
 
 (autoload 'tern-mode "tern.el" nil t)
 
+;; helm specifics
+
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+
+(when (executable-find "curl")
+  (setq helm-google-suggest-use-curl-p t))
+
+(setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+      helm-ff-file-name-history-use-recentf t)
+
+(helm-mode t)
+(simp-project-define
+ '(:has (.git)
+   :ignore (.git)))
+;; I bind the handy stuff like so:
+(global-set-key (kbd "C-c f") 'simp-project-find-file)
+(global-set-key (kbd "C-c d") 'simp-project-root-dired)
+(global-set-key (kbd "C-c s") 'simp-project-rgrep)
+(global-set-key (kbd "C-c S") 'simp-project-rgrep-dwim)
+(global-set-key (kbd "C-c b") 'simp-project-ibuffer-files-only)
+(global-set-key (kbd "C-c B") 'simp-project-ibuffer)
+(global-set-key (kbd "C-c C-f") 'simp-project-with-bookmark-find-file)
+(global-set-key (kbd "C-c C-s") 'simp-project-with-bookmark-rgrep)
+(global-set-key (kbd "C-c C-b") 'simp-project-with-bookmark-ibuffer)
+
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(setq flycheck-indication-mode 'right-fringe)
+
+(setq dired-use-ls-dired nil)
