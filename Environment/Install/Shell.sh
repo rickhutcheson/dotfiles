@@ -8,3 +8,7 @@ for df in $USER_ENV_CONFIG/Shell/*; do
         ln -s $df ~/.${name:4} # remove "dot-" prefix
     fi
 done
+
+# git completion
+
+echo "if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash; fi" >> ~/.bash_profile
