@@ -1,22 +1,77 @@
+;;; dot-emacs --- Personal Emacs configuration
+
+;; Author: Rick Hutcheson <rick@oddlyaccurate.com>
+
+;; This file is not part of GNU Emacs.
+
+;;; Commentary:
+;; Before performing any configuration, we download and
+;; install all required packages.  Loading config file will have
+;; side-effects.
+
+;;; Code:
+
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/helm")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
 
 
 (defun set-exec-path-from-shell-PATH ()
-  "Set up Emacs' `exec-path' and PATH environment variable to match that used by the user's shell."
+  "Set `execpath and PATH environment variable to match user's $PATH."
   (interactive)
-  (let ((path-from-shell (replace-regexp-in-string "[ \t\n]*$" ""(shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+  (let ((path-from-shell
+         (replace-regexp-in-string
+          "[ \t\n]*$" ""(shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
     (setenv "PATH" path-from-shell)
     (setq exec-path (split-string path-from-shell path-separator))))
 (set-exec-path-from-shell-PATH)
+
+
+;; =====================================================================
+;; Packages
+;; =====================================================================
 
 (require 'package)
 
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 
-;; list the packages you want
-(setq required-package-list '(web-beautify js2-mode nodejs-repl less-css-mode spacegray-theme simp))
+;; ---------------------------------------------------------------------
+;; Required Packages
+;; ---------------------------------------------------------------------
+
+(defvar required-package-list
+  '(
+    ;; appearance
+    spacegray-theme
+    sublime-themes
+
+    ;; general
+    flycheck           ; auto-lint source files (must config for each lang)
+    flycheck-pos-tip   ; show error under point
+    simp
+    
+    ;; HTML & CSS-like
+    less-css-mode
+    web-mode           ; replaces html-mode
+
+    ;; JavaScript
+    js2-mode           ; syntax-highlighting, linting, etc.
+    nodejs-repl        ; required for web-beautify to work
+    web-beautify       ; formatting
+
+    ;; markdown
+    markdown-mode
+    pandoc-mode
+    
+    ;; PHP
+    php-mode
+
+    ;; Python
+    jedi               ; auto-completion & docs
+    python-environment ; required for jedi
+    pyvenv             ; use virtualenv inside emacs
+    ))
+
 ;; activate all the packages (in particular autoloads)
 (package-initialize)
 
@@ -31,9 +86,17 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-(require 'helm)
-(require 'helm-config)
-(require 'simp)
+
+;; ====================================================================
+;; general
+;; ====================================================================
+
+;; SPACES / TABS
+(setq-default indent-tabs-mode nil)
+
+;; ---------------------------------------------------------------------
+;; appearance
+;; ---------------------------------------------------------------------
 
 (if (eq system-type 'darwin)
     (set-frame-font "Bitstream Vera Sans Mono-11")
@@ -44,31 +107,8 @@
 ;; 80 chars + room for fringe
 (add-to-list 'default-frame-alist '(width . 88))
 
-;; Use this instead for disabling anti-aliasing
-;;defaults write org.gnu.Emacs AppleAntiAliasingThreshold 999
-;; In order for this to take effect, you must use the following command:
-;defaults write org.gnu.Emacs FontBackend ns
-;(setq mac-allow-anti-aliasing nil)
-
-;; Light Theme
-;; (load-theme 'sanityinc-tomorrow-day t)
-;; (load-theme 'leuven t)
-;;(load-theme 'tango t)
+;; light Theme
 (load-theme 'tango t)
-;; (load-theme 'soft-morning t)
-
-(setq backup-by-copying t               ; don't clobber symlinks
-      backup-directory-alist '(("." . "~/.emacs.d/backups"))
-      delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)                ; use versioned backups
-
-;; no bells
-(setq visible-bell t)
-
-;; Doesn't work on OS X
-;; (setq ring-bell-function (lambda () (play-sound-file ".emacs.d/sounds/goron_oop.au")))
 
 ;; naked emacs
 (scroll-bar-mode 0)
@@ -84,54 +124,70 @@
 (setq initial-scratch-message "")
 (setq inhibit-startup-message t)
 
-;; SPACES / TABS
-(setq-default indent-tabs-mode nil)
-;; web-beautify specifics
+;; no bells
+(setq visible-bell t)
 
-;; This constant is internal to web-beautify, but I haven't found
-;; another way to define options *globally*
-(require 'web-beautify)
-(defconst web-beautify-args '("-s" "2" "-w" "80" "-f" "-"))
+;; Doesn't work on OS X
+;; (setq ring-bell-function (lambda () (play-sound-file ".emacs.d/sounds/goron_oop.au")))
 
-;; css-mode specifics
-(setq css-indent-offset 2)
-;; js2-mode specifics
-;; basic options
 
-;; associate with '.js' files
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;; ---------------------------------------------------------------------
+;; backup
+;; ---------------------------------------------------------------------
+(setq backup-by-copying t               ; don't clobber symlinks
+      backup-directory-alist '(("." . "~/.emacs.d/backups"))
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)                ; use versioned backups
 
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.emacs\\'" . emacs-lisp-mode))
-(setq js2-basic-offset 2)
 
-;; auto-beautify on save
-(eval-after-load 'js2-mode
-  (lambda ()
-    (require 'nodejs-repl)
-    (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)
-    (linum-mode)))
+;; ---------------------------------------------------------------------
+;; dired
+;; ---------------------------------------------------------------------
+(setq-default dired-use-ls-dired nil)
 
-(eval-after-load 'html-mode
-  (lambda ()
-    (define-key html-mode-map (kbd "C-c b") 'web-beautify-html)
-    (linum-mode)))
 
-(eval-after-load 'css-mode
-  (lambda ()
-    (define-key css-mode-map (kbd "C-c b") 'web-beautify-css)
-    (linum-mode)))
+;; ---------------------------------------------------------------------
+;; flycheck
+;; ---------------------------------------------------------------------
+(require 'flycheck)
 
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-;; add support for tern
+;; ask flycheck to use same load path as emacs
+;; otherwise, it complains about third-party (require) calls
+(setq-default flycheck-emacs-lisp-load-path 'inherit)
 
-(autoload 'tern-mode "tern.el" nil t)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(setq flycheck-indication-mode 'right-fringe)
 
-;; helm specifics
+(setq flycheck-check-syntax-automatically '(mode-enabled save idle-change))
 
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+;; idle time before check in SECONDS
+(setq flycheck-idle-change-delay 2)
+
+;; ---------------------------------------------------------------------
+;; flycheck-pos
+;; ---------------------------------------------------------------------
+
+(eval-after-load 'flycheck
+  '(custom-set-variables
+   '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+
+;; ---------------------------------------------------------------------
+;; helm
+;; ---------------------------------------------------------------------
+
+(require 'helm)
+(require 'helm-config)
+
+;; rebind tab to run persistent action
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+
+;; make TAB work in terminal
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+
+;; list actions using C-z
+(define-key helm-map (kbd "C-z")  'helm-select-action)
 
 ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
 ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
@@ -139,20 +195,34 @@
 (global-set-key (kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
 
-(when (executable-find "curl")
-  (setq helm-google-suggest-use-curl-p t))
+;; open helm buffer inside current window, not occupy whole other window
+(setq helm-split-window-in-side-p t)
 
-(setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-      helm-ff-file-name-history-use-recentf t)
+;; move to end/beginning of source when reaching top/bottom of source.
+(setq helm-move-to-line-cycle-in-source t)
 
+;; search for library in `require' and `declare-function' sexp.
+(setq-default helm-ff-search-library-in-sexp t)
+
+;; scroll 8 lines other window using M-<next>/M-<prior>
+(setq helm-scroll-amount 8)
+(setq-default helm-ff-file-name-history-use-recentf t)
+
+;; must run after config performed
 (helm-mode t)
+
+
+;; ---------------------------------------------------------------------
+;; simp
+;; ---------------------------------------------------------------------
+(require 'simp)
+
+;; define what a project directory should look like
 (simp-project-define
  '(:has (.git)
    :ignore (.git)))
-;; I bind the handy stuff like so:
+
+;; keys
 (global-set-key (kbd "C-c f") 'simp-project-find-file)
 (global-set-key (kbd "C-c d") 'simp-project-root-dired)
 (global-set-key (kbd "C-c s") 'simp-project-rgrep)
@@ -163,7 +233,91 @@
 (global-set-key (kbd "C-c C-s") 'simp-project-with-bookmark-rgrep)
 (global-set-key (kbd "C-c C-b") 'simp-project-with-bookmark-ibuffer)
 
-(add-hook 'after-init-hook #'global-flycheck-mode)
-(setq flycheck-indication-mode 'right-fringe)
 
-(setq dired-use-ls-dired nil)
+;; =====================================================================
+;; Emacs lisp
+;; =====================================================================
+
+(add-to-list 'auto-mode-alist '("\\.emacs\\'" . emacs-lisp-mode))
+(add-to-list 'auto-mode-alist '("\\dot-emacs\\'" . emacs-lisp-mode))
+
+
+;; =====================================================================
+;; HTML & CSS-like
+;; =====================================================================
+
+;; ---------------------------------------------------------------------
+;; css-mode
+;; ---------------------------------------------------------------------
+
+(setq-default css-indent-offset 2)
+
+(eval-after-load 'css-mode
+  (lambda ()
+    (define-key css-mode-map (kbd "C-c b") 'web-beautify-css)
+    (linum-mode)))
+
+;; ---------------------------------------------------------------------
+;; web-mode
+;; ---------------------------------------------------------------------
+
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+
+(eval-after-load 'web-mode
+  (lambda ()
+    (define-key html-mode-map (kbd "C-c b") 'web-beautify-html)
+    (linum-mode)))
+
+
+;; =====================================================================
+;; JavaScript
+;; =====================================================================
+
+;; ---------------------------------------------------------------------
+;; js2-mode
+;; ---------------------------------------------------------------------
+
+;; associate with '.js' files
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(setq-default js2-basic-offset 2)
+
+;; ---------------------------------------------------------------------
+;; web-beautify
+;; ---------------------------------------------------------------------
+(require 'web-beautify)
+
+;; This constant is internal to web-beautify, but I haven't found
+;; another way to define options *globally*
+(defconst web-beautify-args '("-s" "2" "-w" "80" "-f" "-"))
+
+;; auto-beautify on save
+(eval-after-load 'js2-mode
+  (lambda ()
+    (require 'nodejs-repl)
+    (require 'web-beautify-repl)
+    (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)
+    (linum-mode)))
+
+
+;; ---------------------------------------------------------------------
+;; tern
+;; ---------------------------------------------------------------------
+(autoload 'tern-mode "tern.el" nil t)
+(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+
+;; =====================================================================
+;; markdown
+;; =====================================================================
+(add-hook 'markdown-mode-hook
+          (lambda () (setq-default markdown-command "pandoc")))
+
+
+;; =====================================================================
+;; Python
+;; =====================================================================
+(setq-default python-indent-offset 4)
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq-default jedi:complete-on-dot t)                 ; optional
+
+;;; dot-emacs ends here
