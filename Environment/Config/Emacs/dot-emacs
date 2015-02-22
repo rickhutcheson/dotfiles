@@ -20,18 +20,20 @@
 ;; activate all the packages (in particular autoloads)
 (package-initialize)
 
-;; fetch the list of packages available
-(unless (file-exists-p package-user-dir)
-  (package-refresh-contents))
-
-(require 'helm)
-(require 'helm-config)
-(require 'simp)
+;; refresh package contents
+;; HACK: This should really only run once, not for every package.
+(dolist (package required-package-list)
+  (unless (package-installed-p package)
+    (package-refresh-contents)))
 
 ;; install the missing packages
 (dolist (package required-package-list)
   (unless (package-installed-p package)
     (package-install package)))
+
+(require 'helm)
+(require 'helm-config)
+(require 'simp)
 
 (if (eq system-type 'darwin)
     (set-frame-font "Bitstream Vera Sans Mono-11")
