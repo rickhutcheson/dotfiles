@@ -87,10 +87,10 @@ bind pad2:cmd,alt,shift   resize 100%   -2%  top-left
 bind pad4:cmd,alt,shift   resize  -2%  100%  top-left
 bind pad6:cmd,alt,shift   resize 102%  100%  top-left
 
-bind up:cmd,alt,shift   resize 100%  102%  top-left
-bind down:cmd,alt,shift   resize 100%   -2%  top-left
-bind left:cmd,alt,shift   resize  -2%  100%  top-left
-bind right:cmd,alt,shift   resize 102%  100%  top-left
+bind up:cmd,alt,ctrl   corner top-left resize:0.5*screenSizeX;0.5*screenSizeY
+bind down:cmd,alt,ctrl   corner bottom-left resize:0.5*screenSizeX;0.5*screenSizeY
+bind left:cmd,alt,ctrl   corner bottom-left resize:0.5*screenSizeX;0.5*screenSizeY
+bind right:cmd,alt,ctrl  corner bottom-right resize:0.5*screenSizeX;0.5*screenSizeY
 
 # App Hiding & Switching
 bind pad.:cmd sequence hide 'current' | hint

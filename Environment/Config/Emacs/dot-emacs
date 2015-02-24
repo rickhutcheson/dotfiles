@@ -266,7 +266,7 @@
 
 (eval-after-load 'web-mode
   (lambda ()
-    (define-key html-mode-map (kbd "C-c b") 'web-beautify-html)
+    (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)
     (linum-mode)))
 
 
@@ -295,7 +295,7 @@
 (eval-after-load 'js2-mode
   (lambda ()
     (require 'nodejs-repl)
-    (require 'web-beautify-repl)
+    (require 'web-beautify)
     (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)
     (linum-mode)))
 
@@ -304,13 +304,16 @@
 ;; tern
 ;; ---------------------------------------------------------------------
 (autoload 'tern-mode "tern.el" nil t)
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-
+(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+(eval-after-load 'tern
+   '(progn
+      (require 'tern-auto-complete)
+      (tern-ac-setup)))
 ;; =====================================================================
 ;; markdown
 ;; =====================================================================
-(add-hook 'markdown-mode-hook
-          (lambda () (setq-default markdown-command "pandoc")))
+(setq-default markdown-command "pandoc")
+(setq-default markdown-open-command "/usr/local/bin/mark")
 
 
 ;; =====================================================================
