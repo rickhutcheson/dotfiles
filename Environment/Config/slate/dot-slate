@@ -31,6 +31,8 @@ config resizePercentOf        screenSize
 
 config focusCheckWidthMax 1000
 
+# Useful for maximum reusability
+orderScreensLeftToRight true
 
                         ######################
                         #        BIND        #
@@ -95,6 +97,11 @@ bind right:cmd,alt,ctrl  corner bottom-right resize:0.5*screenSizeX;0.5*screenSi
 # App Hiding & Switching
 bind pad.:cmd sequence hide 'current' | hint
 bind .:cmd sequence hide 'current' | hint
+
+bind pad/:cmd,shift throw 0
+bind pad*:cmd,shift throw 1
+bind ,:cmd,alt,ctrl throw 0
+bind .:cmd,alt,ctrl throw 1
 
 # If the app-switcher actually worked, I'd have it mapped to alt-tab.
 # Unfortunately, it really doesn't.
