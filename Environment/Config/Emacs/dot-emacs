@@ -11,13 +11,14 @@
 
 ;;; Code:
 
+(add-to-list 'load-path "~/Environment/Utilities/Emacs/flycheck")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/helm")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
 
 
 (defun set-exec-path-from-shell-PATH ()
-  "Set `execpath and PATH environment variable to match user's $PATH."
+  "Set `execpath` and PATH environment variable to match user's $PATH."
   (interactive)
   (let ((path-from-shell
          (replace-regexp-in-string
@@ -32,8 +33,10 @@
 ;; =====================================================================
 
 (require 'package)
-
+(add-to-list 'package-archives
+             '("elpy" . "http://jorgenschaefer.github.io/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+
 
 ;; ---------------------------------------------------------------------
 ;; Required Packages
@@ -42,14 +45,16 @@
 (defvar required-package-list
   '(
     ;; appearance
-    spacegray-theme
+    moe-theme
     sublime-themes
 
+
     ;; general
+    browse-at-remote
     flycheck           ; auto-lint source files (must config for each lang)
     flycheck-pos-tip   ; show error under point
     simp
-    
+
     ;; HTML & CSS-like
     less-css-mode
     web-mode           ; replaces html-mode
@@ -62,7 +67,7 @@
     ;; markdown
     markdown-mode
     pandoc-mode
-    
+
     ;; PHP
     php-mode
 
@@ -87,28 +92,46 @@
     (package-install package)))
 
 
-;; ====================================================================
+;; =====================================================================
 ;; general
-;; ====================================================================
+;; =====================================================================
 
-;; SPACES / TABS
-(setq-default indent-tabs-mode nil)
+;; ---------------------------------------------------------------------
+;; required packages
+;; ---------------------------------------------------------------------
+(require 'browse-at-remote)
+(require 'flycheck)
+(require 'flymake)
+(require 'flymake-php)
+(require 'flymake-phpcs)
+(require 'helm)
+(require 'helm-config)
+(require 'moe-theme)
+(require 'simp)
+(require 'web-beautify)
 
 ;; ---------------------------------------------------------------------
 ;; appearance
 ;; ---------------------------------------------------------------------
 
+;; SPACES / TABS
+(setq-default indent-tabs-mode nil)
+
+;;    (set-frame-font "Monaco-11")
 (if (eq system-type 'darwin)
-    (set-frame-font "Bitstream Vera Sans Mono-11")
+    (set-face-attribute 'default nil
+                        :family "Menlo" :height 100 :weight 'medium)
     (set-frame-font "Ubuntu Mono-15"))
 
-(setq-default line-spacing 0.10)
+(setq-default line-spacing 0.02)
 
 ;; 80 chars + room for fringe
 (add-to-list 'default-frame-alist '(width . 88))
 
-;; light Theme
-(load-theme 'tango t)
+;; dark Theme
+
+(load-theme 'moe-dark t)
+(moe-theme-set-color 'w/b)
 
 ;; naked emacs
 (scroll-bar-mode 0)
@@ -119,7 +142,7 @@
 ;; Prevent the cursor from blinking
 (global-linum-mode t)
 (column-number-mode t)
- 
+
 ;; Don't use messages that you don't read
 (setq initial-scratch-message "")
 (setq inhibit-startup-message t)
@@ -132,8 +155,41 @@
 
 
 ;; ---------------------------------------------------------------------
+;; functions
+;; ---------------------------------------------------------------------
+
+(defun layout-django ()
+   "Lay out the frame as two 80-column windows across"
+   (interactive)
+   (split-window-right 110)) ; 100 chars + fringe
+
+(require 'cl)
+(defun kill-matching (regexp)
+  "Kill buffers matching REGEXP *without* asking for confirmation."
+  (interactive "sMatch: ")
+  (flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
+    (kill-matching-buffers regexp)))
+
+
+;; ---------------------------------------------------------------------
+;; global hooks
+;; ---------------------------------------------------------------------
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+
+;; ---------------------------------------------------------------------
+;; global key bindings
+;; ---------------------------------------------------------------------
+(global-set-key (kbd "C-c l d") 'layout-django)
+(global-set-key (kbd "C-c g") 'magit-status)
+(global-set-key (kbd "C-c h") 'browse-at-remote)
+
+
+;; ---------------------------------------------------------------------
 ;; backup
 ;; ---------------------------------------------------------------------
+
 (setq backup-by-copying t               ; don't clobber symlinks
       backup-directory-alist '(("." . "~/.emacs.d/backups"))
       delete-old-versions t
@@ -145,25 +201,34 @@
 ;; ---------------------------------------------------------------------
 ;; dired
 ;; ---------------------------------------------------------------------
+
 (setq-default dired-use-ls-dired nil)
+
+
+;; ---------------------------------------------------------------------
+;; eshell
+;; ---------------------------------------------------------------------
+
+(setq eshell-aliases-file "~/Environment/Config/Emacs/eshell-aliases")
 
 
 ;; ---------------------------------------------------------------------
 ;; flycheck
 ;; ---------------------------------------------------------------------
-(require 'flycheck)
 
 ;; ask flycheck to use same load path as emacs
 ;; otherwise, it complains about third-party (require) calls
 (setq-default flycheck-emacs-lisp-load-path 'inherit)
 
-(add-hook 'after-init-hook #'global-flycheck-mode)
+;; (add-hook 'after-init-hook #'global-flycheck-mode)
+
 (setq flycheck-indication-mode 'right-fringe)
 
 (setq flycheck-check-syntax-automatically '(mode-enabled save idle-change))
 
 ;; idle time before check in SECONDS
 (setq flycheck-idle-change-delay 2)
+
 
 ;; ---------------------------------------------------------------------
 ;; flycheck-pos
@@ -177,9 +242,6 @@
 ;; helm
 ;; ---------------------------------------------------------------------
 
-(require 'helm)
-(require 'helm-config)
-
 ;; rebind tab to run persistent action
 (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
 
@@ -192,9 +254,14 @@
 ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
 ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
 ;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
 
+;; helm-buffers-list has better behavior than the default
+(global-unset-key (kbd "C-x b"))
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
+
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
 ;; open helm buffer inside current window, not occupy whole other window
 (setq helm-split-window-in-side-p t)
 
@@ -213,9 +280,24 @@
 
 
 ;; ---------------------------------------------------------------------
+;; PHP
+;; ---------------------------------------------------------------------
+
+(setq-default flymake-phpcs-show-rule t)
+(setq-default flymake-phpcs-standard "~/.emacs.d/UdemyPHPStandard")
+
+(add-hook 'php-mode-hook (lambda ()
+                           (flymake-php-load)
+                           (flymake-phpcs-load)
+
+                           (define-key php-mode-map (kbd "C-c m")
+                             (lambda () (interactive) (eshell-command "udemy_php_make")))))
+
+
+;; ---------------------------------------------------------------------
 ;; simp
 ;; ---------------------------------------------------------------------
-(require 'simp)
+
 
 ;; define what a project directory should look like
 (simp-project-define
@@ -282,14 +364,17 @@
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (setq-default js2-basic-offset 2)
 
+
 ;; ---------------------------------------------------------------------
 ;; web-beautify
 ;; ---------------------------------------------------------------------
-(require 'web-beautify)
 
 ;; This constant is internal to web-beautify, but I haven't found
 ;; another way to define options *globally*
-(defconst web-beautify-args '("-s" "2" "-w" "80" "-f" "-"))
+(defconst web-beautify-args '("-s" "4" "-w" "80" "-f" "-"))
+
+;; automatic checking
+(add-hook 'js2-mode-hook 'flycheck-mode)
 
 ;; auto-beautify on save
 (eval-after-load 'js2-mode
@@ -303,24 +388,101 @@
 ;; ---------------------------------------------------------------------
 ;; tern
 ;; ---------------------------------------------------------------------
+
 (autoload 'tern-mode "tern.el" nil t)
 (add-hook 'js-mode-hook (lambda () (tern-mode t)))
 (eval-after-load 'tern
    '(progn
       (require 'tern-auto-complete)
       (tern-ac-setup)))
+
 ;; =====================================================================
 ;; markdown
 ;; =====================================================================
+
 (setq-default markdown-command "pandoc")
 (setq-default markdown-open-command "/usr/local/bin/mark")
 
 
-;; =====================================================================
-;; Python
-;; =====================================================================
-(setq-default python-indent-offset 4)
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq-default jedi:complete-on-dot t)                 ; optional
+;; ;; =====================================================================
+;; ;; Python
+;; ;; =====================================================================
+(require 'auto-shell-command)
 
+;; Set of key bindings
+;(global-set-key (kbd "C-c C-m") 'ascmd:toggle) ; Temporarily on/off auto-shell-command run
+;(global-set-key (kbd "C-c C-,") 'ascmd:popup)  ; Pop up '*Auto Shell Command*'
+;(global-set-key (kbd "C-c C-.") 'ascmd:exec)   ; Exec-command specify file name
+
+;; ;; Popup on errors
+(push '("*Auto Shell Command*" :height 20 :noselect t) popwin:special-display-config)
+
+;; ;; Notification of results to Growl (optional)
+;(defun ascmd:notify (msg) (deferred:process-shell (format "growlnotify -m %s -t emacs" msg)))
+
+(setenv "DJANGO_SETTINGS_MODULE" "udemy.settings.local")
+(setq-default python-fill-docstring-style 'django)
+(setq-default python-indent-offset 4)
+(setq python-fill-docstring-style 'django)
+(setq python-indent-offset 4)
+(setq default-django-env "~/Environment/Utilities/Python/Envs/py3default")
+
+;; (require 'flycheck)
+;; (setq-default flycheck-flake8-maximum-line-length 100)
+
+;; (flycheck-define-checker python-pep257
+;;   "A Python syntax and style checker using PEP257"
+;;   :command ("pep257" source)
+;;   :error-patterns
+;;   ((warning (file-name) ":" line " " (one-or-more not-newline) "\n" (message)))
+;;   :modes python-mode)
+;; ;(add-to-list 'flycheck-checkers 'python-pep257 'append)
+;; ;(flycheck-add-next-checker 'python-flake8 '(error . python-pep257))
+;(ascmd:add '("~/Repositories/website-django/" "~/Environment/Utilities/Udemy/udemy_emacs_test_unit"))
+;(ascmd:add '("~/Repositories/website-django/" "~/Environment/Utilities/Udemy/udemy_sync_django"))
+(elpy-enable)
+(add-hook 'python-mode-hook
+          (lambda()
+            ;; setup virtualenv for Django
+            (pyvenv-activate default-django-env)
+            (define-key python-mode-map (kbd "C-c t") (lambda () (interactive) (eshell-command "udemy_test_unit")))
+            (add-hook 'before-save-hook 'py-isort-buffer)
+            (define-key python-mode-map (kbd "C-c s") (lambda () (interactive) (eshell-command "udemy_sync_django")))))
+
+;;           (lambda ()
+
+
+
+;;             ;; eshell (auto-testing)
+
+
+;;             ;; python-mode
+
+
+
+;;             ;; jedi
+;;             (setq-default popup-complete-enable t)
+;;             (setq-default jedi:setup-keys t)
+;;             (setq-default jedi:complete-on-dot t)
+;;             (setq-default jedi:environment-root default-django-env)
+;;             (jedi:setup)
+
+;;             ;; flycheck
+;;             ))
 ;;; dot-emacs ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(elpy-test-django-runner-command
+   (quote
+    ("/Users/rickhutcheson/Environment/Utilities/Udemy/udemy_emacs_test_unit")))
+ '(elpy-test-runner (quote elpy-test-django-runner))
+ '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
