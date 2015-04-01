@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
+source $USER_ENV_VARS/Python.sh
+
 easy_install pip
+easy_install-$USER_ENV_PYTHON_PY3_VERSION pip
 pip install virtualenv
 pip3 install virtualenv
 
