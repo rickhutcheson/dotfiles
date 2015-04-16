@@ -106,7 +106,6 @@
 (require 'flymake-phpcs)
 (require 'helm)
 (require 'helm-config)
-(require 'moe-theme)
 (require 'simp)
 (require 'web-beautify)
 
@@ -120,7 +119,7 @@
 ;;    (set-frame-font "Monaco-11")
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
-                        :family "Menlo" :height 100 :weight 'medium)
+                        :family "Monaco" :height 100 :weight 'medium)
     (set-frame-font "Ubuntu Mono-15"))
 
 (setq-default line-spacing 0.02)
@@ -130,8 +129,7 @@
 
 ;; dark Theme
 
-(load-theme 'moe-dark t)
-(moe-theme-set-color 'w/b)
+(load-theme 'railscasts t)
 
 ;; naked emacs
 (scroll-bar-mode 0)
@@ -469,6 +467,15 @@
 
 ;;             ;; flycheck
 ;;             ))
+
+
+;; ---------------------------------------------------------------------
+;; required variables
+;; ---------------------------------------------------------------------
+
+(setq magit-last-seen-setup-instructions "1.4.0")
+
+
 ;;; dot-emacs ends here
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
