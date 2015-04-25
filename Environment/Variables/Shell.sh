@@ -1,6 +1,37 @@
 #!/usr/bin/env bash
 
-export PS1="\[\033[32m\][\w]\[\033[0m\]\n\[\033[1;36m\]\u\[\033[1;33m\] ➤ \[\033[0m\]"
+
+NONE=$(tput sgr0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+CYAN=$(tput setaf 4)
+PURPLE=$(tput setaf 5)
+WHITE=$(tput setaf 7)
+BOLD=$(tput bold)
+
+
+cwd="\[$CYAN\][\w]\[$NONE\]"
+prompt="⁒ "
+
+do_cmd() {
+  if [ -d ".git" ]; then
+    branch="\[$WHITE\] ≻ \[$RED\]"$(git symbolic-ref HEAD|sed -e 's,.*/\(.*\),\1,')""
+  else
+    branch=""
+  fi
+
+  if [ "$VIRTUAL_ENV" ]; then
+    venv=$(basename $VIRTUAL_ENV)
+    pre_prompt="\[$GREEN\]"
+  else
+    pre_prompt="\[$YELLOW\]"
+  fi
+  PS1=$cwd"\[$RED\]"$branch"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\]"
+  return 0
+}
+
+export PROMPT_COMMAND=do_cmd
 
 make-targets() {
     make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}'
