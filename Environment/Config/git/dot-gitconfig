@@ -28,3 +28,11 @@
 [mergetool "sourcetree"]
 	cmd = /Users/rickhutcheson/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+[alias]
+	st = status
+	co = checkout
+	lol = log --graph --decorate --pretty=\"[%h] %d | %s <%an|%cd>\" --abbrev-commit --date=short --all --decorate
+	me = log --author=\"rick.hutcheson@udemy.com\" --decorate
+	amend = commit --amend
+[rerere]
+	enabled = true

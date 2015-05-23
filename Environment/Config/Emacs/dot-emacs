@@ -116,10 +116,10 @@
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
 
-;;    (set-frame-font "Monaco-11")
+;;    (set-frame-font "Monaco-9")
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
-                        :family "Terminus (TTF)" :height 130 :weight 'medium)
+                        :family "Monaco" :height 100 :weight 'medium)
     (set-frame-font "Ubuntu Mono-15"))
 
 (setq-default line-spacing 0.02)
