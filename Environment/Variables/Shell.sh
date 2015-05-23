@@ -23,7 +23,7 @@ do_cmd() {
 
   if [ "$VIRTUAL_ENV" ]; then
     venv=$(basename $VIRTUAL_ENV)
-    pre_prompt="\[$GREEN\]"
+    pre_prompt="\[$GREEN\]⁒"
   else
     pre_prompt="\[$YELLOW\]"
   fi
