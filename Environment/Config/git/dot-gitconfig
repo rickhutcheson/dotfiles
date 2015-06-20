@@ -6,7 +6,7 @@
 	ui = true
 
 [core]
-	editor = emacs
+	editor = nano
 	excludesfile = /Users/rickhutcheson/.gitignore_global
 
 [credential]
@@ -36,3 +36,6 @@
 	amend = commit --amend
 [rerere]
 	enabled = true
+[diff]
+[difftool]
+	prompt = false
