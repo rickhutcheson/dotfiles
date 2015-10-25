@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
+
+# Shell Options
+# ----------------------------------------------------------------------
+shopt -s histappend
 export PATH=$PATH:$USER_ENV_UTILS/Shell/
+
+# Prompt Formatting
+# ----------------------------------------------------------------------
 
 NONE=$(tput sgr0)
 RED=$(tput setaf 1)
@@ -29,11 +36,21 @@ do_cmd() {
     pre_prompt="\[$YELLOW\]"
   fi
   PS1=$cwd"\[$RED\]"$branch"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\]"
+
+  #
+  # History Sharing - These settings share history between terminal tabs.
+  #
+  history -a
+  history -n
+
   return 0
 }
 
 export PROMPT_COMMAND=do_cmd
 
-make-targets() {
+# Miscellaneous
+# ----------------------------------------------------------------------
+
+make_targets() {
     make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}'
 }
