@@ -34,6 +34,8 @@ config focusCheckWidthMax 1000
 # Useful for maximum reusability
 orderScreensLeftToRight true
 
+switchSecondsBeforeRepeat 0.02
+	
                         ######################
                         #        BIND        #
                         ######################
@@ -51,8 +53,8 @@ bind pad4:cmd             focus left
 bind pad6:cmd             focus right
 bind down:cmd             focus down
 bind left:cmd             focus left
-bind right:cmd             focus right
-bind up:cmd            focus up
+bind right:cmd            focus right
+bind up:cmd               focus up
 
 ## Moving w/o resizing
 
@@ -81,7 +83,7 @@ bind pad8:cmd,shift corner   top-left     resize:screenSizeX;0.5*screenSizeY
 bind up:cmd,shift corner   top-left     resize:screenSizeX;0.5*screenSizeY
 bind pad9:cmd,shift corner   top-right    resize:0.5*screenSizeX;0.5*screenSizeY
 bind pad+:cmd,shift corner   top-left     resize:screenSizeX;screenSizeY
-
+bind =:cmd,shift corner      top-left     resize:screenSizeX;screenSizeY
 
 # Resizing
 bind pad8:cmd,alt,shift   resize 100%  102%  top-left
@@ -105,7 +107,7 @@ bind .:cmd,alt,ctrl throw 1
 
 # If the app-switcher actually worked, I'd have it mapped to alt-tab.
 # Unfortunately, it really doesn't.
-# bind tab:alt switch
+# bind tab:cmd switch
 
 
 ############################################################################

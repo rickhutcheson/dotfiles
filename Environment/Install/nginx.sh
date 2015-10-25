@@ -12,10 +12,11 @@ cd build
 ./configure \
     --prefix=$USER_ENV_UTILS/nginx/nginx-$NGINX_VERSION \
     --with-http_stub_status_module
+#    --with-http_ssl_module
 make
 make install
 cd ..
 mv build nginx-$NGINX_VERSION
-if [ $! = 0 ]; then
+if [ $? = 0 ]; then
   echo "nginx install Completed."
 fi
