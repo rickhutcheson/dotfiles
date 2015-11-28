@@ -33,10 +33,10 @@
 ;; =====================================================================
 
 (require 'package)
-(add-to-list 'package-archives
-             '("elpy" . "http://jorgenschaefer.github.io/packages/"))
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-
+(setq package-archives
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+       ("melpa" . "http://melpa.org/packages/")
+       ("elpy" . "http://jorgenschaefer.github.io/packages/")))
 
 ;; ---------------------------------------------------------------------
 ;; Required Packages
@@ -46,8 +46,8 @@
   '(
     ;; appearance
     moe-theme
+    railscasts-theme
     sublime-themes
-
 
     ;; general
     browse-at-remote
@@ -72,9 +72,9 @@
     php-mode
 
     ;; Python
-    jedi               ; auto-completion & docs
-    python-environment ; required for jedi
-    pyvenv             ; use virtualenv inside emacs
+    auto-complete
+    python-environment
+    jedi
     ))
 
 ;; activate all the packages (in particular autoloads)
@@ -102,8 +102,6 @@
 (require 'browse-at-remote)
 (require 'flycheck)
 (require 'flymake)
-(require 'flymake-php)
-(require 'flymake-phpcs)
 (require 'helm)
 (require 'helm-config)
 (require 'simp)
@@ -115,6 +113,7 @@
 
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
+(setq mac-allow-anti-aliasing nil)  ;; turn off anti-aliasing
 
 ;;    (set-frame-font "Monaco-9")
 (if (eq system-type 'darwin)
@@ -145,12 +144,16 @@
 (setq initial-scratch-message "")
 (setq inhibit-startup-message t)
 
-;; no bells
-(setq visible-bell t)
+;; ---------------------------------------------------------------------
+;; sounds
+;; ---------------------------------------------------------------------
+
+(unless (and (fboundp 'play-sound-internal)
+             (subrp (symbol-function 'play-sound-internal)))
+(require 'play-sound))
 
 ;; Doesn't work on OS X
-;; (setq ring-bell-function (lambda () (play-sound-file ".emacs.d/sounds/goron_oop.au")))
-
+(setq ring-bell-function (lambda () (play-sound-file ".emacs.d/goron-oop.wav")))
 
 ;; ---------------------------------------------------------------------
 ;; functions
@@ -307,11 +310,11 @@
 (global-set-key (kbd "C-c d") 'simp-project-root-dired)
 (global-set-key (kbd "C-c s") 'simp-project-rgrep)
 (global-set-key (kbd "C-c S") 'simp-project-rgrep-dwim)
-(global-set-key (kbd "C-c b") 'simp-project-ibuffer-files-only)
-(global-set-key (kbd "C-c B") 'simp-project-ibuffer)
-(global-set-key (kbd "C-c C-f") 'simp-project-with-bookmark-find-file)
-(global-set-key (kbd "C-c C-s") 'simp-project-with-bookmark-rgrep)
-(global-set-key (kbd "C-c C-b") 'simp-project-with-bookmark-ibuffer)
+; (global-set-key (kbd "C-c b") 'simp-project-ibuffer-files-only)
+; (global-set-key (kbd "C-c B") 'simp-project-ibuffer)
+; (global-set-key (kbd "C-c C-f") 'simp-project-with-bookmark-find-file)
+; (global-set-key (kbd "C-c C-s") 'simp-project-with-bookmark-rgrep)
+; (global-set-key (kbd "C-c C-b") 'simp-project-with-bookmark-ibuffer)
 
 
 ;; =====================================================================
@@ -402,94 +405,27 @@
 (setq-default markdown-open-command "/usr/local/bin/mark")
 
 
-;; ;; =====================================================================
-;; ;; Python
-;; ;; =====================================================================
-(require 'auto-shell-command)
+;; =====================================================================
+;; Python
+;; =====================================================================
 
-;; Set of key bindings
-;(global-set-key (kbd "C-c C-m") 'ascmd:toggle) ; Temporarily on/off auto-shell-command run
-;(global-set-key (kbd "C-c C-,") 'ascmd:popup)  ; Pop up '*Auto Shell Command*'
-;(global-set-key (kbd "C-c C-.") 'ascmd:exec)   ; Exec-command specify file name
-
-;; ;; Popup on errors
-(push '("*Auto Shell Command*" :height 20 :noselect t) popwin:special-display-config)
-
-;; ;; Notification of results to Growl (optional)
-;(defun ascmd:notify (msg) (deferred:process-shell (format "growlnotify -m %s -t emacs" msg)))
-
-(setenv "DJANGO_SETTINGS_MODULE" "udemy.settings.local")
-(setq-default python-fill-docstring-style 'django)
+;; Popup on errors
+(setq py-python-command "python3")
 (setq-default python-indent-offset 4)
-(setq python-fill-docstring-style 'django)
 (setq python-indent-offset 4)
-(setq default-django-env "~/Environment/Utilities/Python/Envs/py3default")
 
-;; (require 'flycheck)
-;; (setq-default flycheck-flake8-maximum-line-length 100)
-
-;; (flycheck-define-checker python-pep257
-;;   "A Python syntax and style checker using PEP257"
-;;   :command ("pep257" source)
-;;   :error-patterns
-;;   ((warning (file-name) ":" line " " (one-or-more not-newline) "\n" (message)))
-;;   :modes python-mode)
-;; ;(add-to-list 'flycheck-checkers 'python-pep257 'append)
-;; ;(flycheck-add-next-checker 'python-flake8 '(error . python-pep257))
-;(ascmd:add '("~/Repositories/website-django/" "~/Environment/Utilities/Udemy/udemy_emacs_test_unit"))
-;(ascmd:add '("~/Repositories/website-django/" "~/Environment/Utilities/Udemy/udemy_sync_django"))
-(elpy-enable)
-(add-hook 'python-mode-hook
-          (lambda()
-            ;; setup virtualenv for Django
-            (pyvenv-activate default-django-env)
-            (define-key python-mode-map (kbd "C-c t") (lambda () (interactive) (eshell-command "udemy_test_unit")))
-            (add-hook 'before-save-hook 'py-isort-buffer)
-            (define-key python-mode-map (kbd "C-c s") (lambda () (interactive) (eshell-command "udemy_sync_django")))))
-
-;;           (lambda ()
-
-
-
-;;             ;; eshell (auto-testing)
-
-
-;;             ;; python-mode
-
-
-
-;;             ;; jedi
-;;             (setq-default popup-complete-enable t)
-;;             (setq-default jedi:setup-keys t)
-;;             (setq-default jedi:complete-on-dot t)
-;;             (setq-default jedi:environment-root default-django-env)
-;;             (jedi:setup)
-
-;;             ;; flycheck
-;;             ))
-
+;; autocomplete
+(require 'python-environment)
+(setq jedi:environment-virtualenv
+      (append python-environment-virtualenv
+              '("--python" "~/Environment/Utilities/Python/latest/bin/python3")))
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+(setq jedi:get-in-function-call-delay 250)
+(setq jedi:key-goto-definition (kbd "<C-c b>"))
 
 ;; ---------------------------------------------------------------------
 ;; required variables
 ;; ---------------------------------------------------------------------
 
 (setq magit-last-seen-setup-instructions "1.4.0")
-
-
-;;; dot-emacs ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(elpy-test-django-runner-command
-   (quote
-    ("/Users/rickhutcheson/Environment/Utilities/Udemy/udemy_emacs_test_unit")))
- '(elpy-test-runner (quote elpy-test-django-runner))
- '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
