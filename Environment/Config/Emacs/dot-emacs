@@ -153,7 +153,7 @@
 (require 'play-sound))
 
 ;; Doesn't work on OS X
-(setq ring-bell-function (lambda () (play-sound-file ".emacs.d/goron-oop.wav")))
+(setq ring-bell-function (lambda () (play-sound-file "~/.emacs.d/goron-oop.wav")))
 
 ;; ---------------------------------------------------------------------
 ;; functions
