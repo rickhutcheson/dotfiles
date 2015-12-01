@@ -409,23 +409,35 @@
 ;; =====================================================================
 ;; org-trello
 ;; =====================================================================
+(defun trello-pull-card ()
+  "Pull card data from server"
+  (org-trello/sync-card t))
+
+(defun trello-push-card ()
+  "Push card data to server"
+  (org-trello/sync-card))
+
 (setq org-fast-tag-selection-include-todo t)
 (setq org-trello-files (mapcar
                         (lambda (f) (concat (concat "~/trello/" f) ".org"))
                         (directory-files "~/trello")))
 (eval-after-load 'org-mode
   (lambda ()
-    (define-key org-mode-map (kbd "<s-return>") 'org-insert-todo-heading)))
+    (define-key org-mode-map (kbd "<s-return>") 'org-insert-todo-heading)
+    (define-key org-mode-map (kbd "<C-c d>") 'trello-pull-card)
+    (define-key org-mode-map (kbd "<C-c u>") 'trello-push-card)))
 
-(defun start-trello ()
+(defun trello-board ()
   "Run org-trello mode"
   (interactive)
+  (require 'org-trello)
   (find-file (read-file-name "Board File: "
                              "~/trello/"
                              "sprint.org"  ; default
                              t             ; require-match
                              nil           ; initial-value; nil -> "use default"
-                             nil)))
+                             nil))
+  (org-trello/sync-buffer t))
 
 
 ;; =====================================================================
