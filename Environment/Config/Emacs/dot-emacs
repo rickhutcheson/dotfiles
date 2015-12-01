@@ -53,6 +53,8 @@
     browse-at-remote
     flycheck           ; auto-lint source files (must config for each lang)
     flycheck-pos-tip   ; show error under point
+    magit
+    org-trello
     simp
 
     ;; HTML & CSS-like
@@ -118,7 +120,7 @@
 ;;    (set-frame-font "Monaco-9")
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
-                        :family "Monaco" :height 100 :weight 'medium)
+                        :family "Monaco" :height 220 :weight 'medium)
     (set-frame-font "Ubuntu Mono-15"))
 
 (setq-default line-spacing 0.02)
@@ -404,6 +406,27 @@
 (setq-default markdown-command "pandoc")
 (setq-default markdown-open-command "/usr/local/bin/mark")
 
+;; =====================================================================
+;; org-trello
+;; =====================================================================
+(setq org-fast-tag-selection-include-todo t)
+(setq org-trello-files (mapcar
+                        (lambda (f) (concat (concat "~/trello/" f) ".org"))
+                        (directory-files "~/trello")))
+(eval-after-load 'org-mode
+  (lambda ()
+    (define-key org-mode-map (kbd "<s-return>") 'org-insert-todo-heading)))
+
+(defun start-trello ()
+  "Run org-trello mode"
+  (interactive)
+  (find-file (read-file-name "Board File: "
+                             "~/trello/"
+                             "sprint.org"  ; default
+                             t             ; require-match
+                             nil           ; initial-value; nil -> "use default"
+                             nil)))
+
 
 ;; =====================================================================
 ;; Python
@@ -411,7 +434,7 @@
 
 ;; Popup on errors
 (setq py-python-command "python3")
-(setq-default python-indent-offset 4)
+(setq-default python-inent-offset 4)
 (setq python-indent-offset 4)
 
 ;; autocomplete
