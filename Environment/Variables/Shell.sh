@@ -24,31 +24,37 @@ prompt="⁒ "
 
 
 do_cmd() {
-  if [ -d ".git" ]; then
-      branch="\[$WHITE\] ≻ \[$RED\]"$(git rev-parse --abbrev-ref HEAD)""
-  else
-    branch=""
-  fi
+    branch=''
+    if [ -d ".git" ]
+    then
+        current_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)  # get branch name (if possible)
+        if [ $? -eq 0 ]
+        then
+            branch="\[$WHITE\] ≻ \[$RED\]"$current_branch""
+        fi
+    fi
 
-  if [ "$VIRTUAL_ENV" ]; then
-    venv=$(basename $VIRTUAL_ENV)
-    pre_prompt="\[$GREEN\]⁒"
-  else
-    pre_prompt="\[$YELLOW\]"
-  fi
-  PS1=$cwd"\[$RED\]"$branch"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\]"
+    if [ "$VIRTUAL_ENV" ]
+    then
+        venv=$(basename $VIRTUAL_ENV)
+        pre_prompt="\[$GREEN\]⁒"
+    else
+        pre_prompt="\[$YELLOW\]"
+    fi
+    PS1=$cwd"\[$RED\]"$branch"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\]"
 
-  #
-  # History Sharing - These settings share history between terminal tabs.
-  #
-  history -a
-  history -n
+    #
+    # History Sharing - These settings share history between terminal tabs.
+    #
+    history -a
+    history -n
 
-  return 0
+    return 0
 }
 
 export PROMPT_COMMAND=do_cmd
 
+#
 # Miscellaneous
 # ----------------------------------------------------------------------
 
