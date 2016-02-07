@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+export USER_ENV_HOME=~/Environment
+. $USER_ENV_HOME/SetVariables.sh
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+STASH_MESSAGE="git-switch away from $CURRENT_BRANCH"
+
+read -p "Branch name: " SWITCH_TO_BRANCH
+
+git stash save $STASH_MESSAGE
+git co master
+git pull
+git co -b $SWITCH_TO_BRANCH
