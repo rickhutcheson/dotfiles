@@ -32,8 +32,9 @@
 	st = status
 	co = checkout
 	lol = log --graph --decorate --pretty=\"[%h] %d | %s <%an|%cd>\" --abbrev-commit --date=short --all --decorate
-	me = log --author=\"rick.hutcheson@udemy.com\" --decorate
-	amend = commit --amend
+	me = log --author=\"rick.hutcheson@udemy.com\" --oneline
+	amend = commit --amend --no-edit
+	cc = commit --no-verify
 [rerere]
 	enabled = true
 [diff]
