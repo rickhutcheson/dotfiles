@@ -15,7 +15,7 @@
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/helm")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
-
+(add-to-list 'load-path "~/.emacs.d/cweb.el")
 
 (defun set-exec-path-from-shell-PATH ()
   "Set `execpath` and PATH environment variable to match user's $PATH."
@@ -54,7 +54,6 @@
     flycheck           ; auto-lint source files (must config for each lang)
     flycheck-pos-tip   ; show error under point
     magit
-    org-trello
     simp
 
     ;; HTML & CSS-like
@@ -120,7 +119,7 @@
 ;;    (set-frame-font "Monaco-9")
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
-                        :family "Monaco" :height 220 :weight 'medium)
+                        :family "Monaco" :height 110 :weight 'medium)
     (set-frame-font "Ubuntu Mono-15"))
 
 (setq-default line-spacing 0.02)
@@ -378,7 +377,8 @@
 
 ;; automatic checking
 (add-hook 'js2-mode-hook 'flycheck-mode)
-
+(add-hook 'js2-mode-hook 'ac-js2-mode)
+(setq js2-highlight-level 3)
 ;; auto-beautify on save
 (eval-after-load 'js2-mode
   (lambda ()
@@ -407,40 +407,6 @@
 (setq-default markdown-open-command "/usr/local/bin/mark")
 
 ;; =====================================================================
-;; org-trello
-;; =====================================================================
-(defun trello-pull-card ()
-  "Pull card data from server"
-  (org-trello/sync-card t))
-
-(defun trello-push-card ()
-  "Push card data to server"
-  (org-trello/sync-card))
-
-(setq org-fast-tag-selection-include-todo t)
-(setq org-trello-files (mapcar
-                        (lambda (f) (concat (concat "~/trello/" f) ".org"))
-                        (directory-files "~/trello")))
-(eval-after-load 'org-mode
-  (lambda ()
-    (define-key org-mode-map (kbd "<s-return>") 'org-insert-todo-heading)
-    (define-key org-mode-map (kbd "<C-c d>") 'trello-pull-card)
-    (define-key org-mode-map (kbd "<C-c u>") 'trello-push-card)))
-
-(defun trello-board ()
-  "Run org-trello mode"
-  (interactive)
-  (require 'org-trello)
-  (find-file (read-file-name "Board File: "
-                             "~/trello/"
-                             "sprint.org"  ; default
-                             t             ; require-match
-                             nil           ; initial-value; nil -> "use default"
-                             nil))
-  (org-trello/sync-buffer t))
-
-
-;; =====================================================================
 ;; Python
 ;; =====================================================================
 
@@ -464,3 +430,29 @@
 ;; ---------------------------------------------------------------------
 
 (setq magit-last-seen-setup-instructions "1.4.0")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
+ '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
+ '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
+ '(package-selected-packages
+   (quote
+    (web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
+ '(sql-postgres-login-params
+   (quote
+    ((user :default "rhutcheson")
+     password
+     (server :default "redshift.udemy.com")
+     (database :default "prod")
+     port))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
