@@ -22,9 +22,10 @@ BOLD=$(tput bold)
 cwd="\[$CYAN\][\w]\[$NONE\]"
 prompt="⁒ "
 
+
 do_cmd() {
   if [ -d ".git" ]; then
-    branch="\[$WHITE\] ≻ \[$RED\]"$(git symbolic-ref HEAD|sed -e 's,.*/\(.*\),\1,')""
+      branch="\[$WHITE\] ≻ \[$RED\]"$(git rev-parse --abbrev-ref HEAD)""
   else
     branch=""
   fi
