@@ -29,12 +29,13 @@
 	cmd = /Users/rickhutcheson/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [alias]
-	st = status
+	amend = commit --amend --no-edit
+	cc = commit --no-verify -m
 	co = checkout
+	ll = log --oneline
 	lol = log --graph --decorate --pretty=\"[%h] %d | %s <%an|%cd>\" --abbrev-commit --date=short --all --decorate
 	me = log --author=\"rick.hutcheson@udemy.com\" --oneline
-	amend = commit --amend --no-edit
-	cc = commit --no-verify
+	st = status
 [rerere]
 	enabled = true
 [diff]
