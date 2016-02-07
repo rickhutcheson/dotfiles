@@ -13,8 +13,12 @@ mkdir -p $USER_ENV_SCRIPTS
 mkdir -p $USER_ENV_UTILS
 
 for script in $USER_ENV_INSTALL/*; do
+    echo "Installing $script..."
     if [ -f $script ]
     then
         $script
     fi
+    echo "$script installed"
+    echo "-----------------------------------------"
+    echo "\n\n\n"
 done
