@@ -8,7 +8,7 @@ tar xzf node.tar.gz -C node-$NODE_VERSION --strip-components 1
 rm node.tar.gz
 ln -s node-$NODE_VERSION latest
 
-PKGS="browserify js-beautify docco groc jshint groc watchify"
+PKGS="browserify js-beautify docco jshint groc watchify phantomjs-prebuilt"
 
 mkdir -p $USER_ENV_UTILS/NPM
 cd $USER_ENV_UTILS/NPM
