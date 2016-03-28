@@ -119,7 +119,7 @@
 ;;    (set-frame-font "Monaco-9")
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
-                        :family "Monaco" :height 110 :weight 'medium)
+                        :family "Terminus" :height 160 :weight 'medium)
     (set-frame-font "Ubuntu Mono-15"))
 
 (setq-default line-spacing 0.02)
@@ -149,12 +149,12 @@
 ;; sounds
 ;; ---------------------------------------------------------------------
 
-(unless (and (fboundp 'play-sound-internal)
-             (subrp (symbol-function 'play-sound-internal)))
-(require 'play-sound))
+;; (unless (and (fboundp 'play-sound-internal)
+;;              (subrp (symbol-function 'play-sound-internal)))
+;; (require 'play-sound))
 
 ;; Doesn't work on OS X
-(setq ring-bell-function (lambda () (play-sound-file "~/.emacs.d/goron-oop.wav")))
+; (setq ring-bell-function (lambda () (play-sound-file "~/.emacs.d/goron-oop.wav")))
 
 ;; ---------------------------------------------------------------------
 ;; functions
