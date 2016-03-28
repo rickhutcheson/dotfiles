@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-
-git checkout -b $@
-git push -u origin $@
