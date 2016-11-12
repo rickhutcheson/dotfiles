@@ -2,8 +2,9 @@
 set -e
 source $USER_ENV_VARS/Python.sh
 
-PY3_VERSION=3.5.0
+PY3_VERSION=3.4.5
 
+echo "Installing $PY3_VERSION"
 mkdir -p $USER_ENV_UTILS/Python/python-$PY3_VERSION
 cd $USER_ENV_UTILS/Python
 mkdir -p src
@@ -22,9 +23,8 @@ make install
 
 cd
 easy_install pip
-easy_install-$USER_ENV_PYTHON_PY3_VERSION pip
-pip install virtualenv
-pip3 install virtualenv
+$USER_ENV_UTILS/Python/latest/bin/easy_install-$USER_ENV_PYTHON_PY3_VERSION pip
+$USER_ENV_UTILS/Python/latest/bin/pip install virtualenv
 
 mkdir -p $USER_ENV_UTILS/Python
 mkdir -p $USER_ENV_UTILS/Python/Envs
@@ -33,5 +33,5 @@ mkdir -p $USER_ENV_UTILS/Python/Envs
 cd $USER_ENV_UTILS/Python/Envs
 
 virtualenv --python=`which python` py2default  # default python2 environment
-virtualenv-$PY3_VERSION py3default # default python3 environment
+$USER_ENV_UTILS/Python/latest/bin/virtualenv py3default # default python3 environment
 unset PY3_VERSION
