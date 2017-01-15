@@ -116,10 +116,11 @@
 (setq-default indent-tabs-mode nil)
 (setq mac-allow-anti-aliasing nil)  ;; turn off anti-aliasing
 
-;;    (set-frame-font "Monaco-9")
+
+;; (set-face-attribute 'default nil
+;;                     :family "TheSansMono Condensed" :height 160 :weight 'medium)
 (if (eq system-type 'darwin)
-    (set-face-attribute 'default nil
-                        :family "TheSansMono Condensed" :height 160 :weight 'medium)
+    (set-frame-font "Monaco-12")
     (set-frame-font "Ubuntu Mono-15"))
 
 (setq-default line-spacing 0.02)
@@ -336,7 +337,7 @@
 ;; css-mode
 ;; ---------------------------------------------------------------------
 
-(setq-default css-indent-offset 2)
+(setq-default css-indent-offset 4)
 
 (eval-after-load 'css-mode
   (lambda ()
@@ -349,6 +350,7 @@
 
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.twig\\'" . web-mode))
 
 (eval-after-load 'web-mode
   (lambda ()
@@ -444,7 +446,7 @@
  '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
  '(package-selected-packages
    (quote
-    (js3-mode ac-js2 web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
+    (yaml-mode js3-mode ac-js2 web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
  '(sql-postgres-login-params
    (quote
     ((user :default "rhutcheson")

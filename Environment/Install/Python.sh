@@ -15,9 +15,9 @@ rm python3.tar.xz
 ln -f -s python-$PY3_VERSION latest
 cd latest
 cd src
-export CPPFLAGS=-I$(brew --prefix openssl)/include;
-export LDFLAGS=-L$(brew --prefix openssl)/lib
-./configure --prefix=$USER_ENV_UTILS/Python/python-$PY3_VERSION
+export CPPFLAGS="-I$(brew --prefix openssl)/include -I$(brew --prefix sqlite)/include"
+export LDFLAGS="-L$(brew --prefix openssl)/lib -L$(brew --prefix sqlite)/lib"
+LD_RUN_PATH="$(brew --prefix sqlite)/lib" ./configure --prefix=$USER_ENV_UTILS/Python/python-$PY3_VERSION 
 make
 make install
 
