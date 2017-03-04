@@ -117,11 +117,11 @@
 (setq mac-allow-anti-aliasing nil)  ;; turn off anti-aliasing
 
 
-;; (set-face-attribute 'default nil
-;;                     :family "TheSansMono Condensed" :height 160 :weight 'medium)
-(if (eq system-type 'darwin)
-    (set-frame-font "Monaco-12")
-    (set-frame-font "Ubuntu Mono-15"))
+ (set-face-attribute 'default nil
+                     :family "TheSansMono" :height 130 :weight 'light)
+;; (if (eq system-type 'darwin)
+;;     (set-frame-font "Monaco-12")
+;;     (set-frame-font "Ubuntu Mono-15"))
 
 (setq-default line-spacing 0.02)
 
@@ -398,6 +398,7 @@
 
 (autoload 'tern-mode "tern.el" nil t)
 (add-hook 'js-mode-hook (lambda () (tern-mode t)))
+
 (eval-after-load 'tern
    '(progn
       (require 'tern-auto-complete)
@@ -422,12 +423,12 @@
 ;; autocomplete
 (require 'python-environment)
 (setq jedi:environment-virtualenv
-      (append python-environment-virtualenv
-              '("--python" "~/Environment/Utilities/Python/latest/bin/python3")))
+      '("pyenv-workon" "py3default"))
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t)
-(setq jedi:get-in-function-call-delay 250)
-(setq jedi:key-goto-definition (kbd "<C-c b>"))
+(setq jedi:get-in-function-call-delay 0)
+(setq jedi:doc-mode 'rst-mode)
+
 
 ;; ---------------------------------------------------------------------
 ;; required variables
@@ -446,7 +447,7 @@
  '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
  '(package-selected-packages
    (quote
-    (yaml-mode js3-mode ac-js2 web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
+    (osx-plist tern-django yaml-mode js3-mode ac-js2 web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
  '(sql-postgres-login-params
    (quote
     ((user :default "rhutcheson")

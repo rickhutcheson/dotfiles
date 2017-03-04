@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+git_args=""
+
+for arg in "$@"
+do
+    if [[ "$arg" == "nv" ]]; then
+        git_args=$git_args" --no-verify"
+    fi
+
+    if [[ "$arg" == "f" ]]; then
+        git_args=$git_args" --force"
+    fi
+done
+
+git push $git_args origin HEAD

@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+git commit -m "$@" && git push origin HEAD
+exit $!

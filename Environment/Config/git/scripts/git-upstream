@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+export USER_ENV_HOME=~/Environment
+. $USER_ENV_HOME/SetVariables.sh
+
+git fetch
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+git branch --set-upstream-to=origin/$current_branch $current_branch
+git pull

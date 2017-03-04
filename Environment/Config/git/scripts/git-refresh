@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+export USER_ENV_HOME=~/Environment
+. $USER_ENV_HOME/SetVariables.sh
+
+if pgrep "idea" > /dev/null
+then
+    idea_running=1
+    pkill idea  # prevent crazy syncing from file watchers
+else
+    idea_running=0
+fi
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+git co master
+git pull
+git co $current_branch
+git merge --no-edit master  # no-edit to avoid commit msg prompt
+
+if [ "$idea_running" -eq "1" ]; then
+    open -a 'IntelliJ'
+fi
