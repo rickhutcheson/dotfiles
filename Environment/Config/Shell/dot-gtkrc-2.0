@@ -1,8 +1,10 @@
 
 ## Icon View Text Appearance
 #
-style "xfdesktop-icon-view" {
 
+gtk-font-name = "Segoe UI 14"
+style "xfdesktop-icon-view" {
+    font_name = "Segoe UI 14"
     ## transparency (alpha) factor
     # original: XfdesktopIconView::label-alpha = 75
     # set transparency of icon text background to 100%
