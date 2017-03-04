@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
 
-# Shell Options
+# History Control
 # ----------------------------------------------------------------------
-shopt -s histappend
+shopt -s histappend                      # remember history
+shopt -s cmdhist 			 # attempt to remember multi-line commands correctly
+export HISTCONTROL=ignoredups:erasedups	 # ignore and erase duplicate commands from history
+
+# Global Aliases / Utilities
+# ----------------------------------------------------------------------
+alias nano='emacs -nw -q'  # emacs in terminal & no init file (fast)
 export PATH=$PATH:$USER_ENV_UTILS/Shell/
+
 
 # Prompt Formatting
 # ----------------------------------------------------------------------
@@ -22,8 +29,7 @@ BOLD=$(tput bold)
 cwd="\[$CYAN\][\w]\[$NONE\]"
 prompt="⁒ "
 
-
-do_cmd() {
+show_promt() {
     branch=''
     if [ -d ".git" ]
     then
@@ -52,7 +58,7 @@ do_cmd() {
     return 0
 }
 
-export PROMPT_COMMAND=do_cmd
+export PROMPT_COMMAND=show_prompt
 
 #
 # Miscellaneous
