@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+export USER_ENV_HOME=~/Environment
+. $USER_ENV_HOME/SetVariables.sh
+
+if [ $# -eq 0 ]; then
+    num_commits=1
+else
+    num_commits=$1
+fi
+
+git diff HEAD~${num_commits} HEAD
