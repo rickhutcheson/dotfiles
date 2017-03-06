@@ -2,6 +2,7 @@
 
 set -e
 source $USER_ENV_VARS/TeX.sh
+ln -s $USER_ENV_CONFIG/TeX/ ~/texmf
 
 mkdir -p $USER_ENV_UTILS/TeX/texlive-$TEX_VERSION
 cd $USER_ENV_UTILS/TeX
