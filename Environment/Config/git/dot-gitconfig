@@ -6,7 +6,7 @@
 	ui = true
 
 [core]
-	editor = "emacs -nw"
+	editor = "emacs -nw -q"
 	excludesfile = /Users/rickhutcheson/.gitignore_global
 
 [credential]

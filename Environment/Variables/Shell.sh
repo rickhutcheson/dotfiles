@@ -29,7 +29,7 @@ BOLD=$(tput bold)
 cwd="\[$CYAN\][\w]\[$NONE\]"
 prompt="⁒ "
 
-show_promt() {
+show_prompt() {
     branch=''
     if [ -d ".git" ]
     then
