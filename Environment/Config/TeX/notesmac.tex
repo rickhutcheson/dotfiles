@@ -8,9 +8,9 @@
 \newcount\topicno\topicno=0
 
 % setup fonts for various document sections
-\font\titlerm=cmr12  scaled \magstep5  \font\titlebf=cmbx12 scaled \magstep5
-\font\titlesl=cmsl12 scaled \magstep5  \font\titleit=cmti12 scaled \magstep5
-\font\titlett=cmtt12 at 34pt
+\font\titlerm=cmr12  scaled \magstep3  \font\titlebf=cmbx12 scaled \magstep3
+\font\titlesl=cmsl12 scaled \magstep3  \font\titleit=cmti12 scaled \magstep3
+\font\titlett=cmtt12 at 24pt
 
 \font\sectionrm=cmr12  at 16pt         \font\sectionbf=cmbx12 at 16pt
 \font\sectionsl=cmsl12 at 16pt         \font\sectionit=cmti12 at 16pt
@@ -20,18 +20,20 @@
 \font\subsectionsl=cmsl12              \font\subsectionit=cmti12
 \font\subsectiontt=cmtt10 at 13pt
 
-\font\topicrm=cmr10 at 11pt            \font\topicbf=cmbx10 at 11pt
-\font\topicsl=cmsl10 at 11pt           \font\topicit=cmti10 at 11pt
-\font\topictt=cmtt10 at 12pt
-
 % Re-define the typewriter font so its size is approximately equal to
 % the size of the rest.
 \font\bodytt=cmtt10 at 11pt
 \def\tt{\fam\ttfam\bodytt}
 
+%
+% Document Sizing / Layout
+%
+%\parindent=0
+
 \def\title#1\par{{
     \let\rm\titlerm\let\bf\titlebf
-    \let\tt\titlett\let\it\titleit
+    \let\tt\titlett
+    \let\it\titleit
     \let\sl\titlesl\rm
     {\titlestyle{#1}}}\bigskip}
 
@@ -39,14 +41,15 @@
     \advance\sectionno by 1
     \subsectionno=0\topicno=0
     % Encourages TeX to put on a new page if the subsection would not
-    % have much room to start. (From the TEXBook)
+    % have much room to start. (From the TeXBook)
     \vskip0pt plus 0.3\vsize\penalty-450
     \vskip0pt plus -0.3\vsize\penalty-450
     \bigskip
     {\let\rm\sectionrm\let\bf\sectionbf
     \let\tt\sectiontt\let\it\sectionit
     \let\sl\sectionsl
-    \rm\sectionstyle{#1}}
+
+\rm\sectionstyle{#1}}
     \nobreak\smallskip\noindent}
 
 \def\subsection#1\par{
@@ -70,7 +73,7 @@
 \def\titlestyle#1{\centerline{#1}}
 \def\sectionstyle#1{\leftline{\bf\the\sectionno.\ #1}}
 \def\subsectionstyle#1{\leftline{\bf\the\sectionno.\the\subsectionno.\ #1}}
-\def\topicstyle#1{{\moveleft .5in\vbox{\topicit #1}}\noindent}
+\def\topicstyle#1{\bigskip{\moveleft .5in\vbox{\it #1}}\noindent\bigskip}
 
 % Document Objects
 \def\centertable#1#2{
@@ -88,10 +91,96 @@
 % rules don't squish text.
 \def\trule{\noalign{\vskip2pt\hrule\vskip2pt}}
 \def\TODO{\hbox{\bf $\star$ TODO $\star$}}
+
+%
+% Aside
+%
+
 \font\eightss=cmss10 at 8pt
 \font\eightssb=cmssbx10 at 8pt
 \font\eightssi=cmssi10 at 8pt
-\def\aside#1\par{
+\def\bigaside#1{
         {\medskip
         \hrule\smallskip\noindent\let\bf\eightssb\let\it\eightssi
         \eightss#1\smallskip\hrule\medskip}}
+\def\aside#1{({\it #1})}
+
+
+%%%
+%%% From `varsize` package
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\font\tencsc=cmcsc10
+
+\newfam\scfam
+
+\def\tenpoint{\def\rm{\fam0\tenrm}% switch to 10-point type
+    \textfont0=\tenrm  \scriptfont0=\sevenrm  \scriptscriptfont0=\fiverm
+    \textfont1=\teni   \scriptfont1=\seveni   \scriptscriptfont1=\fivei
+    \textfont2=\tensy  \scriptfont2=\sevensy  \scriptscriptfont2=\fivesy
+    \textfont3=\tenex  \scriptfont3=\tenex    \scriptscriptfont3=\tenex
+    \textfont\itfam=\tenit   \def\it{\fam\itfam\tenit}%
+    \textfont\slfam=\tensl   \def\sl{\fam\slfam\tensl}%
+    \textfont\ttfam=\tentt   \def\tt{\fam\ttfam\tentt}%
+    \textfont\bffam=\tenbf   \scriptfont\bffam=\sevenbf
+    \scriptscriptfont\bffam=\fivebf  \def\bf{\fam\bffam\tenbf}%
+    \textfont\scfam=\tencsc  \def\sc{\fam\scfam\tencsc}%
+    \normalbaselineskip=12pt
+    \setbox\strutbox=\hbox{\vrule height8.5pt depth 3.5pt width0pt}%
+    \normalbaselines\rm}
+
+
+\ifx\tenpoint\undefined\let\loadedfrommacro=Y
+         \input 10point
+         \let\loadedfrommacro=N\fi
+
+%%%
+%%% Load in the fonts
+%%%
+\font\fourteenrm=cmr12 scaled \magstep1
+\font\fourteeni=cmmi12 scaled \magstep1
+\font\fourteensy=cmsy10 scaled \magstep2
+\font\fourteenex=cmex10 scaled \magstep2
+\font\fourteenbf=cmbx12 scaled \magstep1
+\font\fourteensl=cmsl12 scaled \magstep1
+\font\fourteentt=cmtt12 scaled \magstep1
+\font\fourteenit=cmti12 scaled \magstep1
+\font\fourteencsc=cmcsc10 scaled \magstep2
+
+%%%
+%%% Set up the fourteenpoint macros
+%%%
+\ifx\fourteenpoint\undefined
+   \def\fourteenpoint{\def\rm{\fam0\fourteenrm}% switch to 14-point type
+       \textfont0=\fourteenrm \scriptfont0=\tenrm \scriptscriptfont0=\sevenrm
+       \textfont1=\fourteeni  \scriptfont1=\teni  \scriptscriptfont1=\seveni
+       \textfont2=\fourteensy \scriptfont2=\tensy \scriptscriptfont2=\sevensy
+       \textfont3=\fourteenex \scriptfont3=\fourteenex
+                              \scriptscriptfont3=\fourteenex
+       \textfont\itfam=\fourteenit  \def\it{\fam\itfam\fourteenit}%
+       \textfont\slfam=\fourteensl  \def\sl{\fam\slfam\fourteensl}%
+       \textfont\ttfam=\fourteentt  \def\tt{\fam\ttfam\fourteentt}%
+       \textfont\bffam=\fourteenbf  \scriptfont\bffam=\tenbf
+        \scriptscriptfont\bffam=\sevenbf  \def\bf{\fam\bffam\fourteenbf}%
+       \textfont\scfam=\fourteencsc \def\sc{\fam\scfam\fourteencsc}%
+       \normalbaselineskip=17pt
+       \setbox\strutbox=\hbox{\vrule height11.9pt depth6.3pt width0pt}%
+       \normalbaselines\rm}
+   \fi
+
+%%
+%% Algorithm Macros
+%%
+
+\font\algoss=cmssq8
+\font\algossi=cmssqi8
+\def\algorithm #1 (#2){\medskip{\bigbf Algorithm #1} ({\bigit
+#2})\medskip}
+\def\beginalgo #1 (#2) #3\par{\bigskip{\noindent\algoss Algorithm #1} {\algossi (#2)} \smallskip\hrule height 1pt\smallskip {\tenpoint\noindent#3}\medskip}
+\def\endalgo{\medskip\hrule height 1pt\bigskip}
+\def\algostep #1. (#2){\smallskip{\noindent{\bf #1} {\it (#2)} \hskip 10pt}}
+\def\invariant#1 {{\smallskip\noindent\let\bf\eightssb\let\it\eightssi
+        \eightss {Invariant: \tenpoint #1\smallskip}}}
+
+\def\sectionstyle#1{\bigskip\noindent\bigit #1\bigskip}

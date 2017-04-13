@@ -1,6 +1,20 @@
-\def\definition(#1)#2\par{
-        {\smallskip
-        \noindent{\bf Definition}\hskip 1mm({\it #1\/})\quad{\sl #2}
-        \smallskip}}
+\def\definition(#1)#2\par{{\smallskip\noindent{\bf Definition}\hskip 1mm({\it #1\/})\smallskip\noindent#2}}
+
 %% Probability Macros
 \def\pr#1{{\cal P}\left(#1\right)}
+
+%%
+%% Number Sets
+%%
+
+\newfam\bbbfam
+\font\bbbten=msbm10 at 14pt
+\font\bbbseven=msbm7
+\font\bbbfive=msbm5
+\textfont\bbbfam=\bbbten
+\scriptfont\bbbfam=\bbbseven
+\scriptscriptfont\bbbfam=\bbbfive
+\def\bbb{\fam=\bbbfam}
+
+\def\N{{\bbb N}}
+\def\Z{{\bbb Z}}

@@ -116,7 +116,6 @@
 (setq-default indent-tabs-mode nil)
 (setq mac-allow-anti-aliasing nil)  ;; turn off anti-aliasing
 
-
  (set-face-attribute 'default nil
                      :family "TheSansMono" :height 130 :weight 'light)
 ;; (if (eq system-type 'darwin)
@@ -201,6 +200,14 @@
       kept-new-versions 6
       kept-old-versions 2
       version-control t)                ; use versioned backups
+
+
+;; ---------------------------------------------------------------------
+;; TeX
+;; ---------------------------------------------------------------------
+
+(add-to-list 'auto-mode-alist '("\\.tex\\'" . auto-fill-mode))
+(add-to-list 'auto-mode-alist '("\\.tex\\'" . tex-mode))
 
 
 ;; ---------------------------------------------------------------------
@@ -447,7 +454,7 @@
  '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
  '(package-selected-packages
    (quote
-    (osx-plist tern-django yaml-mode js3-mode ac-js2 web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
+    (auctex osx-plist tern-django yaml-mode js3-mode ac-js2 web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
  '(sql-postgres-login-params
    (quote
     ((user :default "rhutcheson")
