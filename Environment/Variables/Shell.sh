@@ -9,7 +9,7 @@ export HISTCONTROL=ignoredups:erasedups	 # ignore and erase duplicate commands f
 
 # Global Aliases / Utilities
 # ----------------------------------------------------------------------
-alias nano='emacs -nw -q'  # emacs in terminal & no init file (fast)
+alias nano='emacs -nw'  # emacs in terminal & no init file (fast)
 export PATH=$PATH:$USER_ENV_UTILS/Shell/
 
 
@@ -24,30 +24,40 @@ CYAN=$(tput setaf 4)
 PURPLE=$(tput setaf 5)
 WHITE=$(tput setaf 7)
 BOLD=$(tput bold)
+ITALIC=$(tput sitm)
 
 
-cwd="\[$CYAN\][\w]\[$NONE\]"
-prompt="⁒ "
+host="\[$PURPLE\]\H\[$NONE\]"
+cwd="\[$CYAN\]\w\[$NONE\]"
+#prompt="➥ "
+prompt="↪ "
+separator="\[$WHITE\] // \[$NONE\]"
+
+hr() {
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' ─
+}
 
 show_prompt() {
+    info_line=$host$separator$cwd
+
     branch=''
-    if [ -d ".git" ]
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)  # get branch name (if possible)
+    if [ $? -eq 0 ]
     then
-        current_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)  # get branch name (if possible)
-        if [ $? -eq 0 ]
-        then
-            branch="\[$WHITE\] ≻ \[$RED\]"$current_branch""
-        fi
+        branch="\[$NONE\]\[$RED\]"$current_branch"\[$NONE\]"
+        info_line=$info_line$separator$branch
     fi
 
     if [ "$VIRTUAL_ENV" ]
     then
-        venv=$(basename $VIRTUAL_ENV)
-        pre_prompt="\[$GREEN\]⁒"
+        venv=$GREEN$(basename $VIRTUAL_ENV)$NONE
+        info_line=$info_line$separator$venv
+        pre_prompt="\[$CYAN\]\[$ITALIC\]"
+        prompt="❱❱"
     else
         pre_prompt="\[$YELLOW\]"
     fi
-    PS1=$cwd"\[$RED\]"$branch"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\]"
+    PS1="\$(hr)\n"$info_line"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\] "
 
     #
     # History Sharing - These settings share history between terminal tabs.
