@@ -36,10 +36,14 @@
 	amend = commit --amend --no-edit
 	cc = commit --no-verify -m
 
+	# diff
+	ds = diff --stat
+
 	# logs
 	ll = log --oneline
 	lol = log --graph --decorate --pretty=\"[%h] %d | %s <%an|%cd>\" --abbrev-commit --date=short --all --decorate
 	me = log --author=\"rick.hutcheson@udemy.com\" --oneline
+        log-commits = log --oneline --graph --all --decorate --abbrev-commit master..HEAD
 
 	# status
 	st = status

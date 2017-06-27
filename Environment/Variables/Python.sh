@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 export USER_ENV_PYTHON_PY3_VERSION=3.4
 export PATH=$USER_ENV_UTILS/Python/latest/bin:$PATH
+export PY3_DEFAULT_VENV=$USER_ENV_UTILS/Python/Envs/py3default
+export PY3_DEFAULT_VENV_ACTIVATE=$PY3_DEFAULT_VENV/bin/activate
 alias 2env-default='source $USER_ENV_UTILS/Python/Envs/py2default/bin/activate'
-alias 3env-default='source $USER_ENV_UTILS/Python/Envs/py3default/bin/activate'
+alias 3env-default='source $PY3_DEFAULT_VENV_ACTIVATE'
 
 # for non-default cases
 pyactivate() {

@@ -13,7 +13,6 @@
 
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/flycheck")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
-(add-to-list 'load-path "~/Environment/Utilities/Emacs/helm")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
 (add-to-list 'load-path "~/.emacs.d/cweb.el")
 
@@ -45,12 +44,9 @@
 (defvar required-package-list
   '(
     ;; appearance
-    moe-theme
     railscasts-theme
-    sublime-themes
 
     ;; general
-    browse-at-remote
     flycheck           ; auto-lint source files (must config for each lang)
     flycheck-pos-tip   ; show error under point
     magit
@@ -62,8 +58,7 @@
 
     ;; JavaScript
     js2-mode           ; syntax-highlighting, linting, etc.
-    nodejs-repl        ; required for web-beautify to work
-    web-beautify       ; formatting
+
 
     ;; markdown
     markdown-mode
@@ -100,13 +95,13 @@
 ;; ---------------------------------------------------------------------
 ;; required packages
 ;; ---------------------------------------------------------------------
-(require 'browse-at-remote)
 (require 'flycheck)
 (require 'flymake)
-(require 'helm)
-(require 'helm-config)
+(require 'ido)
+(require 'smex)
 (require 'simp)
-(require 'web-beautify)
+(require 'cl)  ; used for kill-matching
+
 
 ;; ---------------------------------------------------------------------
 ;; appearance
@@ -114,13 +109,11 @@
 
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
-(setq mac-allow-anti-aliasing nil)  ;; turn off anti-aliasing
 
- (set-face-attribute 'default nil
-                     :family "TheSansMono" :height 130 :weight 'light)
-;; (if (eq system-type 'darwin)
-;;     (set-frame-font "Monaco-12")
-;;     (set-frame-font "Ubuntu Mono-15"))
+(if (eq system-type 'darwin)
+    (set-frame-font "-*-Operator Mono-thin-normal-normal-*-14-*-*-*-m-*-*-*")
+  (set-face-attribute 'default nil :family "TheSans Mono" :height 140))
+
 
 (setq-default line-spacing 0.02)
 
@@ -163,11 +156,10 @@
 ;; ---------------------------------------------------------------------
 
 (defun layout-django ()
-   "Lay out the frame as two 80-column windows across"
+   "Lay out the frame as two 80-column windows."
    (interactive)
    (split-window-right 110)) ; 100 chars + fringe
 
-(require 'cl)
 (defun kill-matching (regexp)
   "Kill buffers matching REGEXP *without* asking for confirmation."
   (interactive "sMatch: ")
@@ -187,19 +179,39 @@
 ;; ---------------------------------------------------------------------
 (global-set-key (kbd "C-c l d") 'layout-django)
 (global-set-key (kbd "C-c g") 'magit-status)
-(global-set-key (kbd "C-c h") 'browse-at-remote)
 
+
+;; ---------------------------------------------------------------------
+;; ido / smex
+;; ---------------------------------------------------------------------
+
+(ido-mode t)
+(smex-initialize)
+
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
+;; old M-x
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
 ;; ---------------------------------------------------------------------
 ;; backup
 ;; ---------------------------------------------------------------------
 
-(setq backup-by-copying t               ; don't clobber symlinks
-      backup-directory-alist '(("." . "~/.emacs.d/backups"))
-      delete-old-versions t
+;; backup locations
+(defconst emacs-tmp-dir  "~/.emacs.d/backups")
+(setq backup-directory-alist
+      `((".*" . ,emacs-tmp-dir)))
+(setq auto-save-file-name-transforms
+      `((".*" ,emacs-tmp-dir t)))
+
+;; backup behavior
+(setq backup-by-copying t)               ; don't clobber symlinks
+(setq delete-old-versions t
       kept-new-versions 6
       kept-old-versions 2
       version-control t)                ; use versioned backups
+
 
 
 ;; ---------------------------------------------------------------------
@@ -246,49 +258,8 @@
 ;; flycheck-pos
 ;; ---------------------------------------------------------------------
 
-(eval-after-load 'flycheck
-  '(custom-set-variables
-   '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
-
-;; ---------------------------------------------------------------------
-;; helm
-;; ---------------------------------------------------------------------
-
-;; rebind tab to run persistent action
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-
-;; make TAB work in terminal
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
-
-;; list actions using C-z
-(define-key helm-map (kbd "C-z")  'helm-select-action)
-
-;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
-;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
-;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
-(global-unset-key (kbd "C-x c"))
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-
-;; helm-buffers-list has better behavior than the default
-(global-unset-key (kbd "C-x b"))
-(global-set-key (kbd "C-x b") 'helm-buffers-list)
-
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-;; open helm buffer inside current window, not occupy whole other window
-(setq helm-split-window-in-side-p t)
-
-;; move to end/beginning of source when reaching top/bottom of source.
-(setq helm-move-to-line-cycle-in-source t)
-
-;; search for library in `require' and `declare-function' sexp.
-(setq-default helm-ff-search-library-in-sexp t)
-
-;; scroll 8 lines other window using M-<next>/M-<prior>
-(setq helm-scroll-amount 8)
-(setq-default helm-ff-file-name-history-use-recentf t)
-
-;; must run after config performed
-(helm-mode t)
+(with-eval-after-load 'flycheck
+  (flycheck-pos-tip-mode))
 
 
 ;; ---------------------------------------------------------------------
@@ -315,6 +286,9 @@
 (simp-project-define
  '(:has (.git)
    :ignore (.git)))
+;; customize search behavior; ido is awesome
+(setq-default ido-enable-flex-matching t)
+(setq-default simp-completing-read-command (quote ido-completing-read))
 
 ;; keys
 (global-set-key (kbd "C-c f") 'simp-project-find-file)
@@ -425,23 +399,22 @@
 ;; Popup on errors
 (setq py-python-command "python3")
 (setq-default python-inent-offset 4)
-(setq python-indent-offset 4)
+(setq-default python-indent-offset 4)
 
 ;; autocomplete
 (require 'python-environment)
 (setq jedi:environment-virtualenv
       '("pyenv-workon" "py3default"))
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
-(setq jedi:get-in-function-call-delay 0)
-(setq jedi:doc-mode 'rst-mode)
+
+(add-hook 'python-mode-hook
+          (lambda() (define-key python-mode-map (kbd "s-b") 'jedi:goto-definition)))
+
 
 
 ;; ---------------------------------------------------------------------
 ;; required variables
 ;; ---------------------------------------------------------------------
 
-(setq magit-last-seen-setup-instructions "1.4.0")
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -451,17 +424,14 @@
    (quote
     ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
  '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
- '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
+ '(flycheck-pos-tip-mode t)
+ '(global-flycheck-mode t)
  '(package-selected-packages
    (quote
-    (auctex osx-plist tern-django yaml-mode js3-mode ac-js2 web-mode web-beautify sublime-themes simp railscasts-theme py-yapf play-sound php-mode pandoc-mode org-trello nodejs-repl moe-theme magit-gh-pulls less-css-mode js2-mode jedi htmlize gmail-message-mode flycheck-pos-tip elpy color-theme-sanityinc-tomorrow browse-at-remote)))
- '(sql-postgres-login-params
-   (quote
-    ((user :default "rhutcheson")
-     password
-     (server :default "redshift.udemy.com")
-     (database :default "prod")
-     port))))
+    (helm smex company-anaconda anaconda-mode yaml-mode web-mode web-beautify simp railscasts-theme python-docstring py-yapf play-sound php-mode pandoc-mode osx-plist markdown-mode magit less-css-mode jedi flymake-python-pyflakes flycheck-tip flycheck-pyflakes flycheck-pos-tip elpy auctex ac-js2))))
+
+
+;;; dot-emacs ends here
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
