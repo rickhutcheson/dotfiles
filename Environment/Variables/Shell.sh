@@ -27,10 +27,9 @@ BOLD=$(tput bold)
 ITALIC=$(tput sitm)
 
 
-host="\[$PURPLE\]\H\[$NONE\]"
+#host="\[$PURPLE\]\H\[$NONE\]"
 cwd="\[$CYAN\]\w\[$NONE\]"
-#prompt="➥ "
-prompt="↪ "
+# prompt="➥ "
 separator="\[$WHITE\] // \[$NONE\]"
 
 hr() {
@@ -38,7 +37,8 @@ hr() {
 }
 
 show_prompt() {
-    info_line=$host$separator$cwd
+    prompt="↪ "
+    info_line=$cwd
 
     branch=''
     current_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)  # get branch name (if possible)

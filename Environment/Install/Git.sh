@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
-
+set -e
 ln -s $USER_ENV_CONFIG/git/dot-gitconfig ~/.gitconfig
-ln -s $USER_ENV_CONFIG/git/hub-completion.bash ~/.hub-completion.bash
+GIT_VERSION=2.13.2
+VERSION_DIR=$USER_ENV_UTILS/Git/Git-$GIT_VERSION
 
+echo "Installing Git $GIT_VERSION..."
+mkdir -p $VERSION_DIR
+cd $VERSION_DIR
+wget https://github.com/git/git/archive/v$GIT_VERSION.tar.gz -O src.tar.xz
+tar xf src.tar.xz --strip-components=1
+rm src.tar.xz
+make prefix=$VERSION_DIR
+make install
+cd $VERSION_DIR
+cd ..
+ln -f -s Git-$GIT_VERSION latest
+echo "Done. Git $GIT_VERSION installed."
+unset VERSION_DIR
+unset GIT_VERSION
