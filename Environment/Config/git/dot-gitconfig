@@ -52,3 +52,5 @@
 [diff]
 [difftool]
 	prompt = false
+[gui]
+	recentrepo = /Users/rickhutcheson/Repositories/udemy
