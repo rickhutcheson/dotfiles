@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-export PATH=$USER_ENV_UTILS/MySQL/bin:$PATH
+export PATH=$USER_ENV_UTILS/MySQL/latest/bin:$PATH

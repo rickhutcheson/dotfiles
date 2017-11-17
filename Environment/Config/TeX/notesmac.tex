@@ -20,6 +20,11 @@
 \font\subsectionsl=cmsl12              \font\subsectionit=cmti12
 \font\subsectiontt=cmtt10 at 13pt
 
+\font\quoterm=cmssqi8
+
+\font\bigbf=cmssq8 scaled \magstep3
+\font\bigit=cmssi12 at 18pt
+
 % Re-define the typewriter font so its size is approximately equal to
 % the size of the rest.
 \font\bodytt=cmtt10 at 11pt
@@ -70,7 +75,13 @@
     \medskip\vskip\parskip
     \rm\topicstyle{#1}}
 
+\def\addquote #1\par{
+    \hrule\smallskip
+    {\let\rm\quoterm\quotestyle{#1}}
+    \smallskip\hrule
+}
 \def\titlestyle#1{\centerline{#1}}
+\def\quotestyle#1{\quoterm {#1}}
 \def\sectionstyle#1{\leftline{\bf\the\sectionno.\ #1}}
 \def\subsectionstyle#1{\leftline{\bf\the\sectionno.\the\subsectionno.\ #1}}
 \def\topicstyle#1{\bigskip{\moveleft .5in\vbox{\it #1}}\noindent\bigskip}
@@ -182,5 +193,7 @@
 \def\algostep #1. (#2){\smallskip{\noindent{\bf #1} {\it (#2)} \hskip 10pt}}
 \def\invariant#1 {{\smallskip\noindent\let\bf\eightssb\let\it\eightssi
         \eightss {Invariant: \tenpoint #1\smallskip}}}
+\def\stepnote#1 {{\smallskip\noindent\let\bf\eightssb\let\it\eightssi
+        \eightss {\hfill\tenpoint #1\smallskip}}}
 
 \def\sectionstyle#1{\bigskip\noindent\bigit #1\bigskip}

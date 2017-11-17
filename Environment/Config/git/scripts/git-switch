@@ -6,18 +6,18 @@ export USER_ENV_HOME=~/Environment
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 stash_message="git-switch away from $current_branch"
 
-read -p "Branch name: " new_branch
+new_branch="$1"
 
-git rev-parse --verify $new_branch
+new_branch_sha=$(git show-ref "refs/heads/$new_branch")
 
-# $? == 0 means local branch with <branch-name> exists.
+# length of new_branch != 0  means local branch with <branch-name> exists.
 
 git stash save $stash_message
-if [ $? = 0 ]
+if [[ -z $new_branch_sha ]]
 then
-    git co $new_branch
-else
     git co master
     git pull
     git co -b $new_branch
+else
+    git co $new_branch
 fi

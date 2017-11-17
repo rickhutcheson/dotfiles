@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+export USER_ENV_HOME=~/Environment
+. $USER_ENV_HOME/SetVariables.sh
+
+# Unignores any files that have been added as "assume unchanged"
+git ls-files -v | grep '^h' | sed 's/^..//' | sed 's/\ /\\ /g' | xargs -I FILE git update-index --no-assume-unchanged FILE || true
