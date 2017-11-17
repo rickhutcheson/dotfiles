@@ -2,12 +2,12 @@
 # It will NOT be updated and reflects only the
 # installation profile at installation time.
 selected_scheme scheme-minimal
-TEXDIR /Users/rickhutcheson/Environment/Utilities/TeX/$TEX_VERSION
+TEXDIR /Users/rick/Environment/Utilities/TeX/$TEX_VERSION
 TEXMFCONFIG ~/Environment/Config/TeX/texmf-config
 TEXMFHOME ~/texmf
-TEXMFLOCAL /Users/rickhutcheson/Environment/Utilities/TeX/texmf-local
-TEXMFSYSCONFIG /Users/rickhutcheson/Environment/Utilities/TeX/$TEX_VERSION/texmf-config
-TEXMFSYSVAR /Users/rickhutcheson/Environment/Utilities/TeX/$TEX_VERSION/texmf-var
+TEXMFLOCAL /Users/rick/Environment/Utilities/TeX/texmf-local
+TEXMFSYSCONFIG /Users/rick/Environment/Utilities/TeX/$TEX_VERSION/texmf-config
+TEXMFSYSVAR /Users/rick/Environment/Utilities/TeX/$TEX_VERSION/texmf-var
 TEXMFVAR ~/.texlive$TEX_VERSION/texmf-var
 binary_x86_64-darwin 1
 collection-basic 1

@@ -38,7 +38,7 @@ while getopts "hn:" opt; do
   esac
 done
 
-NUM=${NUM-10} # default to 10 lines
+NUM=${NUM-15} # default to 15 lines
 
 # This: `awk ' !x[$0]++'` removes duplicates.  See http://stackoverflow.com/questions/11532157
 UNIQUE_BRANCHES=$(git reflog | egrep -io "moving from ([^[:space:]]+)" | awk '{ print $3 }' | awk ' !x[$0]++')

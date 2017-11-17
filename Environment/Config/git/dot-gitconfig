@@ -7,13 +7,13 @@
 
 [core]
 	editor = "emacs -nw -q"
-	excludesfile = /Users/rickhutcheson/.gitignore_global
+	excludesfile = /Users/rick/.gitignore_global
 
 [credential]
 	helper = cache --timeout=7200
 
 [github]
-	user = rickhutcheson
+	user = rick
 
 [push]
 	default = matching
@@ -26,7 +26,7 @@
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "sourcetree"]
-	cmd = /Users/rickhutcheson/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	cmd = /Users/rick/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [alias]
 	# branching
@@ -47,10 +47,11 @@
 
 	# status
 	st = status
+	stash-rename = "!_() { rev=$(git rev-parse $1) && git stash drop $1 || exit 1 ; git diff-index --quiet HEAD; s=$?; [ $s != 0 ] && git stash save \"tmp stash from stash-rename\"; git stash apply $rev && shift && git stash save \"$@\" && [ $s != 0 ] && git stash pop stash@{1}; }; _"
 [rerere]
 	enabled = true
 [diff]
 [difftool]
 	prompt = false
 [gui]
-	recentrepo = /Users/rickhutcheson/Repositories/udemy
+	recentrepo = /Users/rick/Repositories/udemy

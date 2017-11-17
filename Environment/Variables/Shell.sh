@@ -5,7 +5,25 @@
 # ----------------------------------------------------------------------
 shopt -s histappend                      # remember history
 shopt -s cmdhist 			 # attempt to remember multi-line commands correctly
-export HISTCONTROL=ignoredups:erasedups	 # ignore and erase duplicate commands from history
+export HISTCONTROL=erasedups     	 # erase duplicate commands from history
+export HISTSIZE=100000
+
+#
+# Keep backup history files for each day so we can get back to old commands
+#
+export HISTFILE=~/.history/`date +%Y-%m-%d`.hist
+
+# The first time a history file is generated for today, let's copy 50
+# commands from last session into today's =]
+# (From http://bradchoate.com/weblog/2006/05/19/daily-history-files-for-bash)
+if [[ ! -e $HISTFILE ]]; then
+    LASTHIST=~/.history/`ls -tr ~/.history/ | tail -1`
+    if [[ -e $LASTHIST ]]; then
+        tail -50 $LASTHIST > $HISTFILE
+        # Write a divider to identify where the prior day's session history ends
+        echo "##########################################################" >> $HISTFILE
+    fi
+fi
 
 # Global Aliases / Utilities
 # ----------------------------------------------------------------------
@@ -27,9 +45,7 @@ BOLD=$(tput bold)
 ITALIC=$(tput sitm)
 
 
-#host="\[$PURPLE\]\H\[$NONE\]"
 cwd="\[$CYAN\]\w\[$NONE\]"
-# prompt="➥ "
 separator="\[$WHITE\] // \[$NONE\]"
 
 hr() {
@@ -52,7 +68,7 @@ show_prompt() {
     then
         venv=$GREEN$(basename $VIRTUAL_ENV)$NONE
         info_line=$info_line$separator$venv
-        pre_prompt="\[$CYAN\]\[$ITALIC\]"
+        pre_prompt="\[$GREEN\]\[$ITALIC\]"
         prompt="❱❱"
     else
         pre_prompt="\[$YELLOW\]"

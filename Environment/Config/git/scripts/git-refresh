@@ -18,5 +18,5 @@ git co $current_branch
 git merge --no-edit master  # no-edit to avoid commit msg prompt
 
 if [ "$idea_running" -eq "1" ]; then
-    open -a 'IntelliJ'
+    open -a 'IntelliJ IDEA Ultimate'
 fi
