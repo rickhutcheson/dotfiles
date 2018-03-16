@@ -2,7 +2,7 @@
 set -e
 source $USER_ENV_VARS/Python.sh
 
-export PY3_VERSION=3.6.2
+export PY3_VERSION=3.6.4
 export PY3_VERSION_SHORT="${PY3_VERSION:0:3}"
 
 echo "Installing $PY3_VERSION"
@@ -23,13 +23,11 @@ LD_RUN_PATH="$(brew --prefix sqlite)/lib" ./configure --prefix=$USER_ENV_UTILS/P
 make
 make install
 
-cd
-easy_install-$PY3_VERSION_SHORT pip
+./bin/easy_install-$PY3_VERSION_SHORT pip
 $USER_ENV_UTILS/Python/$PY3_VERSION/bin/easy_install-$USER_ENV_PYTHON_PY3_VERSION pip
 $USER_ENV_UTILS/Python/$PY3_VERSION/bin/pip install virtualenv
 
 
-mkdir -p $USER_ENV_UTILS/Python
 mkdir -p $USER_ENV_UTILS/Python/Envs
 
 # Install a local virtualenv command for use with this system
