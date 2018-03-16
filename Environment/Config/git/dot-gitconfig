@@ -24,7 +24,7 @@
 	required = true
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
+	path =
 [mergetool "sourcetree"]
 	cmd = /Users/rick/Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
@@ -40,7 +40,7 @@
 	ds = diff --stat
 
 	# logs
-	ll = log --oneline
+	ll = log --pretty=format:\"%Cblue%h %Creset%s\"
 	lol = log --graph --decorate --pretty=\"[%h] %d | %s <%an|%cd>\" --abbrev-commit --date=short --all --decorate
 	me = log --author=\"rick.hutcheson@udemy.com\" --oneline
         log-commits = log --oneline --graph --all --decorate --abbrev-commit master..HEAD
@@ -55,3 +55,8 @@
 	prompt = false
 [gui]
 	recentrepo = /Users/rick/Repositories/udemy
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
