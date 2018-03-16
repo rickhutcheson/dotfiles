@@ -1,2 +1,3 @@
-# .inputrc - keyboard mappings
+# .inputrc - bash configs and keyboard mappings
 set mark-symlinked-directories on
+set mark-directories on

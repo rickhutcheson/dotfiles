@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+#
+# Bash Customization
+
+#
+# Customize a bit of autocomplete behavior
+#
+export INPUTRC=~/.inputrc
 
 # History Control
 # ----------------------------------------------------------------------
