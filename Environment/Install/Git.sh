@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 ln -sf $USER_ENV_CONFIG/git/dot-gitconfig ~/.gitconfig
-GIT_VERSION=2.14.0
+GIT_VERSION=2.15.0
 VERSION_DIR=$USER_ENV_UTILS/Git/Git-$GIT_VERSION
 
 echo "Installing Git $GIT_VERSION..."
@@ -15,6 +15,7 @@ NO_GETTEXT=1 make prefix=$VERSION_DIR
 NO_GETTEXT=1 make prefix=$VERSION_DIR install
 cd $VERSION_DIR
 cd ..
+rm -f latest
 ln -f -s Git-$GIT_VERSION latest
 echo "Done. Git $GIT_VERSION installed."
 unset VERSION_DIR
