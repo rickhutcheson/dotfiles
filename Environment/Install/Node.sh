@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-NODE_VERSION=6.11.1
+NODE_VERSION=8.9.1
 mkdir -p $USER_ENV_UTILS/Node.js
 mkdir -p $USER_ENV_UTILS/Node.js/node-$NODE_VERSION
 cd $USER_ENV_UTILS/Node.js
