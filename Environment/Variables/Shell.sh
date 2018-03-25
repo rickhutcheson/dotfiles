@@ -14,6 +14,7 @@ shopt -s histappend                      # remember history
 shopt -s cmdhist 			 # attempt to remember multi-line commands correctly
 export HISTCONTROL=erasedups     	 # erase duplicate commands from history
 export HISTSIZE=100000
+export DAILY_TRANSFER_LIMIT=50           # the number of lines to transfer from yesterday
 
 #
 # Keep backup history files for each day so we can get back to old commands
@@ -26,7 +27,12 @@ export HISTFILE=~/.history/`date +%Y-%m-%d`.hist
 if [[ ! -e $HISTFILE ]]; then
     LASTHIST=~/.history/`ls -tr ~/.history/ | tail -1`
     if [[ -e $LASTHIST ]]; then
-        tail -50 $LASTHIST > $HISTFILE
+        # this awk line keeps unique lines found in the `tail -r` output
+        # so that we transfer the last N *unique* lines from yesterday's history
+        #
+        # source: StackExchange (originally #bash on Freenode)
+        #
+        tail -r $LASTHIST | awk '!seen[$0]++'  | grep . -m $DAILY_TRANSFER_LIMIT
         # Write a divider to identify where the prior day's session history ends
         echo "##########################################################" >> $HISTFILE
     fi
