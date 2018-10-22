@@ -112,8 +112,8 @@
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
 
-(set-frame-font "-*-Monaco-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
-
+(set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+; (setq mac-allow-anti-aliasing nil)
 
 (setq-default line-spacing 0.02)
 
@@ -408,6 +408,12 @@
           (lambda() (define-key python-mode-map (kbd "s-b") 'jedi:goto-definition)))
 
 
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 ;; Local Variables:
 ;; mode: emacs-lisp
 
@@ -427,11 +433,3 @@
  '(package-selected-packages
    (quote
     (csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode jedi flycheck-pos-tip))))
-
-;;; dot-emacs ends here
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-YARN_VERSION=1.3.2
+YARN_VERSION=1.9.4
 mkdir -p $USER_ENV_UTILS/Yarn
 mkdir -p $USER_ENV_UTILS/Yarn/yarn-$YARN_VERSION
 cd $USER_ENV_UTILS/Yarn

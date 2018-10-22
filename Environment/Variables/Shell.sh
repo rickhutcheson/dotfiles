@@ -2,6 +2,9 @@
 
 #
 # Bash Customization
+#
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 #
 # Customize a bit of autocomplete behavior
@@ -32,7 +35,7 @@ if [[ ! -e $HISTFILE ]]; then
         #
         # source: StackExchange (originally #bash on Freenode)
         #
-        tail -r $LASTHIST | awk '!seen[$0]++'  | grep . -m $DAILY_TRANSFER_LIMIT
+        tail -r $LASTHIST | awk '!seen[$0]++'  | grep . -m $DAILY_TRANSFER_LIMIT > $HISTFILE
         # Write a divider to identify where the prior day's session history ends
         echo "##########################################################" >> $HISTFILE
     fi
@@ -79,9 +82,15 @@ show_prompt() {
 
     if [ "$VIRTUAL_ENV" ]
     then
-        venv=$GREEN$(basename $VIRTUAL_ENV)$NONE
+        if [ "$VIRTUAL_ENV_COLOR" ]
+        then
+            vcolor=$(tput setaf $VIRTUAL_ENV_COLOR)
+        else
+            vcolor=$GREEN
+        fi
+        venv=$vcolor$(basename $VIRTUAL_ENV)$NONE
         info_line=$info_line$separator$venv
-        pre_prompt="\[$GREEN\]\[$ITALIC\]"
+        pre_prompt="\[$vcolor\]\[$ITALIC\]"
         prompt="❱❱"
     else
         pre_prompt="\[$YELLOW\]"
