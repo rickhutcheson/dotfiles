@@ -2,7 +2,7 @@
 set -e
 source $USER_ENV_VARS/Python.sh
 
-export PY3_VERSION=3.6.4
+export PY3_VERSION=3.7.1
 export PY3_VERSION_SHORT="${PY3_VERSION:0:3}"
 
 echo "Installing $PY3_VERSION"
@@ -17,9 +17,10 @@ rm python3.tar.xz
 ln -f -s python-$PY3_VERSION latest
 cd python-$PY3_VERSION
 cd src
-export CPPFLAGS="-I$(brew --prefix openssl)/include -I$(brew --prefix sqlite)/include"
-export LDFLAGS="-L$(brew --prefix openssl)/lib -L$(brew --prefix sqlite)/lib"
-LD_RUN_PATH="$(brew --prefix sqlite)/lib" ./configure --prefix=$USER_ENV_UTILS/Python/python-$PY3_VERSION
+export CPPFLAGS="-I$(brew --prefix openssl)/include -I$(brew --prefix sqlite)/include -I$(brew --prefix zlib)/include -I$(xcrun --show-sdk-path)/usr/include"
+export CFLAGS=$CPPFLAGS
+export LDFLAGS="-L$(brew --prefix openssl)/lib -L$(brew --prefix sqlite)/lib -L$(brew --prefix zlib)/lib"
+LD_RUN_PATH="$(brew --prefix sqlite)/lib" ./configure --prefix=$USER_ENV_UTILS/Python/python-$PY3_VERSION --with-openssl=$(brew --prefix openssl)
 make
 make install
 
