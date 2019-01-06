@@ -6,7 +6,7 @@
 	ui = true
 
 [core]
-	editor = "emacs -nw -q"
+	editor = "emacs -nw -q --load \"~/Environment/Config/git/git-emacs.el\""
 	excludesfile = /Users/rick/.gitignore_global
 
 [credential]
@@ -31,6 +31,7 @@
 [alias]
 	# branching
 	co = checkout
+        destroy = "!f() { git stash save -u 'DESTROYED BRANCH' && git checkout master && git branch -D @{-1}; }; f"
 
 	# commits
 	amend = commit --amend --no-edit

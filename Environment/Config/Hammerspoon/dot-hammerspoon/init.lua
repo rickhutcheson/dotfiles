@@ -13,6 +13,10 @@
 
 ------------------------------  CONFIG  --------------------------------
 
+switcher = hs.window.switcher.new(hs.window.filter.new():setDefaultFilter{}) -- include minimized/hidden windows, current Space only
+hs.hotkey.bind('option','tab','Next window',function()switcher:next()end)
+
+
 -----------------------------  GLOBALS  --------------------------------
 
 function moveToScreenTop(windowFrame, screenFrame)
