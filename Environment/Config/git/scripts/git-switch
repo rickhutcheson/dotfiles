@@ -8,15 +8,17 @@ stash_message="git-switch away from $current_branch"
 
 new_branch="$1"
 
-new_branch_sha=$(git show-ref "refs/heads/$new_branch")
+git co master
+git pull
+
+local_branch_sha=$(git show-ref "refs/heads/$new_branch")
+remote_branch_sha=$(git show-ref "refs/remotes/origin/$new_branch")
 
 # length of new_branch != 0  means local branch with <branch-name> exists.
 
 git stash save $stash_message
-if [[ -z $new_branch_sha ]]
+if [[ -z $local_branch_sha ]] && [[ -z $remote_branch_sha ]]
 then
-    git co master
-    git pull
     git co -b $new_branch
 else
     git co $new_branch

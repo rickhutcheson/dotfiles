@@ -6,7 +6,7 @@
 	ui = true
 
 [core]
-	editor = "emacs -nw -q"
+	editor = "emacs -nw -q --load \"~/Environment/Config/git/git-emacs.el\""
 	excludesfile = /Users/rick/.gitignore_global
 
 [credential]
@@ -31,6 +31,7 @@
 [alias]
 	# branching
 	co = checkout
+        destroy = "!f() { git stash save -u 'DESTROYED BRANCH' && git checkout master && git branch -D @{-1}; }; f"
 
 	# commits
 	amend = commit --amend --no-edit
@@ -48,13 +49,14 @@
 	# status
 	st = status
 	stash-rename = "!_() { rev=$(git rev-parse $1) && git stash drop $1 || exit 1 ; git diff-index --quiet HEAD; s=$?; [ $s != 0 ] && git stash save \"tmp stash from stash-rename\"; git stash apply $rev && shift && git stash save \"$@\" && [ $s != 0 ] && git stash pop stash@{1}; }; _"
+
+        # third-party
+        r = recent
 [rerere]
 	enabled = true
 [diff]
 [difftool]
 	prompt = false
-[gui]
-	recentrepo = /Users/rick/Repositories/udemy
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
