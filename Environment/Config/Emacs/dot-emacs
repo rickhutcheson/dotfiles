@@ -62,7 +62,6 @@
     web-beautify       ; code beautifying
     js2-mode           ; syntax-highlighting, linting, etc.
 
-
     ;; markdown
     markdown-mode
     pandoc-mode
@@ -113,7 +112,10 @@
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
 
-(set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
+; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
+(set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+; (setq mac-allow-anti-aliasing nil)
+
 (setq-default line-spacing 0.02)
 
 ;; 80 chars + room for fringe
@@ -213,7 +215,6 @@
       version-control t)                ; use versioned backups
 
 
-
 ;; ---------------------------------------------------------------------
 ;; TeX
 ;; ---------------------------------------------------------------------
@@ -257,6 +258,7 @@
 ;; ---------------------------------------------------------------------
 ;; flycheck-pos
 ;; ---------------------------------------------------------------------
+
 
 (with-eval-after-load 'flycheck
   (flycheck-pos-tip-mode))
@@ -442,4 +444,5 @@
     ("bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
  '(package-selected-packages
    (quote
-    (go-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode jedi flycheck-pos-tip))))
+    (sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode jedi flycheck-pos-tip))))
+

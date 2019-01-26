@@ -13,6 +13,10 @@
 
 ------------------------------  CONFIG  --------------------------------
 
+switcher = hs.window.switcher.new(hs.window.filter.new():setDefaultFilter{}) -- include minimized/hidden windows, current Space only
+hs.hotkey.bind('option','tab','Next window',function()switcher:next()end)
+
+
 -----------------------------  GLOBALS  --------------------------------
 
 function moveToScreenTop(windowFrame, screenFrame)
@@ -71,19 +75,36 @@ end
 -- Halves
 ---------
 
+--- Conventions:
+--    cmd is prefix for everything
+--    control means "will move"
+--    shift means "will change size"
+--    using them together combines functionality
 prefix = {
    focus  = {"cmd"},
-   move   = {"cmd", "option"},
+   move   = {"cmd", "control"},
    resize = {"cmd", "shift"},
-   quadrant = {"control", "option", "cmd"}
+   quadrant = {"cmd", "control", "option"}
 }
 
 
 -- With "focus" prefix, we only switch focus by direction
-hs.hotkey.bind(prefix.focus, "Up", hs.window.focusWindowNorth)
-hs.hotkey.bind(prefix.focus, "Right", hs.window.focusWindowEast)
-hs.hotkey.bind(prefix.focus, "Down", hs.window.focusWindowSouth)
-hs.hotkey.bind(prefix.focus, "Left", hs.window.focusWindowWest)
+
+hs.hotkey.bind(prefix.focus, "Up", function()
+    hs.window.focusWindowNorth(nil, nil, true)
+end)
+
+hs.hotkey.bind(prefix.focus, "Right", function()
+    hs.window.focusWindowEast(nil, nil, true)
+end)
+
+hs.hotkey.bind(prefix.focus, "Down", function()
+    hs.window.focusWindowSouth(nil, nil, true)
+end)
+
+hs.hotkey.bind(prefix.focus, "Left", function()
+    hs.window.focusWindowWest(nil, nil, true)
+end)
 
 
 -- Move without resizing
@@ -180,7 +201,28 @@ hs.hotkey.bind(prefix.resize, "Up", function()
 end)
 
 
+hs.hotkey.bind(prefix.resize, "pad8", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.h / 2
+      end)
+end)
+
+
 hs.hotkey.bind(prefix.resize, "Right", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            newWidth = screenFrame.w / 2
+            windowFrame.x1 = screenFrame.x2 - newWidth
+            windowFrame.w = newWidth
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resize, "pad6", function()
       modifyFocused(function(windowFrame, screenFrame)
             newWidth = screenFrame.w / 2
             windowFrame.x1 = screenFrame.x2 - newWidth
@@ -201,6 +243,16 @@ hs.hotkey.bind(prefix.resize, "Down", function()
 end)
 
 
+hs.hotkey.bind(prefix.resize, "pad2", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.h / 2
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
 hs.hotkey.bind(prefix.resize, "Left", function()
       modifyFocused(function(windowFrame, screenFrame)
             newWidth = screenFrame.w / 2
@@ -212,7 +264,27 @@ hs.hotkey.bind(prefix.resize, "Left", function()
 end)
 
 
+hs.hotkey.bind(prefix.resize, "pad4", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            newWidth = screenFrame.w / 2
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.w = newWidth
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
 hs.hotkey.bind(prefix.resize, "=", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+hs.hotkey.bind(prefix.resize, "pad5", function()
       modifyFocused(function(windowFrame, screenFrame)
             windowFrame.x1 = screenFrame.x1
             windowFrame.x2 = screenFrame.x2
