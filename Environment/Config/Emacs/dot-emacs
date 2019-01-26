@@ -15,6 +15,7 @@
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
 (add-to-list 'load-path "~/.emacs.d/cweb.el")
+(add-to-list 'load-path "~/.emacs.d/CustomModes")
 
 (defun set-exec-path-from-shell-PATH ()
   "Set `execpath` and PATH environment variable to match user's $PATH."
@@ -112,9 +113,7 @@
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
 
-(set-frame-font "-*-Monaco-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
-
-
+(set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 (setq-default line-spacing 0.02)
 
 ;; 80 chars + room for fringe
@@ -179,7 +178,8 @@
 ;; ---------------------------------------------------------------------
 (global-set-key (kbd "C-c l d") 'layout-django)
 (global-set-key (kbd "C-c g") 'magit-status)
-
+(setq  x-meta-keysym 'super
+       x-super-keysym 'meta)
 
 ;; ---------------------------------------------------------------------
 ;; ido / smex
@@ -260,6 +260,16 @@
 
 (with-eval-after-load 'flycheck
   (flycheck-pos-tip-mode))
+
+
+;; ---------------------------------------------------------------------
+;; MMIX (Assembly Language from TAoCP)
+;; ---------------------------------------------------------------------
+
+(autoload 'mmix-mode "mmix-mode"
+  "Major mode for editing MMIX Assembly files"
+  t)
+(add-to-list 'auto-mode-alist '("\\.mms\\'" . mmix-mode))
 
 
 ;; ---------------------------------------------------------------------
@@ -408,6 +418,12 @@
           (lambda() (define-key python-mode-map (kbd "s-b") 'jedi:goto-definition)))
 
 
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 ;; Local Variables:
 ;; mode: emacs-lisp
 
@@ -423,15 +439,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
+    ("bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
  '(package-selected-packages
    (quote
-    (csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode jedi flycheck-pos-tip))))
-
-;;; dot-emacs ends here
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+    (go-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode jedi flycheck-pos-tip))))

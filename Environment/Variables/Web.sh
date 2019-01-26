@@ -8,6 +8,3 @@ export PATH=$PATH:~/node_modules/.bin
 # MongoDB
 export PATH=$PATH:$USER_ENV_UTILS/mongodb/latest/bin
 
-# PhantomJS
-export PATH=$USER_ENV_UTILS/NPM/node_modules/phantomjs-prebuilt/lib/phantom/bin/:$PATH
-export PHANTOMJS_BIN=`which phantomjs`
