@@ -1,5 +1,6 @@
-xterm*faceName: Inconsolata
+xterm*faceName: Terminus
 xterm*faceSize: 11
+XTerm.vt100.scrollBar: false
 
 !Theme Four (phraktured.net)
 *xterm*background: rgb:00/00/00

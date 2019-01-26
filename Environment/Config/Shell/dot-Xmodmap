@@ -1,3 +1,18 @@
-clear control
-clear mod4
-add control = Control_L Control_R Super_L
+!
+! OpenBSD: Swap Caps_Lock and Control_L
+!
+remove Lock = Caps_Lock
+remove Control = Control_R
+keysym Control_R = Caps_Lock
+keysym Caps_Lock = Control_R
+add Lock = Caps_Lock
+add Control = Control_R
+
+
+!
+! Use superl as mod4
+!
+keycode 115 = Super_L
+keycode 116 = Super_R
+! Super_L is already mod4 on my system, but Super_R is not
+add mod4 = Super_R

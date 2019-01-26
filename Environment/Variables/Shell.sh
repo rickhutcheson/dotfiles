@@ -32,7 +32,7 @@ if [[ ! -e $HISTFILE ]]; then
         #
         # source: StackExchange (originally #bash on Freenode)
         #
-        tail -r $LASTHIST | awk '!seen[$0]++'  | grep . -m $DAILY_TRANSFER_LIMIT
+        tail -r $LASTHIST | awk '!seen[$0]++'  | grep . -m $DAILY_TRANSFER_LIMIT >> $HISTFILE
         # Write a divider to identify where the prior day's session history ends
         echo "##########################################################" >> $HISTFILE
     fi
@@ -66,7 +66,7 @@ hr() {
 }
 
 show_prompt() {
-    prompt="↪ "
+    prompt=">"
     info_line=$cwd
 
     branch=''
@@ -82,7 +82,7 @@ show_prompt() {
         venv=$GREEN$(basename $VIRTUAL_ENV)$NONE
         info_line=$info_line$separator$venv
         pre_prompt="\[$GREEN\]\[$ITALIC\]"
-        prompt="❱❱"
+        prompt=">>"
     else
         pre_prompt="\[$YELLOW\]"
     fi

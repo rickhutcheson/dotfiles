@@ -24,15 +24,14 @@ client.focused_inactive         #202020 #202020 #666666
 client.urgent                   #212121 #303030 #ee0000
 client.background               #101010
 #font -*-inconsolata-medium-r-*-17-*-*-*-*-*-*-*
-font pango:Inconsolata 12px
+font pango:Terminus 16px
 
 #i3bar config
 bar {
     position top
-    font pango:Inconsolata 16px
+    font pango:Terminus 16px
     status_command i3status --config ~/.i3/i3status.conf
     colors {
-
         background         #101010
         statusline         #FFFFFF
         focused_workspace  #3399CC #000000
@@ -51,13 +50,13 @@ floating_modifier $mod
 
 # Application Launching
 #######################
-bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec xterm
 
 # old dmenu
 # bindsym $mod+space  exec `dmenu_run -i -nb '#404040' -nf '#dedeff' -fn 'Inconsolata13px'`
 
 # new dmenu, wrapper around old dmenu (USE after i3-4.3 released)
-bindsym $mod+space exec --no-startup-id i3-dmenu-desktop --entry-type=command --dmenu=`dmenu_run -b -i -nb '#101010' -nf '#dedeff' -fn 'Inconsolata-48' -p '>'`
+bindsym $mod+space exec --no-startup-id i3-dmenu-desktop --entry-type=command --dmenu=`dmenu_run -b -i -nb '#101010' -nf '#dedeff' -fn 'Terminus-18' -p '>'`
 # Operations
 #############
 
