@@ -11,4 +11,6 @@ hdiutil attach -mountpoint $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer Emacs.
 cp -rf $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer/Emacs.app ~/Applications/
 hdiutil detach $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer
 cd ..
+unlink $USER_ENV_HOME/.emacs.d
+ln -s  $USER_ENV_DATA/Emacs/ $USER_ENV_HOME/.emacs.d
 exit 0
