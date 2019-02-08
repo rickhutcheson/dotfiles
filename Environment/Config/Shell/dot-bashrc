@@ -1,0 +1,7 @@
+#
+# Customize a bit of autocomplete behavior
+# Note that this only works in .bashrc, not .bash_profile
+#
+
+echo "TEST"
+export INPUTRC=~/.inputrc

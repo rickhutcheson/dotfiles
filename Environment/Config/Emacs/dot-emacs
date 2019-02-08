@@ -6,7 +6,7 @@
 
 ;;; Commentary:
 ;; Before performing any configuration, we download and
-;; install all required packages.  Loading config file will have
+;; install all required packages. Loading config file will have
 ;; side-effects.
 
 ;;; Code:
@@ -101,7 +101,6 @@
 (require 'ido)
 (require 'smex)
 (require 'simp)
-(require 'cl)  ; used for kill-matching
 
 
 ;; ---------------------------------------------------------------------
@@ -159,12 +158,6 @@
    (interactive)
    (split-window-right 110)) ; 100 chars + fringe
 
-(defun kill-matching (regexp)
-  "Kill buffers matching REGEXP *without* asking for confirmation."
-  (interactive "sMatch: ")
-  (flet ((kill-buffer-ask (buffer) (kill-buffer buffer)))
-    (kill-matching-buffers regexp)))
-
 
 ;; ---------------------------------------------------------------------
 ;; global hooks
@@ -211,15 +204,6 @@
       kept-old-versions 2
       version-control t)                ; use versioned backups
 
-
-;; ---------------------------------------------------------------------
-;; TeX
-;; ---------------------------------------------------------------------
-
-(add-to-list 'auto-mode-alist '("\\.tex\\'" . auto-fill-mode))
-(add-to-list 'auto-mode-alist '("\\.tex\\'" . tex-mode))
-
-
 ;; ---------------------------------------------------------------------
 ;; dired
 ;; ---------------------------------------------------------------------
@@ -260,6 +244,18 @@
 (with-eval-after-load 'flycheck
   (flycheck-pos-tip-mode))
 
+;; ---------------------------------------------------------------------
+;; Golang
+;; ---------------------------------------------------------------------
+
+(require 'go-mode)
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+
+(eval-after-load 'go-mode
+  (lambda ()
+    (add-hook 'before-save-hook 'gofmt-before-save)))
+
+
 
 ;; ---------------------------------------------------------------------
 ;; PHP
@@ -299,6 +295,14 @@
 ; (global-set-key (kbd "C-c C-f") 'simp-project-with-bookmark-find-file)
 ; (global-set-key (kbd "C-c C-s") 'simp-project-with-bookmark-rgrep)
 ; (global-set-key (kbd "C-c C-b") 'simp-project-with-bookmark-ibuffer)
+
+
+;; ---------------------------------------------------------------------
+;; TeX
+;; ---------------------------------------------------------------------
+
+(add-to-list 'auto-mode-alist '("\\.tex\\'" . auto-fill-mode))
+(add-to-list 'auto-mode-alist '("\\.tex\\'" . tex-mode))
 
 
 ;; =====================================================================
