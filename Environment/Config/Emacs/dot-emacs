@@ -120,7 +120,7 @@
 
 ;; dark Theme
 
-(load-theme 'sanityinc-tomorrow-night t)
+;(load-theme 'sanityinc-tomorrow-night t)
 
 ;; naked emacs
 (scroll-bar-mode 0)
