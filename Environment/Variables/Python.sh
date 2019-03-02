@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-export USER_ENV_PYTHON_PY3_VERSION=3.4
-export PATH=$PATH:$USER_ENV_UTILS/Python/latest/bin
+export USER_ENV_PYTHON_PY3_VERSION=3.5
+export PATH=$USER_ENV_UTILS/Python/latest/bin:$PATH
 
 # py2default
 export PY2_DEFAULT_VENV=$USER_ENV_UTILS/Python/Envs/py2default
