@@ -21,3 +21,8 @@ pyactivate() {
         . $USER_ENV_UTILS/Python/Envs/"$@"/bin/activate
     fi
 }
+
+pyls() {
+    cd $USER_ENV_UTILS/Python/Envs
+    ls -l
+}
