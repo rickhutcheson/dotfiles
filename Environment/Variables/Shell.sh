@@ -46,6 +46,10 @@ fi
 alias nano='emacs -nw'  # emacs in terminal & no init file (fast)
 export PATH=$PATH:$USER_ENV_UTILS/Shell/
 
+# General Appearance
+# ----------------------------------------------------------------------
+
+export CLICOLOR=1  # Enable colors for BSD variants (including macOS)
 
 # Prompt Formatting
 # ----------------------------------------------------------------------
