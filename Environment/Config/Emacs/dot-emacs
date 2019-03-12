@@ -122,7 +122,7 @@
 
 ;; dark Theme
 
-;(load-theme 'sanityinc-tomorrow-night t)
+(load-theme 'sanityinc-tomorrow-night t)
 
 ;; naked emacs
 (scroll-bar-mode 0)
@@ -445,8 +445,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
+    ("628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
  '(package-selected-packages
    (quote
     (sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode jedi flycheck-pos-tip))))
-
