@@ -12,6 +12,8 @@ cd $USER_ENV_UTILS/Python
 rm -rf $USER_ENV_UTILS/Python/python-$PY3_VERSION
 rm -f python3.tar.xz
 
+mkdir -p $USER_ENV_UTILS/Python/python-$PY3_VERSION
+
 echo "Downloading..."
 wget -q https://www.python.org/ftp/python/$PY3_VERSION/Python-$PY3_VERSION.tar.xz -O python3.tar.xz
 
@@ -41,7 +43,7 @@ if [[ "$USER_ENV_OS" == "darwin" ]]; then
        -I$(brew --prefix sqlite)/include \
        -I$(brew --prefix gettext)/include \
        -I$(brew --prefix zlib)/include \
-       -I$(brew --prefix readline)/include \
+       -I$USER_ENV_LIB/Readline/readline-7.0/include \
        -I$(xcrun --show-sdk-path)/usr/include"
     export CFLAGS=$CPPFLAGS
     export LDFLAGS="\
@@ -49,7 +51,7 @@ if [[ "$USER_ENV_OS" == "darwin" ]]; then
        -L$(brew --prefix sqlite)/lib \
        -L$(brew --prefix gettext)/lib \
        -L$(brew --prefix zlib)/lib \
-       -L$(brew --prefix readline)/lib"  # Proper readline support; otherwise IPython complains about libedit
+       -L$USER_ENV_LIB/Readline/readline-7.0/lib"  # Proper readline support; otherwise IPython complains about libedit
     LD_RUN_PATH="$(brew --prefix sqlite)/lib" ./configure --prefix=$USER_ENV_UTILS/Python/python-$PY3_VERSION --with-openssl=$(brew --prefix openssl)
 else
     ./configure --prefix=$USER_ENV_UTILS/Python/python-$PY3_VERSION

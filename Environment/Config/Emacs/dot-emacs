@@ -111,6 +111,7 @@
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
 
+;; FONTS
 ; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
 ; (setq mac-allow-anti-aliasing nil)
@@ -130,9 +131,10 @@
 (menu-bar-mode 0)
 (set-default 'cursor-type '(hbar . 1))
 
-;; Prevent the cursor from blinking
+;; Show line numbers (and pad them a little)
 (global-linum-mode t)
 (column-number-mode t)
+(setq linum-format "%d ")
 
 ;; Don't use messages that you don't read
 (setq initial-scratch-message "")
