@@ -1,5 +1,6 @@
 .DS_Store
 Environment/Utilities/
+Environment/Libraries/
 Environment/Variables/Udemy.sh
 Environment/Config/Udemy/
 Environment/Install/Udemy/

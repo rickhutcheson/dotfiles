@@ -112,6 +112,39 @@ show_prompt() {
 
 export PROMPT_COMMAND=show_prompt
 
+#######################################
+# Displays a boxed string:
+#  ╔═════════╗
+#╠═╣ Hello!  ║
+#  ╚═════════╝
+#
+#######################################
+proclaim() {
+    local line="$1"
+    local line_length=${#line}
+
+    # top line
+    printf "\n${CYAN}╗ ╔"
+    # line_length + 5 is for the 3 extra spaces around $line and 2 for the sign
+    for (( i = 0; i < line_length+5; i++ )); do
+        printf '═'
+    done
+    printf "╗\n"
+
+    # text
+    printf "╠═╣ $line    ║\n"
+
+    # bottom line
+    printf '╝ ╚'  # 5 characters for prefix of sign
+    for (( i = 0; i < line_length+5; i++ )); do
+        printf '═'
+    done
+    printf "╝\n"
+
+    # finish sign
+    printf "\n${NONE}"
+}
+
 #
 # Miscellaneous
 # ----------------------------------------------------------------------
