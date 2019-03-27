@@ -75,7 +75,6 @@ hr() {
 show_prompt() {
     prompt=">"
     info_line=$cwd
-
     branch=''
     current_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)  # get branch name (if possible)
     if [ $? -eq 0 ]
