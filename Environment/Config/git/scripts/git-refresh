@@ -15,7 +15,12 @@ current_branch=$(git rev-parse --abbrev-ref HEAD)
 git co master
 git pull
 git co $current_branch
-git merge --no-edit master  # no-edit to avoid commit msg prompt
+
+if [[ "$@" == "--rebase" ]]; then
+    git rebase master
+else
+    git merge --no-edit master  # no-edit to avoid commit msg prompt
+fi
 
 if [ "$idea_running" -eq "1" ]; then
     open -a 'IntelliJ IDEA Ultimate'

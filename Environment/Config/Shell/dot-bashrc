@@ -3,5 +3,7 @@
 # Note that this only works in .bashrc, not .bash_profile
 #
 
-echo "TEST"
+export USER_ENV_HOME=~/Environment
+export USER_ENV_OS=darwin
+. $USER_ENV_HOME/Startup.sh
 export INPUTRC=~/.inputrc
