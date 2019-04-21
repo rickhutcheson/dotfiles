@@ -14,8 +14,8 @@
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/flycheck")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
-(add-to-list 'load-path "~/.emacs.d/cweb.el")
-(add-to-list 'load-path "~/.emacs.d/CustomModes")
+(add-to-list 'load-path "~/.emacs.d/CustomModes/cweb.el")
+; (add-to-list 'load-path "~/.emacs.d/CustomModes")
 
 (defun set-exec-path-from-shell-PATH ()
   "Set `execpath` and PATH environment variable to match user's $PATH."
@@ -38,6 +38,7 @@
        ("melpa" . "http://melpa.org/packages/")
        ("elpy" . "http://jorgenschaefer.github.io/packages/")))
 
+
 ;; ---------------------------------------------------------------------
 ;; Required Packages
 ;; ---------------------------------------------------------------------
@@ -48,11 +49,15 @@
     color-theme-sanityinc-tomorrow
 
     ;; general
+    company            ; auto-completion framework (actively maintained)
     flycheck           ; auto-lint source files (must config for each lang)
     flycheck-pos-tip   ; show error under point
     magit
     simp
     smex
+
+    ;; Golang
+    go-mode
 
     ;; HTML & CSS-like
     less-css-mode
@@ -97,6 +102,7 @@
 ;; ---------------------------------------------------------------------
 ;; required packages
 ;; ---------------------------------------------------------------------
+(require 'company)
 (require 'flycheck)
 (require 'flymake)
 (require 'ido)
@@ -113,16 +119,18 @@
 
 ;; FONTS
 ; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
-(set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-; (setq mac-allow-anti-aliasing nil)
+; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+(set-frame-font "-*-Monaco-normal-normal-normal-*-10-*-*-*-m-0-iso10646-1")
+;; In order for this to take effect, you must use the following command:
+;; defaults write org.gnu.Emacs FontBackend ns
+(setq mac-allow-anti-aliasing nil)
 
 (setq-default line-spacing 0.02)
 
 ;; 80 chars + room for fringe
 (add-to-list 'default-frame-alist '(width . 88))
 
-;; dark Theme
-
+;; dark theme
 (load-theme 'sanityinc-tomorrow-night t)
 
 ;; naked emacs
@@ -150,7 +158,7 @@
 
 ;; This got annoying
 ;;(setq ring-bell-function (lambda () (play-sound-file "~/.emacs.d/goron-oop.wav")))
-(setq ring-bell-function (lambda () (play-sound-file "~/.emacs.d/quack.wav")))
+(setq ring-bell-function (lambda () (play-sound-file "~/.emacs.d/voltage.wav")))
 
 
 ;; ---------------------------------------------------------------------
@@ -203,11 +211,19 @@
       `((".*" ,emacs-tmp-dir t)))
 
 ;; backup behavior
-(setq backup-by-copying t)               ; don't clobber symlinks
-(setq delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)                ; use versioned backups
+(setq version-control t            ; use versioned backups
+      delete-old-versions t
+      kept-new-versions 10
+      kept-old-versions 10
+      backup-by-copying t)         ; don't clobber symlinks
+
+
+;; ---------------------------------------------------------------------
+;; company
+;; ---------------------------------------------------------------------
+
+(define-key company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+
 
 ;; ---------------------------------------------------------------------
 ;; dired
@@ -316,8 +332,8 @@
 ;; TeX
 ;; ---------------------------------------------------------------------
 
-(add-to-list 'auto-mode-alist '("\\.tex\\'" . auto-fill-mode))
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . tex-mode))
+(add-hook 'tex-mode-hook 'auto-fill-mode)
 
 
 ;; =====================================================================
@@ -450,4 +466,4 @@
     ("628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
  '(package-selected-packages
    (quote
-    (sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode jedi flycheck-pos-tip))))
+    (company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
