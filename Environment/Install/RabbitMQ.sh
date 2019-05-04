@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-export RABBIT_VERSION=3.7.9
+export RABBIT_VERSION=3.7.14
 echo "Installing Rabbit v. $RABBIT_VERSION"
 echo "Please ensure that you've installed Erlang!"
 cd $USER_ENV_UTILS/RabbitMQ
