@@ -10,13 +10,30 @@
 
 ------------------------------------------------------------------------
 
-
-------------------------------  CONFIG  --------------------------------
-
-switcher = hs.window.switcher.new(hs.window.filter.new():setDefaultFilter{}) -- include minimized/hidden windows, current Space only
-hs.hotkey.bind('option','tab','Next window',function()switcher:next()end)
+-----------------------------  CONFIG  ---------------------------------
 
 
+----------------------------  CAFFEINE  --------------------------------
+
+-- See: http://www.hammerspoon.org/go/#simplemenubar
+
+caffeine = hs.menubar.new()
+function setCaffeineDisplay(state)
+    if state then
+        caffeine:setTitle("☕")   -- coffee cup icon
+    else
+        caffeine:setTitle("💤")  -- zzz icon
+    end
+end
+
+function caffeineClicked()
+    setCaffeineDisplay(hs.caffeinate.toggle("displayIdle"))
+end
+
+if caffeine then
+    caffeine:setClickCallback(caffeineClicked)
+    setCaffeineDisplay(hs.caffeinate.get("displayIdle"))
+end
 -----------------------------  GLOBALS  --------------------------------
 
 function moveToScreenTop(windowFrame, screenFrame)
