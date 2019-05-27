@@ -1,15 +1,15 @@
 ;;; dot-emacs --- Personal Emacs configuration
 
-;; Author: Rick Hutcheson <rick@oddlyaccurate.com>
+;; Author Rick Hutcheson <rick@oddlyaccurate.com>
 
 ;; This file is not part of GNU Emacs.
 
-;;; Commentary:
+;;; Commentary
 ;; Before performing any configuration, we download and
 ;; install all required packages. Loading config file will have
 ;; side-effects.
 
-;;; Code:
+;;; Code
 
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/flycheck")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
@@ -84,7 +84,7 @@
 (package-initialize)
 
 ;; refresh package contents
-;; HACK: This should really only run once, not for every package.
+;; HACK - This should really only run once, not for every package.
 (dolist (package required-package-list)
   (unless (package-installed-p package)
     (package-refresh-contents)))
@@ -121,7 +121,7 @@
 ; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 ; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
 (set-frame-font "-*-Monaco-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1")
-;; In order for this to take effect, you must use the following command:
+;; In order for this to take effect, you must use the following command--
 ;; defaults write org.gnu.Emacs FontBackend ns
 ; (setq mac-allow-anti-aliasing nil)
 
@@ -131,7 +131,7 @@
 (add-to-list 'default-frame-alist '(width . 88))
 
 ;; dark theme
-(load-theme 'sanityinc-tomorrow-night t)
+(load-theme 'gruvbox t)
 
 ;; naked emacs
 (scroll-bar-mode 0)
@@ -231,24 +231,43 @@
 ;; cc-mode
 ;; ---------------------------------------------------------------------
 
-;; we need to know where clang-format lives
-(when (eq system-type 'darwin)
-  ;; find clang-format so we can find clang-format.el
-  ;; (note that the shell command ends with a trailing newline we have to strip
-  (setq clang-prefix
-        (substring (shell-command-to-string "brew --prefix clang-format") 0 -1))
-
-  (load (concat clang-prefix "/share/clang/clang-format.el"))
-)
 (setq c-basic-offset 2)
-(add-hook 'cc-mode-hook 'auto-fill-mode)
-(add-hook 'cc-mode-hook 'company-mode)
-(add-hook 'cc-mode-hook 'flycheck-mode)
-(add-hook 'cc-mode-hook
+(add-hook 'c-mode-hook 'auto-fill-mode)
+(add-hook 'c-mode-hook 'company-mode)
+(add-hook 'c-mode-hook 'flycheck-mode)
+;; auto-fill quotes /parens / braces
+(add-hook 'c-mode-hook 'electric-pair-mode)
+;; highlight matching parens
+(add-hook 'c-mode-hook 'show-paren-mode)
+(add-hook 'c-mode-hook
           (lambda ()
-            (c-set-style "k&r")
+            ;; load our custom style file
+            (load-file "~/.emacs.d/resc-c-style.el")
+            (c-set-style "resc")
+            ;; Add RESC_HOME to our include path for flycheck
+            ;; gets everything but trailing newline
+            (setq flycheck-clang-include-path
+                  (list
+                   (concat
+                    (substring (shell-command-to-string "$SHELL --login -i -c 'echo $RESC_HOME'") 0 -1)
+                    "/src/base")))
+            ;; allow completing from #included header files
+            (add-to-list 'company-backends 'company-c-headers)
             (setq c-basic-offset 2)
-            (add-hook 'before-save-hook 'clang-format-buffer)))
+            ;; on macOS, we can setup clang-format
+            (when (eq system-type 'darwin)
+              ;; find & load clang-format.el
+              ;; it lives in the brew prefix for
+              ;; find clang-format so we can find clang-format.el
+              ;; (note that the shell command ends with a trailing newline we have to strip
+              (load (concat
+                     (substring (shell-command-to-string "brew --prefix clang-format") 0 -1)
+                    "/share/clang/clang-format.el"))
+              (add-hook 'before-save-hook
+                        'clang-format-buffer
+                        t  ; append to existing value
+                        t  ; buffer-local (important, since we don't want tof
+                        ))))
 
 
 ;; ---------------------------------------------------------------------
@@ -308,7 +327,7 @@
 
 (eval-after-load 'go-mode
   (lambda ()
-    (add-hook 'before-save-hook 'gofmt-before-save)))
+    (add-hook 'before-save-hook 'gofmt-before-save nil t)))
 
 
 ;; ---------------------------------------------------------------------
@@ -489,16 +508,6 @@
           (lambda() (define-key python-mode-map (kbd "s-b") 'jedi:goto-definition)))
 
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-;; Local Variables:
-;; mode: emacs-lisp
-
-
 ;; ---------------------------------------------------------------------
 ;; required variables
 ;; ---------------------------------------------------------------------
@@ -508,9 +517,19 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
+ '(company-c-headers-path-user
    (quote
-    ("628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" default)))
+    ("/rick/Repositories/resC/src/base" "/rick/Repositories/resC/src/components/a
+")))
+ '(company-clang-arguments
+   (quote
+    ("-I/rick/Repositories/resC/src/components/a" "-I/rick/Repositories/resC/src/base")))
  '(package-selected-packages
    (quote
-    (company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
+    (gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
