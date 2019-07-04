@@ -78,21 +78,25 @@
     auto-complete
     python-environment
     jedi
-    ))
+    )
+  "Packages installed @ startup")
 
 ;; activate all the packages (in particular autoloads)
 (package-initialize)
 
 ;; refresh package contents
-;; HACK - This should really only run once, not for every package.
+(defvar needs-packages nil)
 (dolist (package required-package-list)
   (unless (package-installed-p package)
-    (package-refresh-contents)))
+    (setq needs-packages t)))
 
 ;; install the missing packages
-(dolist (package required-package-list)
-  (unless (package-installed-p package)
-    (package-install package)))
+(when needs-packages (package-refresh-contents))
+
+(when needs-packages
+  (dolist (package required-package-list)
+    (unless (package-installed-p package)
+      (package-install package))))
 
 
 ;; =====================================================================
@@ -120,7 +124,7 @@
 ;; FONTS
 ; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 ; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-(set-frame-font "-*-Monaco-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1")
+(set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
 ;; In order for this to take effect, you must use the following command--
 ;; defaults write org.gnu.Emacs FontBackend ns
 ; (setq mac-allow-anti-aliasing nil)
@@ -250,7 +254,11 @@
                   (list
                    (concat
                     (substring (shell-command-to-string "$SHELL --login -i -c 'echo $RESC_HOME'") 0 -1)
-                    "/src/base")))
+                    "/src/base")
+
+                   (concat
+                    (substring (shell-command-to-string "$SHELL --login -i -c 'echo $RESC_HOME'") 0 -1)
+                    "/src/")))
             ;; allow completing from #included header files
             (add-to-list 'company-backends 'company-c-headers)
             (setq c-basic-offset 2)
@@ -335,6 +343,8 @@
 ;; ---------------------------------------------------------------------
 
 (ido-mode t)
+(setq ido-enable-flex-matching t)
+
 (smex-initialize)
 
 (global-set-key (kbd "M-x") 'smex)
@@ -379,7 +389,6 @@
  '(:has (.git)
    :ignore (.git)))
 ;; customize search behavior; ido is awesome
-(setq-default ido-enable-flex-matching t)
 (setq-default simp-completing-read-command (quote ido-completing-read))
 
 ;; keys
@@ -523,10 +532,10 @@
 ")))
  '(company-clang-arguments
    (quote
-    ("-I/rick/Repositories/resC/src/components/a" "-I/rick/Repositories/resC/src/base")))
+    ("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base")))
  '(package-selected-packages
    (quote
-    (gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
+    (solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
