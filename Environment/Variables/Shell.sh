@@ -95,6 +95,9 @@ show_prompt() {
         info_line=$info_line$separator$venv
         pre_prompt="\[$vcolor\]\[$ITALIC\]"
         prompt=">>"
+        # try to set the iterm variable
+        iterm2_set_user_var venv `[[ -n $VIRTUAL_ENV ]] && basename $VIRTUAL_ENV || ""`  2>/dev/null || echo
+
     else
         pre_prompt="\[$YELLOW\]"
     fi
