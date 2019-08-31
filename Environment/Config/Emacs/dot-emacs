@@ -118,6 +118,11 @@
 ;; appearance
 ;; ---------------------------------------------------------------------
 
+;; WINDOWS
+;; this is necessary for maximized emacs windows to not have a "gap" at the top / bottom for macOS.
+;;
+(add-hook 'after-init-hook 'toggle-frame-maximized)
+
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
 
@@ -258,7 +263,9 @@
 
                    (concat
                     (substring (shell-command-to-string "$SHELL --login -i -c 'echo $RESC_HOME'") 0 -1)
-                    "/src/")))
+                    "/src/")
+
+                   "/rick/Repositories/kilo/src/components"))
             ;; allow completing from #included header files
             (add-to-list 'company-backends 'company-c-headers)
             (setq c-basic-offset 2)
@@ -277,6 +284,12 @@
                         t  ; buffer-local (important, since we don't want tof
                         ))))
 
+
+;; ---------------------------------------------------------------------
+;; common lisp
+;; ---------------------------------------------------------------------
+
+(setq inferior-lisp-program "/usr/local/bin/clisp")
 
 ;; ---------------------------------------------------------------------
 ;; company
@@ -528,14 +541,16 @@
  ;; If there is more than one, they won't work right.
  '(company-c-headers-path-user
    (quote
-    ("/rick/Repositories/resC/src/base" "/rick/Repositories/resC/src/components/a
-")))
+    ("/rick/Repositories/resC/src/base" "/rick/Repositories/resC/src/components/a" "/rick/Repositories/kilo/src/components")))
  '(company-clang-arguments
    (quote
-    ("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base")))
+    ("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base" "-I/rick/Repositories/kilo/src/components")))
+ '(custom-safe-themes
+   (quote
+    ("1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default)))
  '(package-selected-packages
    (quote
-    (solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
+    (jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
