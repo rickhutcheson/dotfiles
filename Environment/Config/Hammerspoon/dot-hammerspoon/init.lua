@@ -100,7 +100,8 @@ end
 prefix = {
    focus  = {"cmd"},
    move   = {"cmd", "control"},
-   resize = {"cmd", "shift"},
+   resizeHalf = {"cmd", "shift"},
+   resizeThird = {"cmd", "option", "shift"},
    quadrant = {"cmd", "control", "option"}
 }
 
@@ -128,10 +129,9 @@ end)
 
 hs.hotkey.bind(prefix.move, "Up", function()
       modifyFocused(function(windowFrame, screenFrame)
-            moveToScreenTop(windowFrame, screenFrame)
+            moveToScreenCenter(windowFrame, screenFrame)
       end)
 end)
-
 
 hs.hotkey.bind(prefix.move, "Right", function()
       modifyFocused(function(windowFrame, screenFrame)
@@ -208,7 +208,7 @@ end)
 
 -- Resize to halves
 
-hs.hotkey.bind(prefix.resize, "Up", function()
+hs.hotkey.bind(prefix.resizeHalf, "Up", function()
       modifyFocused(function(windowFrame, screenFrame)
             windowFrame.x1 = screenFrame.x1
             windowFrame.x2 = screenFrame.x2
@@ -218,7 +218,7 @@ hs.hotkey.bind(prefix.resize, "Up", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "pad8", function()
+hs.hotkey.bind(prefix.resizeHalf, "pad8", function()
       modifyFocused(function(windowFrame, screenFrame)
             windowFrame.x1 = screenFrame.x1
             windowFrame.x2 = screenFrame.x2
@@ -228,7 +228,7 @@ hs.hotkey.bind(prefix.resize, "pad8", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "Right", function()
+hs.hotkey.bind(prefix.resizeHalf, "Right", function()
       modifyFocused(function(windowFrame, screenFrame)
             newWidth = screenFrame.w / 2
             windowFrame.x1 = screenFrame.x2 - newWidth
@@ -239,7 +239,7 @@ hs.hotkey.bind(prefix.resize, "Right", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "pad6", function()
+hs.hotkey.bind(prefix.resizeHalf, "pad6", function()
       modifyFocused(function(windowFrame, screenFrame)
             newWidth = screenFrame.w / 2
             windowFrame.x1 = screenFrame.x2 - newWidth
@@ -250,7 +250,7 @@ hs.hotkey.bind(prefix.resize, "pad6", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "Down", function()
+hs.hotkey.bind(prefix.resizeHalf, "Down", function()
       modifyFocused(function(windowFrame, screenFrame)
             windowFrame.x1 = screenFrame.x1
             windowFrame.x2 = screenFrame.x2
@@ -260,7 +260,7 @@ hs.hotkey.bind(prefix.resize, "Down", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "pad2", function()
+hs.hotkey.bind(prefix.resizeHalf, "pad2", function()
       modifyFocused(function(windowFrame, screenFrame)
             windowFrame.x1 = screenFrame.x1
             windowFrame.x2 = screenFrame.x2
@@ -270,7 +270,7 @@ hs.hotkey.bind(prefix.resize, "pad2", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "Left", function()
+hs.hotkey.bind(prefix.resizeHalf, "Left", function()
       modifyFocused(function(windowFrame, screenFrame)
             newWidth = screenFrame.w / 2
             windowFrame.x1 = screenFrame.x1
@@ -281,7 +281,7 @@ hs.hotkey.bind(prefix.resize, "Left", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "pad4", function()
+hs.hotkey.bind(prefix.resizeHalf, "pad4", function()
       modifyFocused(function(windowFrame, screenFrame)
             newWidth = screenFrame.w / 2
             windowFrame.x1 = screenFrame.x1
@@ -292,7 +292,7 @@ hs.hotkey.bind(prefix.resize, "pad4", function()
 end)
 
 
-hs.hotkey.bind(prefix.resize, "=", function()
+hs.hotkey.bind(prefix.resizeHalf, "=", function()
       modifyFocused(function(windowFrame, screenFrame)
             windowFrame.x1 = screenFrame.x1
             windowFrame.x2 = screenFrame.x2
@@ -301,7 +301,113 @@ hs.hotkey.bind(prefix.resize, "=", function()
       end)
 end)
 
-hs.hotkey.bind(prefix.resize, "pad5", function()
+hs.hotkey.bind(prefix.resizeHalf, "pad5", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+-- Resize to thirds
+
+hs.hotkey.bind(prefix.resizeThird, "Up", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.h / 3
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "pad8", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.h / 3
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "Right", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            newWidth = screenFrame.w / 3
+            windowFrame.x1 = screenFrame.x2 - newWidth
+            windowFrame.w = newWidth
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "pad6", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            newWidth = screenFrame.w / 3
+            windowFrame.x1 = screenFrame.x2 - newWidth
+            windowFrame.w = newWidth
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "Down", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.h / 3
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "pad2", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.x2 = screenFrame.x2
+            windowFrame.y1 = screenFrame.h / 3
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "Left", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            newWidth = screenFrame.w / 3
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.w = newWidth
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "pad4", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            newWidth = screenFrame.w / 3
+            windowFrame.x1 = screenFrame.x1
+            windowFrame.w = newWidth
+            windowFrame.y1 = screenFrame.y1
+            windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "=", function()
+     modifyFocused(function(windowFrame, screenFrame)
+         margin = screenFrame.w - windowFrame.w
+         windowFrame.x1 = screenFrame.x1 + margin
+         windowFrame.x1 = screenFrame.x2 - margin
+         windowFrame.y1 = screenFrame.y1
+         windowFrame.y2 = screenFrame.y2
+      end)
+end)
+
+
+hs.hotkey.bind(prefix.resizeThird, "pad5", function()
       modifyFocused(function(windowFrame, screenFrame)
             windowFrame.x1 = screenFrame.x1
             windowFrame.x2 = screenFrame.x2

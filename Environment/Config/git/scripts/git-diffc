@@ -9,4 +9,4 @@ else
     num_commits=$1
 fi
 
-git diff HEAD~${num_commits} HEAD
+git diff HEAD~${num_commits} HEAD "${@:2}"
