@@ -2,7 +2,7 @@
 
 set -e
 
-PHP_VERSION=7.1.10
+PHP_VERSION=7.3.9
 echo "Setting up PHP location"
 mkdir -p $USER_ENV_UTILS/PHP/php-$PHP_VERSION
 cd $USER_ENV_UTILS/PHP
@@ -23,16 +23,21 @@ echo "Compiling files..."
 
 export PKG_CONFIG_PATH=$(brew --prefix openssl)/lib/pkgconfig
 export CFLAGS="-I$(brew --prefix openssl)/include/ \
+-L$(brew --prefix libiconv)/include \
 -I$(brew --prefix libpng)/include  \
 -I$(brew --prefix libjpeg)/include \
+-I$(brew --prefix libzip)/include \
 -I$(brew --prefix zlib)/include"
 export CPPFLAGS="-I$(brew --prefix openssl)/include/ \
+-L$(brew --prefix libiconv)/include \
 -I$(brew --prefix libpng)/include  \
 -I$(brew --prefix libjpeg)/include \
+-I$(brew --prefix libzip)/include \
 -I$(brew --prefix zlib)/include"
 export LDFLAGS="-L$(brew --prefix openssl)/lib \
 -L$(brew --prefix libpng)/lib \
 -L$(brew --prefix libjpeg)/lib \
+-L$(brew --prefix libzip)/lib \
 -L$(brew --prefix zlib)/lib"
 
 ./configure --enable-mbstring \
@@ -41,10 +46,13 @@ export LDFLAGS="-L$(brew --prefix openssl)/lib \
             --enable-zip \
             --with-openssl \
             --with-curl=$(brew --prefix curl) \
+            --with-iconv=$(brew --prefix libiconv) \
             --with-openssl-dir=$(brew --prefix openssl) \
             --with-libxml-dir=$(brew --prefix libxml2) \
             --with-zlib=$(brew --prefix zlib) \
             --with-zlib-dir=$(brew --prefix zlib) \
             --prefix=$USER_ENV_UTILS/PHP/php-$PHP_VERSION
+
 make
+
 make install
