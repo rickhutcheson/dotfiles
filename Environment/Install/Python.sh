@@ -2,7 +2,7 @@
 set -e
 source $USER_ENV_VARS/Python.sh
 
-export PY3_VERSION=3.7.3
+export PY3_VERSION=3.5.6
 export PY3_VERSION_SHORT="${PY3_VERSION:0:3}"
 
 echo "Installing $PY3_VERSION"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 ln -sf $USER_ENV_CONFIG/git/dot-gitconfig ~/.gitconfig
-GIT_VERSION=2.16.3
+GIT_VERSION=2.24.0
 VERSION_DIR=$USER_ENV_UTILS/Git/Git-$GIT_VERSION
 
 echo "Installing Git $GIT_VERSION..."
