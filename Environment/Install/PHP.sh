@@ -2,7 +2,7 @@
 
 set -e
 
-PHP_VERSION=7.3.9
+PHP_VERSION=7.3.13
 echo "Setting up PHP location"
 mkdir -p $USER_ENV_UTILS/PHP/php-$PHP_VERSION
 cd $USER_ENV_UTILS/PHP
