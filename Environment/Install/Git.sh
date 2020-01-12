@@ -17,6 +17,10 @@ cd $VERSION_DIR
 cd ..
 rm -f latest
 ln -f -s Git-$GIT_VERSION latest
+
+echo "Configuring"
+mkdir -p latest/etc
+cp latest/contrib/completion/git-completion.bash latest/etc/
 echo "Done. Git $GIT_VERSION installed."
 unset VERSION_DIR
 unset GIT_VERSION

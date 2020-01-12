@@ -2,7 +2,7 @@
 set -e
 source $USER_ENV_VARS/Memcached.sh
 
-MEMCACHED_VERSION=1.5.12
+MEMCACHED_VERSION=1.5.20
 
 echo "Installing $MEMCACHED_VERSION"
 
@@ -24,7 +24,6 @@ rm memcached.tar.gz
 
 echo "Building..."
 cd src
-
 ./configure --prefix=$USER_ENV_UTILS/Memcached/memcached-$MEMCACHED_VERSION
 
 make
