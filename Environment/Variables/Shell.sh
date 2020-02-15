@@ -41,6 +41,10 @@ if [[ ! -e $HISTFILE ]]; then
     fi
 fi
 
+hh()
+{
+    grep -r "$@" ~/.history
+}
 # Global Aliases / Utilities
 # ----------------------------------------------------------------------
 alias nano='emacs -nw'  # emacs in terminal & no init file (fast)

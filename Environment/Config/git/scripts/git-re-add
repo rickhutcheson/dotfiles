@@ -1,3 +1,8 @@
 #!/usr/bin/env sh
 
-git add $(git diff --name-only --cached)
+repo_root=$(git rev-parse --show-toplevel)
+changed=$(git diff --name-only --cached)
+
+for ch in $changed; do
+    git add "$repo_root/$ch"
+done

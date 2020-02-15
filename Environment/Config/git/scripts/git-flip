@@ -8,8 +8,7 @@ stash_message="git-switch away from $current_branch"
 
 new_branch="$1"
 
-git co master
-git pull
+git co master && git pull || git co -
 
 local_branch_sha=$(git show-ref "refs/heads/$new_branch")
 remote_branch_sha=$(git show-ref "refs/remotes/origin/$new_branch")
