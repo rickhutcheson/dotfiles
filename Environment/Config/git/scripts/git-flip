@@ -4,10 +4,11 @@ export USER_ENV_HOME=~/Environment
 . $USER_ENV_HOME/SetVariables.sh
 
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-stash_message="git-switch away from $current_branch"
+stash_message="git-flip away from $current_branch"
 
 new_branch="$1"
 
+git stash save $stash_message
 git co master && git pull || git co -
 
 local_branch_sha=$(git show-ref "refs/heads/$new_branch")
@@ -15,7 +16,6 @@ remote_branch_sha=$(git show-ref "refs/remotes/origin/$new_branch")
 
 # length of new_branch != 0  means local branch with <branch-name> exists.
 
-git stash save $stash_message
 if [[ -z $local_branch_sha ]] && [[ -z $remote_branch_sha ]]
 then
     git co -b $new_branch
