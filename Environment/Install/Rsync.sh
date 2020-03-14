@@ -33,7 +33,7 @@ make install
 
 echo "Setting up this version as 'latest'"
 cd $USER_ENV_UTILS/Rsync
-unlink latest
+rm -f latest
 ln -f -s rsync-$RSYNC_VERSION latest
 
 unset RSYNC_VERSION
