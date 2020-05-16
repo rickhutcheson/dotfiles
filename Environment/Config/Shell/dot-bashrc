@@ -7,3 +7,5 @@ export USER_ENV_HOME=~/Environment
 export USER_ENV_OS=darwin
 . $USER_ENV_HOME/Startup.sh
 export INPUTRC=~/.inputrc
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"

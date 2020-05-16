@@ -13,6 +13,7 @@ cp -Rfv $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer/Emacs.app ~/Applications/
 echo "Done."
 hdiutil detach $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer
 cd ..
-unlink ~/.emacs.d
+rm -f ~/.emacs.d
 ln -s  $USER_ENV_DATA/Emacs/ ~/.emacs.d
+ln -s  $USER_ENV_CONFIG/Emacs/dot-emacs ~/.emacs
 exit 0

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-POETRY_VERSION=0.12.11
+POETRY_VERSION=1.0.5
 cd $USER_ENV_HOME
 mkdir -p $USER_ENV_UTILS/Poetry
 rm -rf
