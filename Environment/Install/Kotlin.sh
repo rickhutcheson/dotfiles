@@ -2,14 +2,16 @@
 set -e
 source $USER_ENV_VARS/Kotlin.sh
 
-export KOTLIN_VERSION=1.3.50
+export KOTLIN_VERSION=1.3.70
 
 echo "Installing $KOTLIN_VERSION"
 
 # Remove old version-specific directory
+
 rm -rf $USER_ENV_UTILS/Kotlin/kotlin-$KOTLIN_VERSION
 
 # Download & install necessary components
+mkdir -p $USER_ENV_UTILS/Kotlin/
 cd  $USER_ENV_UTILS/Kotlin/
 wget https://github.com/JetBrains/kotlin/releases/download/v$KOTLIN_VERSION/kotlin-compiler-$KOTLIN_VERSION.zip \
      -O kotlin.zip

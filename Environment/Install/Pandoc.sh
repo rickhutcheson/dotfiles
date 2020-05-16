@@ -2,7 +2,7 @@
 
 set -e
 
-export PANDOC_VERSION=2.7.3
+export PANDOC_VERSION=2.9.1.1
 echo "Installing Pandoc v. $PANDOC_VERSION"
 rm -rf $USER_ENV_UTILS/Pandoc/pandoc-$PANDOC_VERSION
 rm -rf $USER_ENV_UTILS/Pandoc/pandoc-$PANDOC_VERSION
@@ -17,7 +17,7 @@ if [[ -f ~/.ghcup/env ]]; then
 else
     echo "Installing Haskell Platform first..."
     curl https://get-ghcup.haskell.org -sSf | sh
-    source ~/.ghcup/envp
+    source ~/.ghcup/env
 fi
 
 cd ~/Environment/Utilities/Pandoc/pandoc-$PANDOC_VERSION
