@@ -1,2 +1,5 @@
 #!/usr/bin/env bash
-export PATH=$USER_ENV_UTILS/LLVM/latest/bin:$PATH
+
+# We put custom LLVM at the end of $PATH so that we only get the extra
+# tools not included in Xcode
+export PATH=$PATH:$USER_ENV_UTILS/LLVM/latest/bin

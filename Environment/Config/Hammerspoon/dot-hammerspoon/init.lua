@@ -34,6 +34,23 @@ if caffeine then
     caffeine:setClickCallback(caffeineClicked)
     setCaffeineDisplay(hs.caffeinate.get("displayIdle"))
 end
+
+-----------------------------  BATTERY  --------------------------------
+-- Watcher to ensure that Macbook doesn't surprise me by being dead in
+-- the morning when I wake up.
+
+MINIMUM_PERCENT = 5
+function sleepOnBatteryLow()
+   currentPercent = hs.battery.percentage()
+   if currentPercent < MINIMUM_PERCENT and not hs.battery.isCharging() then
+      hs.notify.show("Sleepy Time!", "Pay more attention", string.format(
+                        "Had to sleep the system. Your battery was at %f!", currentPercent))
+      hs.caffeinate.systemSleep()
+   end
+end
+
+hs.battery.watcher.new(sleepOnBatteryLow):start()
+
 -----------------------------  GLOBALS  --------------------------------
 
 function moveToScreenTop(windowFrame, screenFrame)
