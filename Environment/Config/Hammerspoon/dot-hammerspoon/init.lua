@@ -103,6 +103,22 @@ function modifyFocused(modifier)
    window:setFrame(windowFrame)
 end
 
+function extendedModifyFocused(modifier)
+   local window, screen = getFocusedWindowInScreen()
+   if window == nil then
+      return
+   end
+   local windowFrame, screenFrame = extractFrames(window, screen)
+   modifier(window, screen)
+end
+
+function resizeFull(windowFrame, screenFrame)
+   windowFrame.x1 = screenFrame.x1
+   windowFrame.x2 = screenFrame.x2
+   windowFrame.y1 = screenFrame.y1
+   windowFrame.y2 = screenFrame.y2
+end
+
 
 -------------------------------  BIND  ---------------------------------
 
@@ -111,11 +127,11 @@ end
 
 --- Conventions:
 --    cmd is prefix for everything
---    control means "will move"
+--    option means "will move"
 --    shift means "will change size"
 --    using them together combines functionality
 prefix = {
-   focus  = {"cmd"},
+   focus  = {"cmd", "option"},
    move   = {"cmd", "control"},
    resizeHalf = {"cmd", "shift"},
    resizeThird = {"cmd", "option", "shift"},
@@ -146,7 +162,7 @@ end)
 
 hs.hotkey.bind(prefix.move, "Up", function()
       modifyFocused(function(windowFrame, screenFrame)
-            moveToScreenCenter(windowFrame, screenFrame)
+            moveToScreenTop(windowFrame, screenFrame)
       end)
 end)
 
@@ -247,7 +263,22 @@ end)
 
 hs.hotkey.bind(prefix.resizeHalf, "Right", function()
       modifyFocused(function(windowFrame, screenFrame)
-            newWidth = screenFrame.w / 2
+            halfWidth = screenFrame.w / 2
+            thirdWidth = screenFrame.w / 3
+            currentWidth = windowFrame.x2 - windowFrame.x1
+            notFullHeight = math.abs(windowFrame.h - screenFrame.h) > 4
+            if math.abs(windowFrame.x2 - screenFrame.x2) > 4 or notFullHeight then
+               -- default; if we're not even ON the right side of
+               -- the screen, then we shouldn't be toggling size,
+               -- we should just assume we wanna get over there
+               newWidth = halfWidth
+            elseif math.abs(currentWidth - halfWidth) < 10 then
+               newWidth = thirdWidth
+            elseif math.abs(currentWidth - thirdWidth) < 10 then
+               newWidth = 2 * thirdWidth
+            else
+               newWidth = halfWidth
+            end
             windowFrame.x1 = screenFrame.x2 - newWidth
             windowFrame.w = newWidth
             windowFrame.y1 = screenFrame.y1
@@ -289,7 +320,22 @@ end)
 
 hs.hotkey.bind(prefix.resizeHalf, "Left", function()
       modifyFocused(function(windowFrame, screenFrame)
-            newWidth = screenFrame.w / 2
+            halfWidth = screenFrame.w / 2
+            thirdWidth = screenFrame.w / 3
+            currentWidth = windowFrame.x2 - windowFrame.x1
+            notFullHeight = math.abs(windowFrame.h - screenFrame.h) > 4
+            if windowFrame.x1 ~= screenFrame.x1 or notFullHeight then
+               -- default; if we're not already filling the left side of
+               -- the screen, then we shouldn't be toggling size,
+               -- we should just assume we wanna get over there
+               newWidth = halfWidth
+            elseif math.abs(currentWidth - halfWidth) < 10 then
+               newWidth = thirdWidth
+            elseif math.abs(currentWidth - thirdWidth) < 10 then
+               newWidth = 2 * thirdWidth
+            else
+               newWidth = halfWidth
+            end
             windowFrame.x1 = screenFrame.x1
             windowFrame.w = newWidth
             windowFrame.y1 = screenFrame.y1

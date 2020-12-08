@@ -15,10 +15,16 @@ alias 3env-default='source $PY3_DEFAULT_VENV_ACTIVATE'
 
 # for non-default cases
 pyactivate() {
-    if [ $# -eq 0 ]; then
-        echo "ERROR: Specify virtualenv name."
-    else
+    cur_dir=$(pwd)
+    maybe_venv_name=$(basename $cur_dir)
+    maybe_venv=$USER_ENV_UTILS/Python/Envs/"$maybe_venv_name"/bin/
+
+    if [ $# -ne 0 ]; then
         . $USER_ENV_UTILS/Python/Envs/"$@"/bin/activate
+    elif [ -d "$maybe_venv" ]; then
+        . "$maybe_venv"/activate
+    else
+        echo "ERROR: Specify virtualenv name."
     fi
 }
 

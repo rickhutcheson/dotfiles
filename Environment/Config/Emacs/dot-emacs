@@ -1,4 +1,13 @@
 ;;; dot-emacs --- Personal Emacs configuration
+;; ____________________________________________________________________________
+;; Aquamacs custom-file warning:
+;; Warning: After loading this .emacs file, Aquamacs will also load
+;; customizations from `custom-file' (customizations.el). Any settings there
+;; will override those made here.
+;; Consider moving your startup settings to the Preferences.el file, which
+;; is loaded after `custom-file':
+;; ~/Library/Preferences/Aquamacs Emacs/Preferences
+;; _____________________________________________________________________________
 
 ;; Author Rick Hutcheson <rick@oddlyaccurate.com>
 
@@ -81,9 +90,6 @@
     )
   "Packages installed @ startup")
 
-;; activate all the packages (in particular autoloads)
-(package-initialize)
-
 ;; refresh package contents
 (defvar needs-packages nil)
 (dolist (package required-package-list)
@@ -121,7 +127,17 @@
 ;; WINDOWS
 ;; this is necessary for maximized emacs windows to not have a "gap" at the top / bottom for macOS.
 ;;
-(add-hook 'after-init-hook 'toggle-frame-maximized)
+;; From the docs...
+;;   > Non-nil means resize frames pixelwise.
+;;   > If this option is nil, resizing a frame rounds its sizes to the frame's
+;;   > current values of `frame-char-height' and `frame-char-width'.  If this
+;;   > is non-nil, no rounding occurs, hence frame sizes can increase/decrease
+;;   > by one pixel.
+
+;;   > With some window managers you have to set this to non-nil in order to
+;;   > fully maximize frames.  To resize your initial frame pixelwise,
+;;   > set this option to a non-nil value in your init file.
+(setq frame-resize-pixelwise t)
 
 ;; SPACES / TABS
 (setq-default indent-tabs-mode nil)
@@ -181,6 +197,10 @@
 ;; navigation
 ;; ---------------------------------------------------------------------
 
+;; Default to the home directory for new files. This used to be the
+;; default, but at least on macOS Catalina, this has become the root
+;; path.
+(setq default-directory "~/")
 ;; Since most of my dotfiles are symlinked from the `dotfiles` repo,
 ;; this setting allows us to edit them without vc asking whether to
 ;; follow the symlink each time.
@@ -553,17 +573,13 @@
  '(ansi-color-names-vector
    ["#3c3836" "#fb4934" "#b8bb26" "#fabd2f" "#83a598" "#d3869b" "#8ec07c" "#ebdbb2"])
  '(company-c-headers-path-user
-   (quote
-    ("/rick/Repositories/resC/src/base" "/rick/Repositories/resC/src/components/a" "/rick/Repositories/kilo/src/components")))
+   '("/rick/Repositories/resC/src/base" "/rick/Repositories/resC/src/components/a" "/rick/Repositories/kilo/src/components"))
  '(company-clang-arguments
-   (quote
-    ("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base" "-I/rick/Repositories/kilo/src/components")))
+   '("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base" "-I/rick/Repositories/kilo/src/components"))
  '(custom-safe-themes
-   (quote
-    ("b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default)))
+   '("b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
  '(package-selected-packages
-   (quote
-    (graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))))
+   '(scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
