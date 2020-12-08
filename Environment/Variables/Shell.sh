@@ -43,7 +43,7 @@ fi
 
 hh()
 {
-    grep -r "$@" ~/.history
+    grep -r "$@" ~/.history | grep -v ':hh ' | sort
 }
 # Global Aliases / Utilities
 # ----------------------------------------------------------------------
@@ -73,7 +73,7 @@ cwd="\[$CYAN\]\w\[$NONE\]"
 separator="\[$WHITE\] // \[$NONE\]"
 
 hr() {
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' ─
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | sed 'y/ /─/'
 }
 
 show_prompt() {
