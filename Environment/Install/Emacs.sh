@@ -10,7 +10,7 @@ wget https://emacsformacosx.com/emacs-builds/Emacs-$EMACS_VERSION-universal.dmg 
 hdiutil attach -mountpoint $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer Emacs.dmg
 echo "Copying Emacs.app..."
 rm -r ~/Applications/Emacs.app
-cp -Rfv $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer/Emacs.app
+cp -Rfv $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer/Emacs.app ~/Applications/Emacs.app
 echo "Done."
 hdiutil detach $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer
 cd ..

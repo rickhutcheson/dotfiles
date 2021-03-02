@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cRDM_VERSION="0.9.0-alpha4"
+RDM_VERSION="0.9.0-alpha4"
 
 echo "Make sure you install QT Creator First! (brew install qt5)"
 
