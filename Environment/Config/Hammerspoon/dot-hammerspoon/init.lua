@@ -184,6 +184,13 @@ hs.hotkey.bind(prefix.move, "Left", function()
       end)
 end)
 
+hs.hotkey.bind(prefix.move, "=", function()
+      modifyFocused(function(windowFrame, screenFrame)
+            spaceAroundWindow = screenFrame.w - windowFrame.w
+            windowFrame.x = screenFrame.x + (spaceAroundWindow / 2)
+      end)
+end)
+
 
 -- Resize to quadrants
 
@@ -266,15 +273,15 @@ hs.hotkey.bind(prefix.resizeHalf, "Right", function()
             halfWidth = screenFrame.w / 2
             thirdWidth = screenFrame.w / 3
             currentWidth = windowFrame.x2 - windowFrame.x1
-            notFullHeight = math.abs(windowFrame.h - screenFrame.h) > 4
+            notFullHeight = math.abs(windowFrame.h - screenFrame.h) > 10
             if math.abs(windowFrame.x2 - screenFrame.x2) > 4 or notFullHeight then
                -- default; if we're not even ON the right side of
                -- the screen, then we shouldn't be toggling size,
                -- we should just assume we wanna get over there
                newWidth = halfWidth
-            elseif math.abs(currentWidth - halfWidth) < 10 then
+            elseif math.abs(currentWidth - halfWidth) < 20 then
                newWidth = thirdWidth
-            elseif math.abs(currentWidth - thirdWidth) < 10 then
+            elseif math.abs(currentWidth - thirdWidth) < 20 then
                newWidth = 2 * thirdWidth
             else
                newWidth = halfWidth
@@ -324,14 +331,14 @@ hs.hotkey.bind(prefix.resizeHalf, "Left", function()
             thirdWidth = screenFrame.w / 3
             currentWidth = windowFrame.x2 - windowFrame.x1
             notFullHeight = math.abs(windowFrame.h - screenFrame.h) > 4
-            if windowFrame.x1 ~= screenFrame.x1 or notFullHeight then
+            if math.abs(windowFrame.x1 - screenFrame.x1) > 4 or notFullHeight then
                -- default; if we're not already filling the left side of
                -- the screen, then we shouldn't be toggling size,
                -- we should just assume we wanna get over there
                newWidth = halfWidth
-            elseif math.abs(currentWidth - halfWidth) < 10 then
+            elseif math.abs(currentWidth - halfWidth) < 20 then
                newWidth = thirdWidth
-            elseif math.abs(currentWidth - thirdWidth) < 10 then
+            elseif math.abs(currentWidth - thirdWidth) < 20 then
                newWidth = 2 * thirdWidth
             else
                newWidth = halfWidth
