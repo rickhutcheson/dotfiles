@@ -41,7 +41,8 @@
 	ds = diff --stat
 
 	# logs
-	ll = log --pretty=format:\"%Cblue%h %Creset%s\" -10
+	ll = log --pretty=format:\"%Cblue%h (%ad) %Creset%s %ad\" -10 --date=relative
+
 	lol = log --graph --decorate --pretty=\"[%h] %d | %s <%an|%cd>\" --abbrev-commit --date=short --all --decorate
 	me = log --author=\"rick.hutcheson@udemy.com\" --oneline
         log-commits = log --oneline --graph --all --decorate --abbrev-commit master..HEAD
