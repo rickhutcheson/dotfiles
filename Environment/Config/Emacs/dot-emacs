@@ -248,10 +248,12 @@
 ;; ---------------------------------------------------------------------
 ;; global key bindings
 ;; ---------------------------------------------------------------------
-(global-set-key (kbd "C-c l d") 'layout-django)
+(global-set-key (kbd "s-l") 'goto-line)
 (global-set-key (kbd "C-c g") 'magit-status)
 (setq  x-meta-keysym 'super
        x-super-keysym 'meta)
+(global-set-key (kbd "C-c l d") 'layout-django)
+
 
 
 ;; =====================================================================

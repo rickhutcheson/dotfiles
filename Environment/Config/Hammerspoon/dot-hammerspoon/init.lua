@@ -12,6 +12,10 @@
 
 -----------------------------  CONFIG  ---------------------------------
 
+-- Disable Hammerspoon's window animations, because it is more
+-- distracting than smooth.
+
+hs.window.animationDuration = 0
 
 ----------------------------  CAFFEINE  --------------------------------
 
