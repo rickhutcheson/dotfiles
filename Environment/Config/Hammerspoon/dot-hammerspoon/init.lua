@@ -21,6 +21,21 @@ hs.window.animationDuration = 0
 
 -- See: http://www.hammerspoon.org/go/#simplemenubar
 
+-- cpuTemp = hs.menubar.new()
+-- function setTempDisplay()
+--    local output, status, type, rc = hs.execute("sudo powermetrics --samplers=smc | grep 'CPU die temperature' -m 1 | tr -d ' \t\n\r'")
+--    cpuTemp:setTitle(output)   -- coffee cup icon
+-- end
+
+-- function cpuTempClicked()
+--    setTempDisplay()
+-- end
+
+-- if cpuTemp then
+--     cpuTemp:setClickCallback(cpuTempClicked)
+--     setTempDisplay()
+-- end
+
 caffeine = hs.menubar.new()
 function setCaffeineDisplay(state)
     if state then
@@ -35,9 +50,10 @@ function caffeineClicked()
 end
 
 if caffeine then
-    caffeine:setClickCallback(caffeineClicked)
-    setCaffeineDisplay(hs.caffeinate.get("displayIdle"))
+   caffeine:setClickCallback(caffeineClicked)
+   setCaffeineDisplay(hs.caffeinate.get("displayIdle"))
 end
+
 
 -----------------------------  BATTERY  --------------------------------
 -- Watcher to ensure that Macbook doesn't surprise me by being dead in
