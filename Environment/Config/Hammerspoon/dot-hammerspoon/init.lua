@@ -39,9 +39,9 @@ hs.window.animationDuration = 0
 caffeine = hs.menubar.new()
 function setCaffeineDisplay(state)
     if state then
-        caffeine:setTitle("☕")   -- coffee cup icon
+        caffeine:setTitle("☀")   -- sun icon
     else
-        caffeine:setTitle("💤")  -- zzz icon
+        caffeine:setTitle("☾")  -- moon icon
     end
 end
 

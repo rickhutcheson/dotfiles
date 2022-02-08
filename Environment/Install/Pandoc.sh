@@ -2,7 +2,7 @@
 
 set -e
 
-export PANDOC_VERSION=2.9.1.1
+export PANDOC_VERSION=2.16.2
 echo "Installing Pandoc v. $PANDOC_VERSION"
 rm -rf $USER_ENV_UTILS/Pandoc/pandoc-$PANDOC_VERSION
 rm -rf $USER_ENV_UTILS/Pandoc/pandoc-$PANDOC_VERSION

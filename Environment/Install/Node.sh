@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-NODE_VERSION=14.15.3
+NODE_VERSION=17.3.0
 mkdir -p $USER_ENV_UTILS/Node.js
 mkdir -p $USER_ENV_UTILS/Node.js/node-$NODE_VERSION
 cd $USER_ENV_UTILS/Node.js
-wget https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-$USER_ENV_OS-x64.tar.gz -O node.tar.gz
+wget https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-$USER_ENV_OS-$USER_ENV_ARCH.tar.gz -O node.tar.gz
 tar xzf node.tar.gz -C node-$NODE_VERSION --strip-components 1
 rm node.tar.gz
 rm -f latest

@@ -1,13 +1,5 @@
 ;;; dot-emacs --- Personal Emacs configuration
 ;; ____________________________________________________________________________
-;; Aquamacs custom-file warning:
-;; Warning: After loading this .emacs file, Aquamacs will also load
-;; customizations from `custom-file' (customizations.el). Any settings there
-;; will override those made here.
-;; Consider moving your startup settings to the Preferences.el file, which
-;; is loaded after `custom-file':
-;; ~/Library/Preferences/Aquamacs Emacs/Preferences
-;; _____________________________________________________________________________
 
 ;; Author Rick Hutcheson <rick@oddlyaccurate.com>
 
@@ -64,6 +56,9 @@
     magit
     simp
     smex
+
+    ;; C
+    company-c-headers
 
     ;; Golang
     go-mode
@@ -145,11 +140,13 @@
 ;; FONTS
 ; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 ; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-(set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
 ;(set-frame-font "-*-TheSansMono-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
+(set-frame-font "-*-TheSansMono-normal-normal-normal-*-16-*-*-*-m-0-iso10646-1")
+; (set-frame-font "-*-Operator Mono-semilight-normal-normal-*-13-*-*-*-m-0-iso10646-1")
 ;; In order for this to take effect, you must use the following command--
 ;; defaults write org.gnu.Emacs FontBackend ns
-; (setq mac-allow-anti-aliasing nil)
+;; (setq mac-allow-anti-aliasing nil)
 
 (setq-default line-spacing 0.02)
 
@@ -161,8 +158,8 @@
 
 ;; naked emacs
 (scroll-bar-mode 0)
-(tool-bar-mode 0)
-(menu-bar-mode 0)
+; (tool-bar-mode 0)
+; (menu-bar-mode 0)
 (set-default 'cursor-type '(hbar . 1))
 
 ;; Show line numbers (and pad them a little)
@@ -248,7 +245,8 @@
 ;; ---------------------------------------------------------------------
 ;; global key bindings
 ;; ---------------------------------------------------------------------
-(global-set-key (kbd "s-l") 'goto-line)
+(global-unset-key (kbd "s-L"))
+(global-set-key (kbd "s-L") 'goto-line)
 (global-set-key (kbd "C-c g") 'magit-status)
 (setq  x-meta-keysym 'super
        x-super-keysym 'meta)
@@ -266,9 +264,10 @@
 ;; ---------------------------------------------------------------------
 
 (setq c-basic-offset 2)
+(setq lsp-clangd-binary-path "/Library/Developer/CommandLineTools/usr/bin/clangd")
+
 (add-hook 'c-mode-hook 'auto-fill-mode)
 (add-hook 'c-mode-hook 'company-mode)
-(add-hook 'c-mode-hook 'flycheck-mode)
 ;; auto-fill quotes /parens / braces
 (add-hook 'c-mode-hook 'electric-pair-mode)
 ;; highlight matching parens
@@ -276,23 +275,15 @@
 (add-hook 'c-mode-hook
           (lambda ()
             ;; load our custom style file
-            (load-file "~/.emacs.d/resc-c-style.el")
-            (c-set-style "resc")
+            ;(load-file "~/.emacs.d/resc-c-style.el")
+            ;(c-set-style "resc")
             ;; Add RESC_HOME to our include path for flycheck
             ;; gets everything but trailing newline
-            (setq flycheck-clang-include-path
-                  (list
-                   (concat
-                    (substring (shell-command-to-string "$SHELL --login -i -c 'echo $RESC_HOME'") 0 -1)
-                    "/src/base")
-
-                   (concat
-                    (substring (shell-command-to-string "$SHELL --login -i -c 'echo $RESC_HOME'") 0 -1)
-                    "/src/")
-
-                   "/rick/Repositories/kilo/src/components"))
+            (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
             ;; allow completing from #included header files
             (add-to-list 'company-backends 'company-c-headers)
+            (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup)
+
             (setq c-basic-offset 2)
             ;; on macOS, we can setup clang-format
             (when (eq system-type 'darwin)
@@ -301,14 +292,29 @@
               ;; find clang-format so we can find clang-format.el
               ;; (note that the shell command ends with a trailing newline we have to strip
               (load (concat
-                     (substring (shell-command-to-string "brew --prefix clang-format") 0 -1)
+                     (substring (shell-command-to-string "dirname $(dirname $(which clang-format))") 0 -1)
                     "/share/clang/clang-format.el"))
               (add-hook 'before-save-hook
                         'clang-format-buffer
                         t  ; append to existing value
                         t  ; buffer-local (important, since we don't want tof
                         ))))
+(add-hook 'c-mode-hook 'flycheck-mode)
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c-mode-hook
+          (lambda ()
+            ;; load our custom style file
+            ;(load-file "~/.emacs.d/resc-c-style.el")
+            ;(c-set-style "resc")
+            ;; Add RESC_HOME to our include path for flycheck
+            ;; gets everything but trailing newline
+            (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
 
+            ))
+(custom-set-variables
+         '(lsp-clients-clangd-library-directories
+   '("/opt/homebrew/include"
+     "/Library/Developer/CommandLineTools/usr/include/c++/v1/")))
 
 ;; ---------------------------------------------------------------------
 ;; common lisp
@@ -575,13 +581,16 @@
  '(ansi-color-names-vector
    ["#3c3836" "#fb4934" "#b8bb26" "#fabd2f" "#83a598" "#d3869b" "#8ec07c" "#ebdbb2"])
  '(company-c-headers-path-user
-   '("/rick/Repositories/resC/src/base" "/rick/Repositories/resC/src/components/a" "/rick/Repositories/kilo/src/components"))
+   '("/opt/homebrew/include" "/opt/homebrew/include/CUnit" "/Users/rick/Repositories/learningc/cii/include"))
  '(company-clang-arguments
    '("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base" "-I/rick/Repositories/kilo/src/components"))
  '(custom-safe-themes
-   '("6b5c518d1c250a8ce17463b7e435e9e20faa84f3f7defba8b579d4f5925f60c1" "7661b762556018a44a29477b84757994d8386d6edee909409fabe0631952dad9" "83e0376b5df8d6a3fbdfffb9fb0e8cf41a11799d9471293a810deb7586c131e6" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" "b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
+   '("90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "6b5c518d1c250a8ce17463b7e435e9e20faa84f3f7defba8b579d4f5925f60c1" "7661b762556018a44a29477b84757994d8386d6edee909409fabe0631952dad9" "83e0376b5df8d6a3fbdfffb9fb0e8cf41a11799d9471293a810deb7586c131e6" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" "b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
+ '(flycheck-clang-include-path
+   '("/rick/Repositories/kilo/src/components" "/Users/rick/Repositories/learningc/cii/include" "/opt/homebrew/include"))
  '(package-selected-packages
-   '(speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip)))
+   '(lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
+ '(web-mode-markup-indent-offset 2))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

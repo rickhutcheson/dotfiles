@@ -5,7 +5,7 @@ source $USER_ENV_VARS/LLVM.sh
 
 if [ -z "$APP_VERSION" ]
 then
-    APP_VERSION=10.0.0
+    APP_VERSION=13.0.0
 fi
 
 echo "Installing $APP_VERSION"
@@ -30,6 +30,7 @@ if [ -x "$(command -v xzcat)" ]; then
     mv $dir_name llvm-$APP_VERSION
 else
     # If it doesn't, then it probably has GNU tar
+    mkdir llvm-$APP_VERSION
     tar xf llvm.tar.xz -C llvm-$APP_VERSION --strip-components 1
 fi
 
