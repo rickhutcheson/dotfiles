@@ -16,7 +16,7 @@
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
 (add-to-list 'load-path "~/.emacs.d/CustomModes/cweb.el")
-; (add-to-list 'load-path "~/.emacs.d/CustomModes")
+(add-to-list 'load-path "~/Environment/Config/Emacs/CustomModes/")
 
 (defun set-exec-path-from-shell-PATH ()
   "Set `execpath` and PATH environment variable to match user's $PATH."
@@ -120,7 +120,8 @@
 ;; ---------------------------------------------------------------------
 
 ;; WINDOWS
-;; this is necessary for maximized emacs windows to not have a "gap" at the top / bottom for macOS.
+;; this is necessary for maximized emacs windows to not have a "gap"
+;; at the top / bottom for macOS.
 ;;
 ;; From the docs...
 ;;   > Non-nil means resize frames pixelwise.
@@ -138,17 +139,20 @@
 (setq-default indent-tabs-mode nil)
 
 ;; FONTS
+; (set-frame-font "-*-SF Mono-light-normal-normal-*-13-*-*-*-m-0-iso10646-1")
 ; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 ; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-;(set-frame-font "-*-TheSansMono-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
-(set-frame-font "-*-TheSansMono-normal-normal-normal-*-16-*-*-*-m-0-iso10646-1")
-; (set-frame-font "-*-Operator Mono-semilight-normal-normal-*-13-*-*-*-m-0-iso10646-1")
-;; In order for this to take effect, you must use the following command--
-;; defaults write org.gnu.Emacs FontBackend ns
-;; (setq mac-allow-anti-aliasing nil)
+; (set-frame-font "-*-Operator Mono-semilight-normal-normal-*-15-*-*-*-m-0-iso10646-1")
 
-(setq-default line-spacing 0.02)
+(set-frame-font "-*-TheSansMono-semilight-normal-normal-*-14-*-*-*-m-0-iso10646-1") ;
+
+;; Disable anti-aliasing -- good for bitmap fonts
+;; In order for this to take effect, you must use the following command--
+;;     defaults write org.gnu.Emacs FontBackend ns
+;;
+;;(setq mac-allow-anti-aliasing nil)
+
+(setq-default line-spacing 0.05) ;; This is ADDITIONAL line spacing added to standard
 
 ;; 80 chars + room for fringe
 (add-to-list 'default-frame-alist '(width . 88))
@@ -158,8 +162,8 @@
 
 ;; naked emacs
 (scroll-bar-mode 0)
-; (tool-bar-mode 0)
-; (menu-bar-mode 0)
+(tool-bar-mode 0)
+(menu-bar-mode 0)
 (set-default 'cursor-type '(hbar . 1))
 
 ;; Show line numbers (and pad them a little)
@@ -185,9 +189,33 @@
 ;; backup behavior
 (setq version-control t            ; use versioned backups
       delete-old-versions t
-      kept-new-versions 10
-      kept-old-versions 10
+      kept-new-versions 100
+      kept-old-versions 100
       backup-by-copying t)         ; don't clobber symlinks
+
+
+;; ---------------------------------------------------------------------
+;; editing
+;; ---------------------------------------------------------------------
+ ;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph
+(defun unfill-paragraph (&optional region)
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive (progn (barf-if-buffer-read-only) '(t)))
+  (let ((fill-column (point-max))
+        ;; This would override `fill-column' if it's an integer.
+        (emacs-lisp-docstring-fill-column t))
+    (fill-paragraph nil region)))
+
+;;; Re-flows a paragraph, redistributing white space. This is required
+;;; for at least TeX-mode.
+(defun refill-paragraph (&optional region)
+  ; this interactive section is required by Emacs, though I don't know why
+  (interactive (progn (barf-if-buffer-read-only) '(t)))
+  (unfill-paragraph region)
+  (fill-paragraph nil region))
+
+;; Handy key definition
+(define-key global-map "\M-q" 'refill-paragraph)
 
 
 ;; ---------------------------------------------------------------------
@@ -198,6 +226,7 @@
 ;; default, but at least on macOS Catalina, this has become the root
 ;; path.
 (setq default-directory "~/")
+
 ;; Since most of my dotfiles are symlinked from the `dotfiles` repo,
 ;; this setting allows us to edit them without vc asking whether to
 ;; follow the symlink each time.
@@ -250,29 +279,31 @@
 (global-set-key (kbd "C-c g") 'magit-status)
 (setq  x-meta-keysym 'super
        x-super-keysym 'meta)
-(global-set-key (kbd "C-c l d") 'layout-django)
-
+;; (setq
+;;  ;; Set 'Option' key to SUPER
+;;  mac-option-modifier 'super
+;;  ;; Set 'CMD' key to 'Meta'
+;;  mac-command-modifier 'meta)
 
 
 ;; =====================================================================
 ;; Mode-Specific Customizations
 ;; =====================================================================
 
-
 ;; ---------------------------------------------------------------------
-;; cc-mode
+;; C & C++
 ;; ---------------------------------------------------------------------
-
-(setq c-basic-offset 2)
 (setq lsp-clangd-binary-path "/Library/Developer/CommandLineTools/usr/bin/clangd")
 
-(add-hook 'c-mode-hook 'auto-fill-mode)
-(add-hook 'c-mode-hook 'company-mode)
+;; c++-mode
+
+(add-hook 'c++-mode-hook 'auto-fill-mode)
+(add-hook 'c++-mode-hook 'company-mode)
 ;; auto-fill quotes /parens / braces
-(add-hook 'c-mode-hook 'electric-pair-mode)
+(add-hook 'c++-mode-hook 'electric-pair-mode)
 ;; highlight matching parens
-(add-hook 'c-mode-hook 'show-paren-mode)
-(add-hook 'c-mode-hook
+(add-hook 'c++-mode-hook 'show-paren-mode)
+(add-hook 'c++-mode-hook
           (lambda ()
             ;; load our custom style file
             ;(load-file "~/.emacs.d/resc-c-style.el")
@@ -299,9 +330,9 @@
                         t  ; append to existing value
                         t  ; buffer-local (important, since we don't want tof
                         ))))
-(add-hook 'c-mode-hook 'flycheck-mode)
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c-mode-hook
+(add-hook 'c++-mode-hook 'flycheck-mode)
+(add-hook 'c++-mode-hook 'lsp)
+(add-hook 'c++-mode-hook
           (lambda ()
             ;; load our custom style file
             ;(load-file "~/.emacs.d/resc-c-style.el")
@@ -311,11 +342,59 @@
             (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
 
             ))
-(custom-set-variables
-         '(lsp-clients-clangd-library-directories
-   '("/opt/homebrew/include"
-     "/Library/Developer/CommandLineTools/usr/include/c++/v1/")))
 
+
+;; ---------------------------------------------------------------------
+;; cc-mode
+;; ---------------------------------------------------------------------
+
+(setq c-basic-offset 2)
+
+;; (add-hook 'c-mode-hook 'auto-fill-mode)
+;; (add-hook 'c-mode-hook 'company-mode)
+;; auto-fill quotes /parens / braces
+;; (add-hook 'c-mode-hook 'electric-pair-mode)
+;; highlight matching parens
+;; (add-hook 'c-mode-hook 'show-paren-mode)
+;; (add-hook 'c-mode-hook
+;;           (lambda ()
+;;             ;; load our custom style file
+;;             ;(load-file "~/.emacs.d/resc-c-style.el")
+;;             ;(c-set-style "resc")
+;;             ;; Add RESC_HOME to our include path for flycheck
+;;             ;; gets everything but trailing newline
+;;             (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
+;;             ;; allow completing from #included header files
+;;             (add-to-list 'company-backends 'company-c-headers)
+;;             (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup)
+
+;;             (setq c-basic-offset 2)
+;;             ;; on macOS, we can setup clang-format
+;;             (when (eq system-type 'darwin)
+;;               ;; find & load clang-format.el
+;;               ;; it lives in the brew prefix for
+;;               ;; find clang-format so we can find clang-format.el
+;;               ;; (note that the shell command ends with a trailing newline we have to strip
+;;               (load (concat
+;;                      (substring (shell-command-to-string "dirname $(dirname $(which clang-format))") 0 -1)
+;;                     "/share/clang/clang-format.el"))
+;;               (add-hook 'before-save-hook
+;;                         'clang-format-buffer
+;;                         t  ; append to existing value
+;;                         t  ; buffer-local (important, since we don't want tof
+;;                         ))))
+;; (add-hook 'c-mode-hook 'flycheck-mode)
+;; (add-hook 'c-mode-hook 'lsp)
+;; (add-hook 'c-mode-hook
+;;           (lambda ()
+;;             ;; load our custom style file
+;;             ;(load-file "~/.emacs.d/resc-c-style.el")
+;;             ;(c-set-style "resc")
+;;             ;; Add RESC_HOME to our include path for flycheck
+;;             ;; gets everything but trailing newline
+;;             (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
+
+;;             ))
 ;; ---------------------------------------------------------------------
 ;; common lisp
 ;; ---------------------------------------------------------------------
@@ -368,7 +447,6 @@
 ;; flycheck-pos
 ;; ---------------------------------------------------------------------
 
-
 (with-eval-after-load 'flycheck
   (flycheck-pos-tip-mode))
 
@@ -409,22 +487,6 @@
   t)
 (add-to-list 'auto-mode-alist '("\\.mms\\'" . mmix-mode))
 
-
-;; ---------------------------------------------------------------------
-;; PHP
-;; ---------------------------------------------------------------------
-
-(setq-default flymake-phpcs-show-rule t)
-(setq-default flymake-phpcs-standard "~/.emacs.d/UdemyPHPStandard")
-
-(add-hook 'php-mode-hook (lambda ()
-                           (flymake-php-load)
-                           (flymake-phpcs-load)
-
-                           (define-key php-mode-map (kbd "C-c m")
-                             (lambda () (interactive) (eshell-command "udemy_php_make")))))
-
-
 ;; ---------------------------------------------------------------------
 ;; simp
 ;; ---------------------------------------------------------------------
@@ -453,9 +515,10 @@
 ;; TeX
 ;; ---------------------------------------------------------------------
 
-(add-to-list 'auto-mode-alist '("\\.tex\\'" . tex-mode))
-(add-hook 'tex-mode-hook 'auto-fill-mode)
-
+(add-to-list 'auto-mode-alist '("\\.tex\\'" . plain-TeX-mode))
+;(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(add-hook 'plain-Tex-mode-hook 'auto-fill-mode)
 
 ;; =====================================================================
 ;; Emacs lisp
@@ -573,30 +636,29 @@
 ;; required variables
 ;; ---------------------------------------------------------------------
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#3c3836" "#fb4934" "#b8bb26" "#fabd2f" "#83a598" "#d3869b" "#8ec07c" "#ebdbb2"])
  '(company-c-headers-path-user
    '("/opt/homebrew/include" "/opt/homebrew/include/CUnit" "/Users/rick/Repositories/learningc/cii/include"))
  '(company-clang-arguments
    '("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base" "-I/rick/Repositories/kilo/src/components"))
  '(custom-safe-themes
-   '("90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "6b5c518d1c250a8ce17463b7e435e9e20faa84f3f7defba8b579d4f5925f60c1" "7661b762556018a44a29477b84757994d8386d6edee909409fabe0631952dad9" "83e0376b5df8d6a3fbdfffb9fb0e8cf41a11799d9471293a810deb7586c131e6" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" "b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
+   '("f149d9986497e8877e0bd1981d1bef8c8a6d35be7d82cba193ad7e46f0989f6a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "6b5c518d1c250a8ce17463b7e435e9e20faa84f3f7defba8b579d4f5925f60c1" "7661b762556018a44a29477b84757994d8386d6edee909409fabe0631952dad9" "83e0376b5df8d6a3fbdfffb9fb0e8cf41a11799d9471293a810deb7586c131e6" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" "b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
+ '(ede-project-directories '("/Users/rick/Repositories/learningc/kilo"))
  '(flycheck-clang-include-path
    '("/rick/Repositories/kilo/src/components" "/Users/rick/Repositories/learningc/cii/include" "/opt/homebrew/include"))
+ '(lsp-clients-clangd-library-directories
+   '("/opt/homebrew/include" "/Library/Developer/CommandLineTools/usr/include/c++/v1/"))
  '(package-selected-packages
-   '(lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
+   '(auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
  '(web-mode-markup-indent-offset 2))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(markdown-bold-face ((t (:inherit bold :foreground "White"))))
- '(markdown-code-face ((t (:inherit fixed-pitch :foreground "#8B9fA8" :height 1.1 :family "TheSansMono"))))
- '(markdown-italic-face ((t (:inherit italic :foreground "tomato"))))
- '(markdown-pre-face ((t (:foreground "#8B9fA8" :height 1.1 :family "TheSansMono")))))
+ )

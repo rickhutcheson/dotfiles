@@ -1,4 +1,4 @@
-!/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 source $USER_ENV_VARS/TeX.sh

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-BASH_VERSION=5.1
+BASH_VERSION=5.2
 VERSION_DIR=$USER_ENV_UTILS/Bash/Bash-$BASH_VERSION
 
 echo "Installing Bash $BASH_VERSION..."

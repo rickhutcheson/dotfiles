@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-GRAPHVIZ_VERSION=2.49.3
+GRAPHVIZ_VERSION=8.0.5
 VERSION_DIR=$USER_ENV_UTILS/Graphviz/Graphviz-$GRAPHVIZ_VERSION
 
 echo "Installing Graphviz $GRAPHVIZ_VERSION..."

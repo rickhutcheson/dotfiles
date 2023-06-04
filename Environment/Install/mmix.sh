@@ -5,6 +5,6 @@ echo "Installing mmix..."
 mkdir -p $USER_ENV_UTILS/mmix/
 rm -rf $USER_ENV_UTILS/mmix/latest
 cd $USER_ENV_UTILS/mmix
-svn co svn://mmix.cs.hm.edu/mmixware/trunk latest
+git clone https://gitlab.lrz.de/mmix/mmixware.git latest
 cd latest
 make all

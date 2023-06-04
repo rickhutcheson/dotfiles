@@ -16,31 +16,60 @@
 \font\sectionsl=cmsl12 at 16pt         \font\sectionit=cmti12 at 16pt
 \font\sectiontt=cmtt10 at 18pt
 
-\font\subsectionrm=cmr12               \font\subsectionbf=cmbx12
-\font\subsectionsl=cmsl12              \font\subsectionit=cmti12
-\font\subsectiontt=cmtt10 at 13pt
+\font\subsectionrm=cmr12 at 13pt       \font\subsectionbf=cmbx12 at 13pt
+\font\subsectionsl=cmsl12  at 13pt     \font\subsectionit=cmti12 at 13pt
+\font\subsectiontt=cmtt10 at 14pt
+
+\font\subsubsectionrm=cmss12 at 13pt       \font\subsubsectionbf=cmssbx10 at 13pt
+\font\subsubsectionsl=cmssqi8 at 13pt      \font\subsubsectionit=cmssi12 at 13pt
+\font\subsubsectiontt=cmtt10 at 14pt
 
 \font\quoterm=cmssqi8
 
 \font\bigbf=cmssq8 scaled \magstep3
-\font\bigit=cmssi12 at 18pt
+\font\bigcaps=cmdunh10 at 18pt
 
+\font\tenss=cmss10
+\font\tenssb=cmssbx10
+\font\tenssi=cmssi10
+
+\font\twelvess=cmss10 at 12pt
+\font\twelvessb=cmssbx10 at 12pt
+\font\twelvessi=cmssi10 at 12pt
+
+\font\elevenss=cmss10 at 11pt
+\font\elevenssb=cmssbx10 at 11pt
+\font\elevenssi=cmssi10 at 11pt
+
+\font\eightss=cmss10 at 8pt
+\font\eightssb=cmssbx10 at 8pt
+\font\eightssdb=cmssdc10 at 8pt
+\font\eightssi=cmssi10 at 8pt
+\font\eightssqi=cmssqi8
+\font\tenfunky=cmu10 at 14pt
 % Re-define the typewriter font so its size is approximately equal to
 % the size of the rest.
 \font\bodytt=cmtt10 at 11pt
+\font\bodytti=cmitt10 at 11pt
+\font\bodyttsl=cmsltt10 at 11pt
+\font\bodyttsc=cmcsc10 at 11pt
 \def\tt{\fam\ttfam\bodytt}
+\def\ttsl{\fam\ttfam\bodyttsl}
+\def\tti{\fam\ttfam\bodytti}
+\def\ttsc{\fam\ttfam\bodyttsc}
 
 %
 % Document Sizing / Layout
 %
 %\parindent=0
 
-\def\title#1\par{{
+\def\title#1\par{
+\vfil\break{
     \let\rm\titlerm\let\bf\titlebf
     \let\tt\titlett
     \let\it\titleit
     \let\sl\titlesl\rm
-    {\titlestyle{#1}}}\bigskip}
+    {\bigskip\titlestyle{#1}\smallskip\hrule\hrule}}}
 
 \def\section#1\par{
     \advance\sectionno by 1
@@ -52,28 +81,39 @@
     \bigskip
     {\let\rm\sectionrm\let\bf\sectionbf
     \let\tt\sectiontt\let\it\sectionit
-    \let\sl\sectionsl
-
-\rm\sectionstyle{#1}}
-    \nobreak\smallskip\noindent}
+    \let\sl\sectionsl\rm\sectionstyle{#1}}
+    \nobreak\noindent\vskip-20pt}
 
 \def\subsection#1\par{
     \advance\subsectionno by 1
     \vskip0pt plus 0.3\vsize\penalty-250
     \vskip0pt plus -0.3\vsize\penalty-250
-    \bigskip
+    \bigskip\bigskip
     {\let\rm\subsectionrm\let\bf\subsectionbf
     \let\tt\subsectiontt\let\it\subsectionit
     \let\sl\subsectionsl
-    \rm\subsectionstyle{#1}}
-    \nobreak\smallskip\noindent}
+    \rm\subsectionstyle{#1}
+    \nobreak\noindent\vskip-10pt}}
+
+\def\subsubsection#1\par{
+    \advance\subsubsectionno by 1
+    \vskip0pt plus 0.3\vsize\penalty-450
+    \vskip0pt plus -0.3\vsize\penalty-450
+    \bigskip\medskip
+    {\let\rm\subsubsectionrm
+    \let\bf\subsubsectionbf
+    \let\tt\subsubsectiontt
+    \let\it\subsubsectionit
+    \let\sl\subsubsectionsl
+    \rm\subsubsectionstyle{#1}}
+    \nobreak\noindent\vskip-10pt}
 
 \def\topic #1. {
     \advance\topicno by 1
-    \vskip0pt plus 0.05\vsize\penalty-250
-    \vskip0pt plus -0.05\vsize\penalty-250
-    \medskip\vskip\parskip
-    \rm\topicstyle{#1}}
+    \vskip0pt plus 0.1\vsize\penalty-250
+    \vskip0pt plus -0.1\vsize\penalty-250
+    \bigskip\rm\topicstyle{#1}
+    \nobreak\noindent\vskip-15pt}
 
 \def\addquote #1\par{
     \hrule\smallskip
@@ -84,7 +124,8 @@
 \def\quotestyle#1{\quoterm {#1}}
 \def\sectionstyle#1{\leftline{\bf\the\sectionno.\ #1}}
 \def\subsectionstyle#1{\leftline{\bf\the\sectionno.\the\subsectionno.\ #1}}
-\def\topicstyle#1{\bigskip{\moveleft .5in\vbox{\it #1}}\noindent\bigskip}
+\def\subsubsectionstyle#1{\leftline{\rm #1}}
+\def\topicstyle#1{{\vbox{\elevenssb#1}}}
 
 % Document Objects
 \def\centertable#1#2{
@@ -101,20 +142,18 @@
 % horizontal rules betwen rows of a table. 2pt spacing used so that
 % rules don't squish text.
 \def\trule{\noalign{\vskip2pt\hrule\vskip2pt}}
-\def\TODO{\hbox{\bf $\star$ TODO $\star$}}
+\def\TODO#1\par{\hbox{\bf $\star$ TODO $\star$ #1\hskip10pt}}
+
 
 %
 % Aside
 %
 
-\font\eightss=cmss10 at 8pt
-\font\eightssb=cmssbx10 at 8pt
-\font\eightssi=cmssi10 at 8pt
 \def\bigaside#1{
-        {\medskip
-        \hrule\smallskip\noindent\let\bf\eightssb\let\it\eightssi
+        {\medskip\hrule\noindent\let\bf\eightssb\let\it\eightssi
         \eightss#1\smallskip\hrule\medskip}}
 \def\aside#1{({\it #1})}
+\def\rightaside#1{\rightline{\aside{#1}}}
 
 
 %%%
@@ -149,7 +188,7 @@
 %%%
 %%% Load in the fonts
 %%%
-\font\fourteenrm=cmr12 scaled \magstep1
+\font\fourteenrm=cmr12 at 14pt
 \font\fourteeni=cmmi12 scaled \magstep1
 \font\fourteensy=cmsy10 scaled \magstep2
 \font\fourteenex=cmex10 scaled \magstep2
@@ -186,8 +225,6 @@
 
 \font\algoss=cmssq8
 \font\algossi=cmssqi8
-\def\algorithm #1 (#2){\medskip{\bigbf Algorithm #1} ({\bigit
-#2})\medskip}
 \def\beginalgo #1 (#2) #3\par{\bigskip{\noindent\algoss Algorithm #1} {\algossi (#2)} \smallskip\hrule height 1pt\smallskip {\tenpoint\noindent#3}\medskip}
 \def\endalgo{\medskip\hrule height 1pt\bigskip}
 \def\algostep #1. (#2){\smallskip{\noindent{\bf #1} {\it (#2)} \hskip 10pt}}
@@ -196,4 +233,10 @@
 \def\stepnote#1 {{\smallskip\noindent\let\bf\eightssb\let\it\eightssi
         \eightss {\hfill\tenpoint #1\smallskip}}}
 
-\def\sectionstyle#1{\bigskip\noindent\bigit #1\bigskip}
+\def\sectionstyle#1{\bigskip\noindent\bigcaps{#1}\bigskip}
+
+
+%%
+%% Random text shorthand
+%%
+\def\th{\hbox{th}}

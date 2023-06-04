@@ -39,9 +39,9 @@ hs.window.animationDuration = 0
 caffeine = hs.menubar.new()
 function setCaffeineDisplay(state)
     if state then
-        caffeine:setTitle("☀")   -- sun icon
+        caffeine:setTitle("★")   -- awake icon
     else
-        caffeine:setTitle("☾")  -- moon icon
+        caffeine:setTitle("✰")  -- sleepy icon
     end
 end
 
@@ -102,10 +102,11 @@ end
 
 function getFocusedWindowInScreen()
    local win = hs.window.focusedWindow()
-   local screen = win:screen()
    if win == nil then
+      print("Failed to get focused window. Perhaps uncheck-recheck Accessibility settings")
       return nil, nil
    end
+   local screen = win:screen()
    return win, screen
 end
 
@@ -150,8 +151,9 @@ end
 --    option means "will move"
 --    shift means "will change size"
 --    using them together combines functionality
+
 prefix = {
-   focus  = {"cmd", "option"},
+   focus  = {"cmd"},
    move   = {"cmd", "control"},
    resizeHalf = {"cmd", "shift"},
    resizeThird = {"cmd", "option", "shift"},
@@ -162,19 +164,19 @@ prefix = {
 -- With "focus" prefix, we only switch focus by direction
 
 hs.hotkey.bind(prefix.focus, "Up", function()
-    hs.window.focusWindowNorth(nil, nil, true)
+    hs.window.frontmostWindow().focusWindowNorth(nil, nil, true)
 end)
 
 hs.hotkey.bind(prefix.focus, "Right", function()
-    hs.window.focusWindowEast(nil, nil, true)
+    hs.window.frontmostWindow().focusWindowEast(nil, nil, true)
 end)
 
 hs.hotkey.bind(prefix.focus, "Down", function()
-    hs.window.focusWindowSouth(nil, nil, true)
+    hs.window.frontmostWindow().focusWindowSouth(nil, nil, true)
 end)
 
 hs.hotkey.bind(prefix.focus, "Left", function()
-    hs.window.focusWindowWest(nil, nil, true)
+    hs.window.frontmostWindow().focusWindowWest(nil, nil, true)
 end)
 
 
