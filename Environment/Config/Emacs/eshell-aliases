@@ -1,6 +1,7 @@
-alias udemy_test_integration cd ~/Repositories/website-django; python manage.py test --settings=udemy.settings.test_integration --verbosity=1
-alias udemy_py2_venv source /Users/rick/Environment/Utilities/Python/Envs/py2default/bin/activate
-alias udemy_py3_venv source /Users/rick/Environment/Utilities/Python/Envs/py3default/bin/activate && (setenv "DJANGO_SETTINGS_MODULE" "udemy.settings.local")
-alias udemy_test_unit_async cd ~/Repositories/website-django; python manage.py test --settings=udemy.settings.test_unit --processes=16 --verbosity=0 &
-alias udemy_php_make cd ~/Repositories/website; make -f Makefile vm
+alias nil  $*
 alias udemy_test_unit cd ~/Repositories/website-django; python manage.py test --settings=udemy.settings.test_unit --processes=16 --verbosity=1
+alias udemy_php_make cd ~/Repositories/website; make -f Makefile vm
+alias udemy_test_unit_async cd ~/Repositories/website-django; python manage.py test --settings=udemy.settings.test_unit --processes=16 --verbosity=0 &
+alias udemy_py3_venv source /Users/rick/Environment/Utilities/Python/Envs/py3default/bin/activate && (setenv "DJANGO_SETTINGS_MODULE" "udemy.settings.local")
+alias udemy_py2_venv source /Users/rick/Environment/Utilities/Python/Envs/py2default/bin/activate
+alias udemy_test_integration cd ~/Repositories/website-django; python manage.py test --settings=udemy.settings.test_integration --verbosity=1

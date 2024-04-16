@@ -2,7 +2,7 @@
 
 set -e
 
-EMACS_VERSION=28.2
+EMACS_VERSION=29.2
 mkdir -p $USER_ENV_UTILS/Emacs
 mkdir -p $USER_ENV_UTILS/Emacs/$EMACS_VERSION
 cd $USER_ENV_UTILS/Emacs/$EMACS_VERSION
@@ -16,5 +16,5 @@ hdiutil detach $USER_ENV_UTILS/Emacs/$EMACS_VERSION/installer
 cd ..
 rm -f ~/.emacs.d
 ln -s  $USER_ENV_DATA/Emacs/ ~/.emacs.d
-ln -s  $USER_ENV_CONFIG/Emacs/dot-emacs ~/.emacs
+ln -sf  $USER_ENV_CONFIG/Emacs/dot-emacs ~/.emacs
 exit 0

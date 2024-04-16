@@ -11,7 +11,6 @@
 ;; side-effects.
 
 ;;; Code
-
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/flycheck")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/tern/emacs")
 (add-to-list 'load-path "~/Environment/Utilities/Emacs/async")
@@ -82,6 +81,11 @@
     auto-complete
     python-environment
     jedi
+
+    ;; TeX
+    auctex
+    company-auctex
+    cdlatex
     )
   "Packages installed @ startup")
 
@@ -139,12 +143,13 @@
 (setq-default indent-tabs-mode nil)
 
 ;; FONTS
-; (set-frame-font "-*-SF Mono-light-normal-normal-*-13-*-*-*-m-0-iso10646-1")
+(set-frame-font "-*-Victor Mono-regular-normal-normal-*-15-*-*-*-m-0-iso10646-1")
+
+                                        ; (set-frame-font "-*-SF Mono-light-normal-normal-*-13-*-*-*-m-0-iso10646-1")
 ; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
 ; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
 ; (set-frame-font "-*-Operator Mono-semilight-normal-normal-*-15-*-*-*-m-0-iso10646-1")
-
-(set-frame-font "-*-TheSansMono-semilight-normal-normal-*-14-*-*-*-m-0-iso10646-1") ;
+; (set-frame-font "-*-IntelOne Mono-regular-normal-normal-*-14-*-*-*-m-0-iso10646-1") ;
 
 ;; Disable anti-aliasing -- good for bitmap fonts
 ;; In order for this to take effect, you must use the following command--
@@ -167,9 +172,9 @@
 (set-default 'cursor-type '(hbar . 1))
 
 ;; Show line numbers (and pad them a little)
-(global-linum-mode t)
+(setq display-line-numbers t)
+(global-display-line-numbers-mode t)
 (column-number-mode t)
-(setq linum-format "%d ")
 
 ;; Don't use messages that you don't read
 (setq initial-scratch-message "")
@@ -197,6 +202,7 @@
 ;; ---------------------------------------------------------------------
 ;; editing
 ;; ---------------------------------------------------------------------
+
  ;;; Stefan Monnier <foo at acm.org>. It is the opposite of fill-paragraph
 (defun unfill-paragraph (&optional region)
   "Takes a multi-line paragraph and makes it into a single line of text."
@@ -232,6 +238,37 @@
 ;; follow the symlink each time.
 (setq vc-follow-symlinks t)
 
+
+;; ---------------------------------------------------------------------
+;; printing
+;; ---------------------------------------------------------------------
+
+;; macOS no longer has native PostScript support, so we need a little
+;; set of functions to make printing simpler
+(defun print-buffer-via-postscripter ()
+  (interactive)
+  (let (
+        (psfile (concat
+                 (buffer-file-name (window-buffer (minibuffer-selected-window)))
+                 ".ps")))
+    (ps-print-buffer-with-faces psfile)
+    (shell-command (concat "open -a PostScripter " psfile))))
+
+(defun print-region-via-postscripter ()
+  (interactive)
+  (let (
+        (psfile (concat
+                 (buffer-file-name (window-buffer (minibuffer-selected-window)))
+                 ".ps")))
+    (ps-print-region-with-faces (region-beginning) (region-end) psfile)
+    (shell-command (concat "open -a PostScripter " psfile))))
+
+;; ---------------------------------------------------------------------
+;; search
+;; ---------------------------------------------------------------------
+;; Since we use auto-fill mode quite a bit, it's nicer to search for
+;; phrases that can span lines.
+(setq search-whitespace-regexp "[ \t\r\n]+")
 
 ;; ---------------------------------------------------------------------
 ;; sounds
@@ -350,51 +387,53 @@
 
 (setq c-basic-offset 2)
 
-;; (add-hook 'c-mode-hook 'auto-fill-mode)
-;; (add-hook 'c-mode-hook 'company-mode)
+(add-hook 'c-mode-hook 'auto-fill-mode)
+(add-hook 'c-mode-hook 'company-mode)
 ;; auto-fill quotes /parens / braces
-;; (add-hook 'c-mode-hook 'electric-pair-mode)
+(add-hook 'c-mode-hook 'electric-pair-mode)
 ;; highlight matching parens
-;; (add-hook 'c-mode-hook 'show-paren-mode)
-;; (add-hook 'c-mode-hook
-;;           (lambda ()
+(add-hook 'c-mode-hook 'show-paren-mode)
+(add-hook 'c-mode-hook
+          (lambda ()
+            ;; setup cscope directory
+
+            (setq cscope-initial-directory "~/Repositories/linux-26/linux-2.6.39.4")
 ;;             ;; load our custom style file
 ;;             ;(load-file "~/.emacs.d/resc-c-style.el")
 ;;             ;(c-set-style "resc")
 ;;             ;; Add RESC_HOME to our include path for flycheck
 ;;             ;; gets everything but trailing newline
-;;             (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
-;;             ;; allow completing from #included header files
-;;             (add-to-list 'company-backends 'company-c-headers)
-;;             (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup)
+             ;;             (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
+             ;; hitting enter should create comment star
+             (define-key c-mode-base-map (kbd "RET") 'c-context-line-break)
 
+             ;; allow completing from #included header files
+             (add-to-list 'company-backends 'company-c-headers)
+             (add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup)
+             (when (not (eq major-mode 'bison-mode))
+               (yas-minor-mode)
+               (lsp))
 ;;             (setq c-basic-offset 2)
-;;             ;; on macOS, we can setup clang-format
-;;             (when (eq system-type 'darwin)
-;;               ;; find & load clang-format.el
-;;               ;; it lives in the brew prefix for
-;;               ;; find clang-format so we can find clang-format.el
-;;               ;; (note that the shell command ends with a trailing newline we have to strip
-;;               (load (concat
-;;                      (substring (shell-command-to-string "dirname $(dirname $(which clang-format))") 0 -1)
-;;                     "/share/clang/clang-format.el"))
-;;               (add-hook 'before-save-hook
-;;                         'clang-format-buffer
-;;                         t  ; append to existing value
-;;                         t  ; buffer-local (important, since we don't want tof
-;;                         ))))
-;; (add-hook 'c-mode-hook 'flycheck-mode)
-;; (add-hook 'c-mode-hook 'lsp)
-;; (add-hook 'c-mode-hook
-;;           (lambda ()
-;;             ;; load our custom style file
-;;             ;(load-file "~/.emacs.d/resc-c-style.el")
-;;             ;(c-set-style "resc")
-;;             ;; Add RESC_HOME to our include path for flycheck
-;;             ;; gets everything but trailing newline
-;;             (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
+             ;; on macOS, we can setup clang-format
+             (when (and (eq system-type 'darwin)
+                        (stringp buffer-file-name)
+                        (not (string-match "\\.y\\'" buffer-file-name)
+                        ))
+               ;; find & load clang-format.el via brew (note that the
+               ;; shell result ends with a trailing newline we have to
+               ;; strip
+               (load (concat
+                      (substring (shell-command-to-string "dirname $(dirname $(which clang-format))") 0 -1)
+                     "/share/clang/clang-format.el"))
+               (add-hook 'before-save-hook
+                         'clang-format-buffer
+                         t  ; append to existing value
+                         t  ; buffer-local (important, since we don't want tof
+                         )
+               )))
+(add-hook 'c-mode-hook 'flycheck-mode)
+(cscope-setup) ; must be after our lambda, so it respects our setq
 
-;;             ))
 ;; ---------------------------------------------------------------------
 ;; common lisp
 ;; ---------------------------------------------------------------------
@@ -514,11 +553,131 @@
 ;; ---------------------------------------------------------------------
 ;; TeX
 ;; ---------------------------------------------------------------------
+(setq TeX-parse-self t)
+(setq TeX-electric-math (cons "$" "$"))
 
 (add-to-list 'auto-mode-alist '("\\.tex\\'" . plain-TeX-mode))
-;(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(add-hook 'plain-Tex-mode-hook 'auto-fill-mode)
+(add-hook 'plain-TeX-mode-hook 'auto-fill-mode)
+(add-hook 'plain-TeX-mode-hook 'cdlatex-mode)
+;; I can't bear having the quote character broken, so we'll just move
+;; this to a completely separate key, which effectively disables the
+;; feature.
+
+(setq cdlatex-math-modify-prefix [8388654])
+
+;; Here is how you might configure CDLaTeX to provide environment templates
+;; (including automatic labels) for two theorem-like environments.
+;; SYNTAX:
+;; - "AUTOLABEL" indicates the place where an automatic label should be
+;;   inserted, using RefTeX.
+;; - The question mark defines the position of the
+;;   cursor after the template has been inserted into the buffer.
+;;   (setq cdlatex-env-alist
+;;      '(("axiom" "\\begin{axiom}\nAUTOLABEL\n?\n\\end{axiom}\n" nil)
+;;        ("theorem" "\\begin{theorem}\nAUTOLABEL\n?\n\\end{theorem}\n" nil)))
+
+(setq cdlatex-env-alist
+      '(("example"   "\\Example(?)\n\\EndExample\n" nil)
+        ("algorithm" "\\Algo ?()\n\\EndAlgo\n"      nil)
+        ("diagram"   "\\diagram images/? @ in ()\n" nil)
+        ("inlinesquare"   "\\inlinesquare{?}"       nil)
+        ))
+
+;; You could also define your own keyword commands "axm" and "thr" to make
+;; the template insertion quicker (e.g. `axm<TAB>' and `thm<TAB>'):
+;;
+;; (setq cdlatex-command-alist
+;;  '(("axm" "Insert axiom env"   "" cdlatex-environment ("axiom") t nil)
+;;    ("thr" "Insert theorem env" "" cdlatex-environment ("theorem") t nil)))
+;;
+;; Configuring the commands:
+;; The command items in the list are ALSO lists, with 7 parameters
+;;   0. KEYWORD     The key that has to be typed into the text.
+;;   1. DOCSTRING   A documentation string, less than 60 characters long.
+;;   2. REPLACE     The text to be substituted for the keyword, if any.
+;;   3. HOOK        A function to be called.
+;;   4. ARGS        Optional list of arguments to the function.
+;;   5. TEXTFLAG    non-nil means this keyword command is active in textmode.
+;;   6. MATHFLAG    non-nil means this keyword command is active in math mode.
+
+(setq cdlatex-command-alist
+      ;; KEYWD       DOCSTRING                 TXT-RPLC      FN-REPLACE          FN-ARGS  TXT-MODE? MMODE?
+      '(
+        ("example"   "Insert Example environment"    ""      cdlatex-environment ("example")      t    nil)
+        ("algo"      "Insert Algorithm environment"  ""      cdlatex-environment ("algorithm")    t    nil)
+        ("dia"       "Insert diagram here"           ""      cdlatex-environment ("diagram")      t    nil)
+        ("sq"        "Insert an inline square here"  ""      cdlatex-environment ("inlinesquare") t    nil)
+        ))
+;;    ("thr" "Insert theorem env" "" cdlatex-environment ("theorem") t nil)))
+
+
+;; Each element contains 6 items:
+;;   0. key:      The character that is the key for a the accent.
+;;   1. mathcmd:  The TeX command associated with the accent in math mode
+;;   2. textcmd:  The TeX command associated with the accent in text mode
+;;   3. type:     t   if command with argument (e.g. \tilde{a}).
+;;                nil if style (e.g. {\cal a}).
+;;   4. rmdot:    t   if the dot on i and j has to be removed.
+;;   5. it        t   if italic correction is required.
+(defconst cdlatex-math-modify-alist-comb-override
+  '(
+;;;  key    mathcmd                     textcmd    type rmdot italic
+    ( ?\.   "\\dot"                     nil           t   t   nil )
+    ( ?\:   "\\ddot"                    nil           t   t   nil )
+    ( ?\~   "\\tilde"                   nil           t   t   nil )
+    ( ?N    "\\widetilde"               nil           t   t   nil )
+    ( ?^    "\\hat"                     nil           t   t   nil )
+    ( ?H    "\\widehat"                 nil           t   t   nil )
+    ( ?\-   "\\bar"                     nil           t   t   nil )
+    ( ?T    "\\overline"                nil           t   nil nil )
+    ( ?\_   "\\underline"               nil           t   nil nil )
+    ( ?\]   "\\overbrace"               nil           t   nil nil )
+    ( ?\}   "\\underbrace"              nil           t   nil nil )
+    ( ?\>   "\\vec"                     nil           t   t   nil )
+    ( ?/    "\\grave"                   nil           t   t   nil )
+    ( ?\\   "\\acute"                   nil           t   t   nil )
+    ( ?u    "\\breve"                   nil           t   t   nil )
+    ( ?h    "\\hbox{?}"                 "\\hbox{?}"   t   nil nil )
+    ( ?v    "\\vbox{?}"                 "\\vbox{?}"   t   nil nil )
+    ( ?t    "\\hbox{\\t(?)}"            "\\t(?)"      t   nil nil )
+    ( ?c    "\\hbox{\\c{?}}"            "\\c{?}"      t   nil nil )
+    ( ?a    nil                         "\\aside{?}"  t   nil nil )
+    ( ?r    "{\\rm ?}"                  "{\\rm ?}"    nil   nil nil )
+    ( ?i    "{\\it ?}"                  "{\\it ?}"    nil   nil nil )
+    ( ?l    nil                         "{\\sl ?}"    nil   nil nil )
+    ( ?b    "{\\bf ?}"                  "{\\bf ?}"    nil   nil nil )
+    ( ?y    "{\\tt ?}"                  "{\\tt ?}"    nil   nil nil )
+    ( ?0    "\\textstyle"               nil           nil nil nil )
+    ( ?1    "\\displaystyle"            nil           nil nil nil )
+    ( ?2    "\\scriptstyle"             nil           nil nil nil )
+    ( ?3    "\\scriptscriptstyle"       nil           nil nil nil )
+    ( ?\(   "\\left( ? \\right)"        nil           nil nil nil )
+    ( ?\[   "\\left[ ? \\right]"        nil           nil nil nil )
+    ( ?\{   "\\left\\{ ? \\right\\}"    nil           nil nil nil )
+    ( ?<    "\\left< ? \\right>"        nil           nil nil nil )
+    ( ?|    "\\left| ? \\right|"        nil           nil nil nil )
+    ;;( ?m    "\\mbox"              nil        t   nil nil )
+    ;;( ?e    "\\mathem"            "\\emph"   t   nil nil )
+    ;;( ?f    "\\mathsf"            "\\textsf" t   nil nil )
+    ;;( ?v    "\\check"                   nil           t   t   nil )
+  )
+  "Default for `cdlatex-math-modify-alist'.")
+
+
+(add-hook 'cdlatex-mode-hook
+          (lambda ()
+            (set 'cdlatex-math-modify-alist-comb
+                 cdlatex-math-modify-alist-comb-override)))
+
+(defun wrap-region-with-delim (b e tag)
+  "'tag' a region"
+  (interactive "r\nMTag for region: ")
+  (let ((e (copy-marker e)))
+    (goto-char b)
+    (insert (format "%s" tag))
+    (goto-char e)
+    (insert (format "%s" tag))))
+
 
 ;; =====================================================================
 ;; Emacs lisp
@@ -541,7 +700,7 @@
 (eval-after-load 'css-mode
   (lambda ()
     (define-key css-mode-map (kbd "C-c b") 'web-beautify-css)
-    (linum-mode)))
+    ))
 
 ;; ---------------------------------------------------------------------
 ;; web-mode
@@ -553,8 +712,7 @@
 
 (eval-after-load 'web-mode
   (lambda ()
-    (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)
-    (linum-mode)))
+    (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)))
 
 
 ;; =====================================================================
@@ -586,8 +744,7 @@
 (eval-after-load 'js2-mode
   (lambda ()
     (require 'web-beautify)
-    (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)
-    (linum-mode)))
+    (define-key js2-mode-map (kbd "C-c b") 'web-beautify-js)))
 
 
 ;; ---------------------------------------------------------------------
@@ -608,6 +765,60 @@
 
 (setq-default markdown-command "pandoc")
 (setq-default markdown-open-command "/usr/local/bin/mark")
+(add-hook 'markdown-mode-hook 'auto-fill-mode)
+;;
+;; Source: https://emacs.stackexchange.com/a/3500
+(defun tag-word-or-region (text-begin text-end)
+  "Surround current word or region with given text."
+  (interactive "sStart tag: \nsEnd tag: ")
+  (let (pos1 pos2 bds)
+    (if (and transient-mark-mode mark-active)
+        (progn
+          (goto-char (region-end))
+          (insert text-end)
+          (goto-char (region-beginning))
+          (insert text-begin)
+          (goto-char (region-end))
+          (dotimes (i (* 3 (length text-end)))
+          (forward-char)))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'symbol))
+        (goto-char (cdr bds))
+        (insert text-end)
+        (goto-char (car bds))
+        (insert text-begin)
+        ;; Addition: move to end of region, then past all the text inserted
+        ;; This requires us to move past both prefix & suffix strings
+        (goto-char (cdr bds))
+        (dotimes (i (+ (length text-start) (length text-end)))
+          (forward-char))))))
+
+(defun md-bold-selection ()
+  (interactive)
+  (tag-word-or-region "**" "**"))
+
+(defun md-italic-selection ()
+  (interactive)
+  (tag-word-or-region "*" "*"))
+
+(defun md-insert-slash ()
+  (interactive)
+  (insert (char-from-name "SLASH")))
+
+(eval-after-load 'markdown-mode
+  (lambda ()
+    (define-key markdown-mode-map (kbd "/ /") 'md-insert-slash)
+    (define-key markdown-mode-map (kbd "/ b") 'md-bold-selection)
+    (define-key markdown-mode-map (kbd "/ i") 'md-italic-selection)))
+
+
+
+;; =====================================================================
+;; PDF Tools
+;; =====================================================================
+
+; Incompatible w/ display-line-numbers-mode
+(add-hook 'pdf-view-mode-hook (lambda() (display-line-numbers-mode 0)))
 
 ;; =====================================================================
 ;; Python
@@ -621,15 +832,13 @@
 ;; autocomplete
 (require 'python-environment)
 (defun my/python-mode-hook ()
-  (add-to-list 'company-backends 'company-jedi))
-(add-hook 'python-mode-hook 'my/python-mode-hook)
-(setq jedi:environment-virtualenv
-      '("/rick/Environment/Utilities/Python/Envs/taocp/bin/virtualenv"))
-(add-hook 'python-mode-hook
-          (lambda() (define-key python-mode-map (kbd "s-b") 'jedi:goto-definition)))
-
-(add-hook 'python-mode-hook
-          (lambda() (python-black-on-save-mode)))
+  ;(add-to-list 'company-backends 'company-jedi))
+  ;(add-hook 'python-mode-hook 'my/python-mode-hook)
+;(setq jedi:environment-virtualenv
+;      '("/rick/Environment/Utilities/Python/Envs/taocp/bin/virtualenv"))
+  ;(add-hook 'python-mode-hook
+   ;       (lambda() (define-key python-mode-map (kbd "s-b") 'jedi:goto-definition)))
+)
 
 
 ;; ---------------------------------------------------------------------
@@ -642,20 +851,27 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(cdlatex-math-modify-prefix 47 t)
  '(company-c-headers-path-user
    '("/opt/homebrew/include" "/opt/homebrew/include/CUnit" "/Users/rick/Repositories/learningc/cii/include"))
  '(company-clang-arguments
    '("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base" "-I/rick/Repositories/kilo/src/components"))
+ '(cscope-indexer-suffixes '("*.[chlysS]" "*.[ch]xx" "*.[ch]pp" "*.cc" "*.hh") nil nil "Allow assembly files too")
  '(custom-safe-themes
-   '("f149d9986497e8877e0bd1981d1bef8c8a6d35be7d82cba193ad7e46f0989f6a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "6b5c518d1c250a8ce17463b7e435e9e20faa84f3f7defba8b579d4f5925f60c1" "7661b762556018a44a29477b84757994d8386d6edee909409fabe0631952dad9" "83e0376b5df8d6a3fbdfffb9fb0e8cf41a11799d9471293a810deb7586c131e6" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" "b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
+   '("d445c7b530713eac282ecdeea07a8fa59692c83045bf84dd112dd738c7bcad1d" "a5270d86fac30303c5910be7403467662d7601b821af2ff0c4eb181153ebfc0a" "7b8f5bbdc7c316ee62f271acf6bcd0e0b8a272fdffe908f8c920b0ba34871d98" "41020bc5a5547dbc5eaf2554d188f516cc5d3b80fd5d5ad804444135a6abf5f4" "f149d9986497e8877e0bd1981d1bef8c8a6d35be7d82cba193ad7e46f0989f6a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "6b5c518d1c250a8ce17463b7e435e9e20faa84f3f7defba8b579d4f5925f60c1" "7661b762556018a44a29477b84757994d8386d6edee909409fabe0631952dad9" "83e0376b5df8d6a3fbdfffb9fb0e8cf41a11799d9471293a810deb7586c131e6" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" "b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
  '(ede-project-directories '("/Users/rick/Repositories/learningc/kilo"))
  '(flycheck-clang-include-path
    '("/rick/Repositories/kilo/src/components" "/Users/rick/Repositories/learningc/cii/include" "/opt/homebrew/include"))
  '(lsp-clients-clangd-library-directories
    '("/opt/homebrew/include" "/Library/Developer/CommandLineTools/usr/include/c++/v1/"))
  '(package-selected-packages
-   '(auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
+   '(xcscope lsp-ui bats-mode buffer-move pdf-tools timu-rouge-theme company-auctex cdlatex auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
+ '(ps-header-lines 1)
+ '(ps-print-color-p 'black-white)
+ '(ps-print-header nil)
+ '(ps-print-header-frame nil)
  '(web-mode-markup-indent-offset 2))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
