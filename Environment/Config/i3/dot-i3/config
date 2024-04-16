@@ -7,7 +7,7 @@
 # Set global modifier key
 # Mod1 - ALT
 # Mod4 - CMD (Macs)
-set $mod Mod1
+set $mod Mod4
 
 ## Fonts for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below. ISO 10646 = Unicode
@@ -24,12 +24,12 @@ client.focused_inactive         #202020 #202020 #666666
 client.urgent                   #212121 #303030 #ee0000
 client.background               #101010
 #font -*-inconsolata-medium-r-*-17-*-*-*-*-*-*-*
-font pango:Terminus 16px
+font pango:Terminus 32px
 
 #i3bar config
 bar {
     position top
-    font pango:Terminus 16px
+    font pango:Terminus 32px
     status_command i3status --config ~/.i3/i3status.conf
     colors {
         background         #101010
@@ -56,7 +56,8 @@ bindsym $mod+Return exec xterm
 # bindsym $mod+space  exec `dmenu_run -i -nb '#404040' -nf '#dedeff' -fn 'Inconsolata13px'`
 
 # new dmenu, wrapper around old dmenu (USE after i3-4.3 released)
-bindsym $mod+space exec --no-startup-id i3-dmenu-desktop --entry-type=command --dmenu=`dmenu_run -b -i -nb '#101010' -nf '#dedeff' -fn 'Terminus-18' -p '>'`
+bindsym $mod+space exec --no-startup-id i3-dmenu-desktop --entry-type=command --dmenu=`dmenu_run -b -i -nb '#101010' -nf '#dedeff' -fn 'Monaco-32' -p '>'`
+
 # Operations
 #############
 

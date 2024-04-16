@@ -1,7 +1,9 @@
+! Corrects font size on Linux using HiDPI monitor
+!Xft.dpi: 192
 xterm*faceName: Monaco
-xterm*faceSize: 12
+xterm*faceSize: 14
 XTerm.vt100.scrollBar: false
-
+xfce4-terminal*font: Monaco-10:antialias=false
 !Theme Four (phraktured.net)
 *xterm*background: rgb:00/00/00
 *xterm*foreground: rgb:ff/ff/ff

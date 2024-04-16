@@ -39,6 +39,11 @@ mkdir -p $USER_ENV_SCRIPTS
 mkdir -p $USER_ENV_UTILS
 
 for script in $USER_ENV_INSTALL/*; do
+    read -n1 -p "Install $script ?[y/n] "
+    echo # print a newline for next prompt
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+	continue
+    fi
     proclaim "Installing $script..."
     if [ -f $script ]; then
         $script

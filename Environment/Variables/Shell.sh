@@ -35,7 +35,7 @@ if [[ ! -e $HISTFILE ]]; then
         #
         # source: StackExchange (originally #bash on Freenode)
         #
-        tail -r $LASTHIST | awk '!seen[$0]++'  | grep . -m $DAILY_TRANSFER_LIMIT >> $HISTFILE
+        tail $LASTHIST | tac | awk '!seen[$0]++'  | grep . -m $DAILY_TRANSFER_LIMIT >> $HISTFILE
         # Write a divider to identify where the prior day's session history ends
         echo "##########################################################" >> $HISTFILE
     fi
@@ -57,16 +57,6 @@ export CLICOLOR=1  # Enable colors for BSD variants (including macOS)
 
 # Prompt Formatting
 # ----------------------------------------------------------------------
-
-NONE=$(tput sgr0)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-CYAN=$(tput setaf 4)
-PURPLE=$(tput setaf 5)
-WHITE=$(tput setaf 7)
-BOLD=$(tput bold)
-ITALIC=$(tput sitm)
 
 
 cwd="\[$CYAN\]\w\[$NONE\]"
@@ -106,17 +96,9 @@ show_prompt() {
         pre_prompt="\[$YELLOW\]"
     fi
     PS1="\$(hr)\n"$info_line"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\] "
-
-    #
-    # History Sharing - These settings share history between terminal tabs.
-    #
-    history -a
-    history -n
-
     return 0
 }
 
-export PROMPT_COMMAND=show_prompt
 
 #######################################
 # Displays a boxed string:
@@ -158,3 +140,23 @@ proclaim() {
 make_targets() {
     make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}'
 }
+
+
+if [[ $- == *i* ]]
+then
+    NONE=$(tput sgr0)
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    YELLOW=$(tput setaf 3)
+    CYAN=$(tput setaf 4)
+    PURPLE=$(tput setaf 5)
+    WHITE=$(tput setaf 7)
+    BOLD=$(tput bold)
+    ITALIC=$(tput sitm)
+    #
+    # History Sharing - These settings share history between terminal tabs.
+    #
+    history -a
+    history -n
+    export PROMPT_COMMAND=show_prompt
+fi
