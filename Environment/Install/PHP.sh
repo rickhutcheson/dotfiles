@@ -15,7 +15,6 @@ rm -rf src php-$PHP_VERSION
 mkdir -p src
 echo "Downloading installation files..."
 wget http://us1.php.net/distributions/php-$PHP_VERSION.tar.bz2 -O php.tar.bz2
-cp ~/php.tar.bz2 php.tar.bz2
 tar xjf php.tar.bz2 -C src --strip-components 1
 mv src php-$PHP_VERSION
 echo "Cleaning Up..."
