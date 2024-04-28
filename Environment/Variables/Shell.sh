@@ -27,6 +27,13 @@ export HISTFILE=~/.history/`date +%Y-%m-%d`.hist
 # The first time a history file is generated for today, let's copy 50
 # commands from last session into today's =]
 # (From http://bradchoate.com/weblog/2006/05/19/daily-history-files-for-bash)
+
+# macOS has no builtin `tac` command, so we map it to the builtin,
+# nonstandard, `tail -r`
+if ! $(which -s tac); then
+    alias tac='tail -r'
+fi
+
 if [[ ! -e $HISTFILE ]]; then
     LASTHIST=~/.history/`ls -tr ~/.history/ | tail -1`
     if [[ -e $LASTHIST ]]; then

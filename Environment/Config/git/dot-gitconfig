@@ -18,10 +18,6 @@
 [push]
 	default = matching
 
-[filter "hawser"]
-	clean = git hawser clean %f
-	smudge = git hawser smudge %f
-	required = true
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path =
@@ -44,7 +40,7 @@
 	ll = log --pretty=format:\"%Cblue%h (%ad) - %Creset%s\" -10 --date=relative
 
 	lol = log --graph --decorate --pretty=\"[%h] %d | %s <%an|%cd>\" --abbrev-commit --date=short --all --decorate
-	me = log --author=\"rick.hutcheson@udemy.com\" --oneline
+	me = log --author=\"rick@oddlyaccurate.com\" --oneline
         log-commits = log --oneline --graph --all --decorate --abbrev-commit master..HEAD
 
 	# status

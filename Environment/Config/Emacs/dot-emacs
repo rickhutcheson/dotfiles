@@ -139,23 +139,38 @@
 ;;   > set this option to a non-nil value in your init file.
 (setq frame-resize-pixelwise t)
 
+;; Customize the *window frame* title (actual window manager
+;; decoration next to close button, etc.)
+;;
+;; It's nice to be able to see
+;; the full path to the current file, especially when we're deep in
+;; inside a repository hierarchy.
+(setq frame-title-format
+      (list (format "%s %%S: %%j " (system-name))
+        '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+
 ;; SPACES / TABS
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil) ; By default, abhor tabs
 
-;; FONTS
-(set-frame-font "-*-Victor Mono-regular-normal-normal-*-15-*-*-*-m-0-iso10646-1")
+;;; FONTS
+;; Some commonly-used fonts
+;; "SF Mono-light"
+;; "Terminus-normal"
+;; "fixed-9x15-medium"
+;; "Monaco-normal"
+;; "Operator Mono-semilight"
+;; "IntelOne Mono-regular"
+;; "Victor Mono-regular"
 
-                                        ; (set-frame-font "-*-SF Mono-light-normal-normal-*-13-*-*-*-m-0-iso10646-1")
-; (set-frame-font "-xos4-Terminus-normal-normal-normal-*-16-*-*-*-c-80-iso10646-1")
-; (set-frame-font "-*-Monaco-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-; (set-frame-font "-*-Operator Mono-semilight-normal-normal-*-15-*-*-*-m-0-iso10646-1")
-; (set-frame-font "-*-IntelOne Mono-regular-normal-normal-*-14-*-*-*-m-0-iso10646-1") ;
+(setq font-name "Victor Mono-regular")
+(setq font-size "16")
+(set-frame-font (concat "-*-" font-name "-normal-normal-*-" font-size "-*-*-*-m-0-iso10646-1"))
 
 ;; Disable anti-aliasing -- good for bitmap fonts
 ;; In order for this to take effect, you must use the following command--
 ;;     defaults write org.gnu.Emacs FontBackend ns
 ;;
-;;(setq mac-allow-anti-aliasing nil)
+;; (setq mac-allow-anti-aliasing nil)
 
 (setq-default line-spacing 0.05) ;; This is ADDITIONAL line spacing added to standard
 
@@ -242,6 +257,14 @@
 ;; ---------------------------------------------------------------------
 ;; printing
 ;; ---------------------------------------------------------------------
+
+;; postscript headers are a bit much
+(setq ps-header-lines 1)
+(setq ps-print-header nil)
+(setq ps-print-header-frame nil)
+
+;; laser printers forever
+(setq ps-print-color-p 'black-white)
 
 ;; macOS no longer has native PostScript support, so we need a little
 ;; set of functions to make printing simpler
@@ -516,6 +539,13 @@
 ;; old M-x
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
+;; ---------------------------------------------------------------------
+;; Magit
+;; ---------------------------------------------------------------------
+
+(setq magit-revision-insert-related-refs nil)
+(setq magit-insert-tags-headers nil)
+(setq magit-insert-revision-headers nil)
 
 ;; ---------------------------------------------------------------------
 ;; MMIX (Assembly Language from TAoCP)
@@ -709,7 +739,7 @@
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.twig\\'" . web-mode))
-
+(setq web-mode-markup-indent-offset 2)
 (eval-after-load 'web-mode
   (lambda ()
     (define-key web-mode-map (kbd "C-c b") 'web-beautify-html)))
@@ -865,12 +895,7 @@
  '(lsp-clients-clangd-library-directories
    '("/opt/homebrew/include" "/Library/Developer/CommandLineTools/usr/include/c++/v1/"))
  '(package-selected-packages
-   '(xcscope lsp-ui bats-mode buffer-move pdf-tools timu-rouge-theme company-auctex cdlatex auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
- '(ps-header-lines 1)
- '(ps-print-color-p 'black-white)
- '(ps-print-header nil)
- '(ps-print-header-frame nil)
- '(web-mode-markup-indent-offset 2))
+   '(sr-speedbar xcscope lsp-ui bats-mode buffer-move pdf-tools timu-rouge-theme company-auctex cdlatex auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
