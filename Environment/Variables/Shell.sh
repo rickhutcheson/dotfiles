@@ -30,7 +30,7 @@ export HISTFILE=~/.history/`date +%Y-%m-%d`.hist
 
 # macOS has no builtin `tac` command, so we map it to the builtin,
 # nonstandard, `tail -r`
-if ! $(which -s tac); then
+if ! $(which >/dev/null 2>&1 tac); then
     alias tac='tail -r'
 fi
 
