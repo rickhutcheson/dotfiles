@@ -33,13 +33,12 @@ bar {
     status_command i3status --config ~/.i3/i3status.conf
     colors {
         background         #101010
-        statusline         #FFFFFF
+        statusline         #EEEEEE
         focused_workspace  #3399CC #000000
 	active_workspace   #999999 #202020
 	inactive_workspace #999999 #101010
 	urgent_workspace   #da6f00 #404040
     }
-
 }
 
 hide_edge_borders both
@@ -50,13 +49,12 @@ floating_modifier $mod
 
 # Application Launching
 #######################
-bindsym $mod+Return exec xterm
+bindsym $mod+Return exec gnome-terminal
 
-# old dmenu
+bindsym $mod+space exec --no-startup-id i3-dmenu-desktop --entry-type=command --dmenu=`dmenu_run -i -nb '#101010' -nf '#dedeff' -l 10 -fn 'Monaco-36' -p '>'`
+
+# old dmenu (pre 4.3)
 # bindsym $mod+space  exec `dmenu_run -i -nb '#404040' -nf '#dedeff' -fn 'Inconsolata13px'`
-
-# new dmenu, wrapper around old dmenu (USE after i3-4.3 released)
-bindsym $mod+space exec --no-startup-id i3-dmenu-desktop --entry-type=command --dmenu=`dmenu_run -b -i -nb '#101010' -nf '#dedeff' -fn 'Monaco-32' -p '>'`
 
 # Operations
 #############
@@ -173,4 +171,13 @@ mode "resize" {
         bindsym Escape mode "default"
 }
 
+for_window [title="Zeal"] fullscreen enable global
+
 bindsym $mod+r mode "resize"
+
+# Autostart
+############
+
+exec --no-startup-id ./setupdisplay.sh
+exec --no-startup-id nm-applet
+exec --no-startup-id zeal
