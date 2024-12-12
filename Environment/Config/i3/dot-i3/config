@@ -7,7 +7,7 @@
 # Set global modifier key
 # Mod1 - ALT
 # Mod4 - CMD (Macs)
-set $mod Mod4
+set $mod Mod1
 
 ## Fonts for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below. ISO 10646 = Unicode

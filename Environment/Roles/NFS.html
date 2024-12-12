@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>NFS.html</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+</head>
+
+<body>
+
+<h1 id="on-the-server">On the server</h1>
+<h2 id="setup-local-mount-points">1. Setup local mount points</h2>
+<p>Create permanent mount points for the disk used for sharing, so that
+we can more easily use a bind mount for the NFS version</p>
+<p><strong>/etc/fstab</strong></p>
+<pre><code># &lt;file system&gt;                 &lt;mount point&gt;       &lt;type&gt;  &lt;options&gt;       &lt;dump&gt;  &lt;pass&gt;
+
+UUID=d18a3097-a928-41e8-a3ed-4cf1a69fdb3b   /media/the-library  btrfs   defaults,nofail     0   2
+UUID=c68aae58-ecd6-4aa3-a3c9-656b9a6e7043   /media/archives     btrfs   defaults,nofail     0   2</code></pre>
+<h2 id="setup-file-sharing-user-to-squash-incoming-logins">2. Setup
+file-sharing user to squash incoming logins</h2>
+<pre><code>sudo adduser --uid=33300 fileshare
+sudo adduser rick fileshare</code></pre>
+<h2 id="setup-permissions-on-the-mounts-appropriately">3. Setup
+permissions on the mounts appropriately</h2>
+<p>Create NFS bind mounts:</p>
+<p><strong>/etc/fstab</strong></p>
+<pre><code>/media/the-library/TheStacks                    /srv/nfs/TheStacks      none    bind,nofail     0       2
+/media/the-library/Nooks/Ricky                  /srv/nfs/RickyNook      none    bind,nofail     0       2
+/media/the-library/Nooks/Raine                  /srv/nfs/RaineNook      none    bind,nofail     0       2</code></pre>
+<h2 id="fixup-permissions-for-changed-files">4. Fixup permissions for
+changed files</h2>
+<p>NFS doesn’t have great support for preserving attributes when we
+squash users, so use the sticky bit on the directory to ensure that
+incoming files are set appropriately.</p>
+<p><strong>shell</strong></p>
+<pre><code># Update owner
+chown -R rick /media/the-library/Nooks/Ricky/
+chmod -R raine /media/the-library/Nooks/Raine/
+
+# Update groups
+chgrp -R fileshare /media/the-library/Nooks/
+chmod -R g+wx  /media/the-library/Nooks/
+
+# Set sticky bit: Always use these permissions!
+chmod -R +s /media/the-library/TheStacks/</code></pre>
+<h2 id="setup-nfs-itself">5. Setup NFS Itself</h2>
+<p>Note that the <code>insecure</code> option is required for all mounts
+accessible via macOS <strong>/etc/exports</strong></p>
+<pre><code># MUST INCLUDE INSECURE IN THE OPTIONS FOR REMOTE MACOS MOUNTS
+
+#
+# RickyNook exports
+#
+# 501 is Rick&#39;s uid on THIS machine
+/srv/nfs/RickyNook 10.0.0.0/24(rw,all_squash,anonuid=501,anongid=33300,insecure,no_subtree_check) \
+                   *.local    (rw,all_squash,anonuid=501,anongid=33300,insecure,no_subtree_check) \
+                   192.168.0.3(rw,all_squash,anonuid=501,anongid=33300,insecure,no_subtree_check)
+
+
+#
+# RaineNook exports
+#
+# 1003 is Raine&#39;s uid on THIS machine
+/srv/nfs/RaineNook      10.0.0.0/24(rw,all_squash,anonuid=1003,anongid=33300,insecure,no_subtree_check)
+/srv/nfs/RaineNook      *.local    (rw,all_squash,anonuid=1003,anongid=33300,insecure,no_subtree_check)</code></pre>
+
+</body>
+</html>

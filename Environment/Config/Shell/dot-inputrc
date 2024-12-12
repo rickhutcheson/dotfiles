@@ -1,3 +1,16 @@
 # .inputrc - bash configs and keyboard mappings
 set mark-symlinked-directories on
 set mark-directories on
+
+# By default, if one navigates to a command in their history, edits
+# it (for example, by killing it), then moves to another command WITHOUT
+# pressing enter, the modified command is not saved as a new entry, but
+# instead is saved in its MODIFIED form at its previous location in the
+# history stack.
+#
+# This is a readline feature, discovered at
+#     https://unix.stackexchange.com/a/299563
+#
+# I kill commands and use them for other things all the time, so
+# disable this option and keep all of the history.
+set revert-all-at-newline on

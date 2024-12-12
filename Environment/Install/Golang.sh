@@ -8,7 +8,7 @@ mkdir -p $USER_ENV_UTILS/Golang/
 cd $USER_ENV_UTILS/Golang
 rm -rf install
 mkdir -p install
-wget https://dl.google.com/go/go$GOLANG_VERSION.darwin-amd64.tar.gz -O golang.tar.gz
+wget https://dl.google.com/go/go$GOLANG_VERSION.$USER_ENV_OS-amd64.tar.gz -O golang.tar.gz
 tar -xzf golang.tar.gz -C install --strip-components 1
 mv install golang-$GOLANG_VERSION
 ln -f -s golang-$GOLANG_VERSION latest

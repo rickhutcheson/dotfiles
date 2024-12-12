@@ -3,6 +3,8 @@
 #
 # Bash Customization
 #
+
+
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
@@ -55,7 +57,16 @@ hh()
 # Global Aliases / Utilities
 # ----------------------------------------------------------------------
 alias nano='emacs -nw'  # emacs in terminal & no init file (fast)
+
+# Replace pbcopy and pbpaste
+if ! $(which /dev/null 2>&1 pbcopy); then
+    alias pbcopy='xclip -selection clipboard'
+    alias pbpaste='xclip -selection clipboard -o'
+fi;
+
+export PATH=$PATH:~/.local/bin
 export PATH=$PATH:$USER_ENV_UTILS/Shell/
+
 
 # General Appearance
 # ----------------------------------------------------------------------
@@ -64,6 +75,29 @@ export CLICOLOR=1  # Enable colors for BSD variants (including macOS)
 
 # Prompt Formatting
 # ----------------------------------------------------------------------
+
+if [[ $- == *i* ]]
+then
+    NONE=$(tput sgr0)
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    YELLOW=$(tput setaf 3)
+    CYAN=$(tput setaf 4)
+    PURPLE=$(tput setaf 5)
+    WHITE=$(tput setaf 7)
+    BOLD=$(tput bold)
+    ITALIC=$(tput sitm)
+else
+    NONE=""
+    RED=""
+    GREEN=""
+    YELLOW=""
+    CYAN=""
+    PURPLE=""
+    WHITE=""
+    BOLD=""
+    ITALIC=""
+fi
 
 
 cwd="\[$CYAN\]\w\[$NONE\]"
@@ -102,6 +136,7 @@ show_prompt() {
     else
         pre_prompt="\[$YELLOW\]"
     fi
+    history -a
     PS1="\$(hr)\n"$info_line"\[$NONE\]\n"$pre_prompt$prompt"\[$NONE\] "
     return 0
 }
@@ -151,19 +186,9 @@ make_targets() {
 
 if [[ $- == *i* ]]
 then
-    NONE=$(tput sgr0)
-    RED=$(tput setaf 1)
-    GREEN=$(tput setaf 2)
-    YELLOW=$(tput setaf 3)
-    CYAN=$(tput setaf 4)
-    PURPLE=$(tput setaf 5)
-    WHITE=$(tput setaf 7)
-    BOLD=$(tput bold)
-    ITALIC=$(tput sitm)
     #
     # History Sharing - These settings share history between terminal tabs.
     #
-    history -a
     history -n
     export PROMPT_COMMAND=show_prompt
 fi

@@ -54,10 +54,15 @@
     flycheck-pos-tip   ; show error under point
     magit
     simp
-    smex
+    ;; direnv
+    direnv
+    ;;smex
+    flx
+    ;;ivy
 
     ;; C
     company-c-headers
+    clang-format
 
     ;; Golang
     go-mode
@@ -114,8 +119,8 @@
 (require 'company)
 ;(require 'flycheck)
 (require 'flymake)
-(require 'ido)
-(require 'smex)
+;(require 'ido)
+;(require 'smex)
 (require 'simp)
 
 
@@ -162,8 +167,9 @@
 ;; "IntelOne Mono-regular"
 ;; "Victor Mono-regular"
 
-(setq font-name "Victor Mono-regular")
-(setq font-size "30")
+
+(setq font-name "Victor Mono-semilight")
+(setq font-size "26")
 (set-frame-font (concat "-*-" font-name "-normal-normal-*-" font-size "-*-*-*-m-0-iso10646-1"))
 
 ;; Disable anti-aliasing -- good for bitmap fonts
@@ -172,13 +178,13 @@
 ;;
 ;; (setq mac-allow-anti-aliasing nil)
 
-(setq-default line-spacing 0.05) ;; This is ADDITIONAL line spacing added to standard
+(setq-default line-spacing 0.15) ;; This is ADDITIONAL line spacing added to standard
 
 ;; 80 chars + room for fringe
 (add-to-list 'default-frame-alist '(width . 88))
 
 ;; dark theme
-(load-theme 'gruvbox-dark-hard-2 t)
+(load-theme 'darktooth t)
 
 ;; naked emacs
 (scroll-bar-mode 0)
@@ -220,9 +226,16 @@
       delete-old-versions t
       kept-new-versions 100
       kept-old-versions 100
-      backup-by-copying t)         ; don't clobber symlinks
-
+      backup-by-copying t          ; don't clobber symlinks
+      auto-save-default t          ; auto-save every buffer that visits a file
+)
 (add-hook 'before-save-hook 'force-backup-of-buffer)
+
+;; ---------------------------------------------------------------------
+;; direnv
+;; ---------------------------------------------------------------------
+(require 'direnv)
+(direnv-mode)
 
 ;; ---------------------------------------------------------------------
 ;; editing
@@ -248,6 +261,12 @@
 ;; Handy key definition
 (define-key global-map "\M-q" 'refill-paragraph)
 
+;; I spend at least 80% of my time reading code, and 19% of my time
+;; telling Emacs not to save whatever changes I accidentally made
+;; while navigating around.
+
+(define-key global-map (kbd "C-x C-f") 'find-file-read-only)
+(define-key global-map (kbd "C-x C-g") 'find-file)
 
 ;; ---------------------------------------------------------------------
 ;; navigation
@@ -267,6 +286,12 @@
 ;; follow the symlink each time.
 (setq vc-follow-symlinks t)
 
+;; I often find myself accidentally switching away from the minibuffer
+;; by the time that I realize that it's asking me for input. This is a
+;; handy way to get right back there.
+(global-unset-key (kbd "C-\\"))
+(define-key isearch-mode-map (kbd "C-\\") 'switch-to-minibuffer) ;; isearch tries to use the same key
+(define-key global-map (kbd "C-\\") 'switch-to-minibuffer) ;; Bind to `C-\'
 
 ;; ---------------------------------------------------------------------
 ;; printing
@@ -364,7 +389,15 @@
   "The directory to use as the 'project' directory for cscope projects"
   :type '(string))
 
+(defun find-file-noselect-and-readonly (f)
+  (let ((buf (find-file-noselect f)))
+    (if buf (with-current-buffer (get-buffer-create buf)
+              (read-only-mode)
+              buf)
+      buf)
+    ))
 
+(setq cscope-find-file-function 'find-file-noselect-and-readonly)
 (defun visit-linux-file ()
   (interactive)
   (let ((linux-file (concat "~/Repositories/linux" (cadr (split-string (buffer-file-name) "4")))))
@@ -383,8 +416,6 @@
 
 (defun add-cscope-hook ()
   (add-hook 'hack-local-variables-hook 'setup-cscope-for-project))
-
-(add-cscope-hook)
 
 (add-hook 'c-mode-hook (function cscope-minor-mode))
 (add-hook 'asm-mode-hook (function cscope-minor-mode))
@@ -463,6 +494,7 @@
 (add-hook 'c-mode-hook 'show-paren-mode)
 ;; display current function in status bar
 (add-hook 'c-mode-hook 'which-function-mode)
+(add-cscope-hook)
 
 (add-hook 'c-mode-hook
           (lambda ()
@@ -471,10 +503,8 @@
 ;;             ;(c-set-style "resc")
 ;;             ;; Add RESC_HOME to our include path for flycheck
 ;;             ;; gets everything but trailing newline
-             ;;             (add-to-list 'flycheck-clang-include-path "/opt/homebrew/include")
              ;; hitting enter should create comment star
              (define-key c-mode-base-map (kbd "RET") 'c-context-line-break)
-
              ;; allow completing from #included header files
              (add-to-list 'company-backends 'company-c-headers)
              ;(add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup)
@@ -496,14 +526,18 @@
                (add-hook 'before-save-hook
                          'clang-format-buffer
                          t  ; append to existing value
-                         t  ; buffer-local (important, since we don't want tof
-                         )
+                         t) ; buffer-local (important, since we don't want to change this everywhere)
+
                )
              (define-key c-mode-base-map (kbd "s-b") 'lsp-find-definition)
              (define-key c-mode-base-map (kbd "s-B") 'cscope-find-this-symbol)
              ))
 ;(add-hook 'c-mode-hook 'flycheck-mode)
 
+;; (add-hook 'lsp-mode-hook
+;;           (lambda ()
+;;             (message "chk?")
+;;             (add-to-list 'flycheck-clang-include-path (lsp-workspace-root))))
 
 ;; ---------------------------------------------------------------------
 ;; common lisp
@@ -576,17 +610,35 @@
 ;; ido / smex
 ;; ---------------------------------------------------------------------
 
-(ido-mode t)
 (setq ido-enable-flex-matching t)
+(setq ido-use-filename-at-point 'guess)
+(setq ido-everywhere t)
+(setq ido-file-extensions-order '(".c" ".h" ".md" ".py" ".txt"))
+(ido-mode t)
 
-(smex-initialize)
+;(smex-initialize)
 
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
 ;; old M-x
-(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+;(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
+;; ---------------------------------------------------------------------
+;; ivy / counsel
+;; ---------------------------------------------------------------------
+;; (ivy-mode 1)
+;; (counsel-mode 1)
+;; (setq ivy-use-virtual-buffers t)
+;; (setq ivy-count-format "(%d/%d) ")
+;; the default sort function for C-x C-f sorts directories first; I'm
+;; not a huge fan.  The customization system just rewrites the whole
+;; alist, which is a bit overkill; we just update the single
+;; association.
+;(add-to-list 'ivy-sort-functions-alist '(read-file-name-internal . ivy-string<))
+;; (setq ivy-re-builders-alist
+;;       '((t . ivy--regex-fuzzy)))
+;; (global-set-key (kbd "C-s") 'swiper-isearch)
 ;; ---------------------------------------------------------------------
 ;; Magit
 ;; ---------------------------------------------------------------------
@@ -842,54 +894,14 @@
 ;; =====================================================================
 
 (setq-default markdown-command "pandoc")
-(setq-default markdown-open-command "/usr/local/bin/mark")
+(if (eq system-type 'darwin)
+  ;; On macOS, we have the Marked app, which gives us a nice local preview.
+    (setq-default markdown-open-command "/usr/local/bin/mark")
+  (setq-default markdown-open-command "/usr/bin/formiko -p")
+  )
+
+
 (add-hook 'markdown-mode-hook 'auto-fill-mode)
-;;
-;; Source: https://emacs.stackexchange.com/a/3500
-(defun tag-word-or-region (text-begin text-end)
-  "Surround current word or region with given text."
-  (interactive "sStart tag: \nsEnd tag: ")
-  (let (pos1 pos2 bds)
-    (if (and transient-mark-mode mark-active)
-        (progn
-          (goto-char (region-end))
-          (insert text-end)
-          (goto-char (region-beginning))
-          (insert text-begin)
-          (goto-char (region-end))
-          (dotimes (i (* 3 (length text-end)))
-          (forward-char)))
-      (progn
-        (setq bds (bounds-of-thing-at-point 'symbol))
-        (goto-char (cdr bds))
-        (insert text-end)
-        (goto-char (car bds))
-        (insert text-begin)
-        ;; Addition: move to end of region, then past all the text inserted
-        ;; This requires us to move past both prefix & suffix strings
-        (goto-char (cdr bds))
-        (dotimes (i (+ (length text-start) (length text-end)))
-          (forward-char))))))
-
-(defun md-bold-selection ()
-  (interactive)
-  (tag-word-or-region "**" "**"))
-
-(defun md-italic-selection ()
-  (interactive)
-  (tag-word-or-region "*" "*"))
-
-(defun md-insert-slash ()
-  (interactive)
-  (insert (char-from-name "SLASH")))
-
-(eval-after-load 'markdown-mode
-  (lambda ()
-    (define-key markdown-mode-map (kbd "/ /") 'md-insert-slash)
-    (define-key markdown-mode-map (kbd "/ b") 'md-bold-selection)
-    (define-key markdown-mode-map (kbd "/ i") 'md-italic-selection)))
-
-
 
 ;; =====================================================================
 ;; PDF Tools
@@ -918,44 +930,55 @@
    ;       (lambda() (define-key python-mode-map (kbd "s-b") 'jedi:goto-definition)))
 )
 
+;; =====================================================================
+;; Shell Scripts
+;; =====================================================================
 
-;; ---------------------------------------------------------------------
-;; required variables
-;; ---------------------------------------------------------------------
+;; associate with '.envrc' files
+(add-to-list 'auto-mode-alist '("\\.envrc\\'" . sh-mode))
+
+;; =====================================================================
+;; yas mode
+;; =====================================================================
+
+(define-key global-map (kbd "C-x C-e") 'yas-expand)
+
+;; =====================================================================
+;; Kernel Dev
+;; =====================================================================
+
+(defun c-lineup-arglist-tabs-only (ignored)
+  "Line up argument lists by tabs, not spaces"
+  (let* ((anchor (c-langelem-pos c-syntactic-element))
+         (column (c-langelem-2nd-pos c-syntactic-element))
+         (offset (- (1+ column) anchor))
+         (steps (floor offset c-basic-offset)))
+    (* (max steps 1)
+       c-basic-offset)))
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            ;; Add kernel style
+            (c-add-style
+             "linux-tabs-only"
+             '("linux" (c-offsets-alist
+                        (arglist-cont-nonempty
+                         c-lineup-gcc-asm-reg
+                         c-lineup-arglist-tabs-only))))))
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            (let ((filename (buffer-file-name)))
+              ;; Enable kernel mode for the appropriate files
+              (when 'current-c-project-directory
+                (setq indent-tabs-mode t)
+                (setq show-trailing-whitespace t)
+                (c-set-style "linux-tabs-only")))))
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(cdlatex-math-modify-prefix 47 t)
- '(column-number-mode t)
- '(company-c-headers-path-user
-   '("/opt/homebrew/include" "/opt/homebrew/include/CUnit" "/Users/rick/Repositories/learningc/cii/include"))
- '(company-clang-arguments
-   '("-I/rick/Repositories/resC/src" "-I/rick/Repositories/resC/src/base" "-I/rick/Repositories/kilo/src/components"))
- '(cscope-browse-without-preview t)
- '(cscope-indexer-suffixes '("*.[chlysS]" "*.[ch]xx" "*.[ch]pp" "*.cc" "*.hh") nil nil "Allow assembly files too")
- '(custom-safe-themes
-   '("297e7e10121ab4ae4320a1a50a2cbd4eabf8db045d170aa002e46ab24f045873" "046a2b81d13afddae309930ef85d458c4f5d278a69448e5a5261a5c78598e012" "d445c7b530713eac282ecdeea07a8fa59692c83045bf84dd112dd738c7bcad1d" "a5270d86fac30303c5910be7403467662d7601b821af2ff0c4eb181153ebfc0a" "7b8f5bbdc7c316ee62f271acf6bcd0e0b8a272fdffe908f8c920b0ba34871d98" "41020bc5a5547dbc5eaf2554d188f516cc5d3b80fd5d5ad804444135a6abf5f4" "f149d9986497e8877e0bd1981d1bef8c8a6d35be7d82cba193ad7e46f0989f6a" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "6b5c518d1c250a8ce17463b7e435e9e20faa84f3f7defba8b579d4f5925f60c1" "7661b762556018a44a29477b84757994d8386d6edee909409fabe0631952dad9" "83e0376b5df8d6a3fbdfffb9fb0e8cf41a11799d9471293a810deb7586c131e6" "d14f3df28603e9517eb8fb7518b662d653b25b26e83bd8e129acea042b774298" "b89ae2d35d2e18e4286c8be8aaecb41022c1a306070f64a66fd114310ade88aa" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "0598c6a29e13e7112cfbc2f523e31927ab7dce56ebb2016b567e1eff6dc1fd4f" "a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "8d805143f2c71cfad5207155234089729bb742a1cb67b7f60357fdd952044315" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" default))
- '(ede-project-directories '("/Users/rick/Repositories/learningc/kilo"))
- '(mode-line-format
-   '("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification "   " mode-line-position "  " mode-line-misc-info mode-line-modes
-     (vc-mode vc-mode)
-     mode-line-end-spaces))
- '(mode-line-percent-position nil)
- '(mode-line-position-column-line-format '("%l:%c"))
- '(package-selected-packages
-   '(backup-walker gnu-elpa-keyring-update sr-speedbar xcscope lsp-ui bats-mode buffer-move pdf-tools timu-rouge-theme company-auctex cdlatex auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
- '(safe-local-variable-values
-   '((current-c-project-directory . "/home/rick/Repositories/linux")
-     (current-c-project-directory . "/data/Projects/bootlin-course/linux")
-     (current-c-project-directory "/data/Projects/bootlin-course/linux"))))
+;; =====================================================================
+;; Customization
+;; =====================================================================
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(setq custom-file "~/Environment/Config/Emacs/custom-file.el")
+(load custom-file)
