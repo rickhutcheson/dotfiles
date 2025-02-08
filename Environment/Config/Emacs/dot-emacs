@@ -27,7 +27,6 @@
     (setq exec-path (split-string path-from-shell path-separator))))
 (set-exec-path-from-shell-PATH)
 
-
 ;; =====================================================================
 ;; Packages
 ;; =====================================================================
@@ -36,7 +35,6 @@
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
        ("melpa" . "https://melpa.org/packages/")))
-
 
 ;; ---------------------------------------------------------------------
 ;; Required Packages
@@ -52,7 +50,8 @@
     company            ; auto-completion framework (actively maintained)
     flycheck           ; auto-lint source files (must config for each lang)
     flycheck-pos-tip   ; show error under point
-    magit
+    magit              ; the one-and-only
+    quelpa             ; install github-only packages
     simp
     ;; direnv
     direnv
@@ -73,7 +72,7 @@
 
     ;; JavaScript
     web-beautify       ; code beautifying
-    js2-mode           ; syntax-highlighting, linting, etc.
+    js2-mode           ; syntax-highlighting, linting, etc .
 
     ;; markdown
     markdown-mode
@@ -94,6 +93,12 @@
     )
   "Packages installed @ startup")
 
+(defvar required-third-party-packages
+  '(
+
+    )
+  "Required packages from non-ELPA sources")
+
 ;; refresh package contents
 (defvar needs-packages nil)
 (dolist (package required-package-list)
@@ -103,11 +108,11 @@
 ;; install the missing packages
 (when needs-packages (package-refresh-contents))
 
-(when needs-packages
-  (dolist (package required-package-list)
-    (unless (package-installed-p package)
-      (package-install package))))
-
+(defun display-startup-echo-area-message ()
+  (dolist (package required-third-party-packages)
+  (unless (package-installed-p package)
+    (message "ALERT! You need to install: [%s] See third-party-packages in .emacs for command." package))
+))
 
 ;; =====================================================================
 ;; general
@@ -167,10 +172,27 @@
 ;; "IntelOne Mono-regular"
 ;; "Victor Mono-regular"
 
+(defun setup-default-font (font-name font-size font-weight)
+  (let (;fontconfig-pattern
+        (font-fc-pattern (concat font-name "-" font-size ":weight=" font-weight))
+        ; X logical font description
+        (font-xlfd (concat "-*-"
+                           font-name "-" font-weight "-normal-normal-*-" font-size
+                           "-*-*-*-m-0-iso10646-1")))
 
-(setq font-name "Victor Mono-semilight")
-(setq font-size "26")
-(set-frame-font (concat "-*-" font-name "-normal-normal-*-" font-size "-*-*-*-m-0-iso10646-1"))
+    (set-frame-font font-xlfd)
+    ;; Note: this backspace-quoted list allows us to evaluate symbols
+    ;; inside if we use the "," operator before them; with a simple
+    ;; quoted list, i.e. '(...), the font-fc-pattern value isn't expanded.
+    (add-to-list 'default-frame-alist `(font . ,font-fc-pattern))))
+
+(setq font-name "Victor Mono")
+
+(if (eq system-type 'darwin)
+  (setq font-size "15")  ; font-size isn't doubled on macOS (retina takes into consideration)
+  (setq font-size "26"))
+
+(setup-default-font font-name font-size "semilight")
 
 ;; Disable anti-aliasing -- good for bitmap fonts
 ;; In order for this to take effect, you must use the following command--
@@ -205,6 +227,7 @@
 ;; Don't use messages that you don't read
 (setq initial-scratch-message "")
 (setq inhibit-startup-message t)
+
 
 ;; ---------------------------------------------------------------------
 ;; backup
@@ -264,8 +287,18 @@
 ;; I spend at least 80% of my time reading code, and 19% of my time
 ;; telling Emacs not to save whatever changes I accidentally made
 ;; while navigating around.
+(defun find-file-readonly-if-exists (filepath &optional wildcards)
+  ; populates filepath and wildcards from our prompt
+  (interactive
+   (find-file-read-args "Find read-only or create: " (confirm-nonexistent-file-or-buffer)))
+  ; Mostly, find-file-readonly, but I don't want to have to stretch my
+  ; fingers just to create a new file.
+  (if (file-exists-p filepath)
+      (find-file-read-only filepath wildcards)
+      (find-file filepath wildcards)
+    ))
 
-(define-key global-map (kbd "C-x C-f") 'find-file-read-only)
+(define-key global-map (kbd "C-x C-f") 'find-file-readonly-if-exists)
 (define-key global-map (kbd "C-x C-g") 'find-file)
 
 ;; ---------------------------------------------------------------------
@@ -495,6 +528,18 @@
 ;; display current function in status bar
 (add-hook 'c-mode-hook 'which-function-mode)
 (add-cscope-hook)
+(defun add-clang-format-save-hook ()
+  ;; find & load clang-format.el via brew (note that the
+  ;; shell result ends with a trailing newline we have to
+  ;; strip
+  (load (concat
+         (substring (shell-command-to-string "dirname $(dirname $(which clang-format))") 0 -1)
+         "/share/clang/clang-format.el"))
+  (add-hook 'before-save-hook
+            'clang-format-buffer
+            t  ; append to existing value
+            t) ; buffer-local (important, since we don't want to change this everywhere!)
+)
 
 (add-hook 'c-mode-hook
           (lambda ()
@@ -503,32 +548,23 @@
 ;;             ;(c-set-style "resc")
 ;;             ;; Add RESC_HOME to our include path for flycheck
 ;;             ;; gets everything but trailing newline
-             ;; hitting enter should create comment star
-             (define-key c-mode-base-map (kbd "RET") 'c-context-line-break)
-             ;; allow completing from #included header files
-             (add-to-list 'company-backends 'company-c-headers)
-             ;(add-hook 'flycheck-mode-hook #'flycheck-clang-tidy-setup)
-             (when (not (eq major-mode 'bison-mode))
-               (yas-minor-mode)
-               (lsp))
-;;             (setq c-basic-offset 2)
+
+            ;; hitting enter should create comment star
+            (define-key c-mode-base-map (kbd "RET") 'c-context-line-break)
+
+            ;; allow completing from #included header files
+            (add-to-list 'company-backends 'company-c-headers)
+
+            (when (not (eq major-mode 'bison-mode))
+              (yas-minor-mode)
+              (lsp))
+
              ;; on macOS, we can setup clang-format
              (when (and (eq system-type 'darwin)
                         (stringp buffer-file-name)
                         (not (string-match "\\.y\\'" buffer-file-name)
                         ))
-               ;; find & load clang-format.el via brew (note that the
-               ;; shell result ends with a trailing newline we have to
-               ;; strip
-               (load (concat
-                      (substring (shell-command-to-string "dirname $(dirname $(which clang-format))") 0 -1)
-                     "/share/clang/clang-format.el"))
-               (add-hook 'before-save-hook
-                         'clang-format-buffer
-                         t  ; append to existing value
-                         t) ; buffer-local (important, since we don't want to change this everywhere)
-
-               )
+               (add-clang-format-save-hook))
              (define-key c-mode-base-map (kbd "s-b") 'lsp-find-definition)
              (define-key c-mode-base-map (kbd "s-B") 'cscope-find-this-symbol)
              ))
@@ -894,14 +930,17 @@
 ;; =====================================================================
 
 (setq-default markdown-command "pandoc")
+(setq markdown-asymmetric-header t)
 (if (eq system-type 'darwin)
   ;; On macOS, we have the Marked app, which gives us a nice local preview.
     (setq-default markdown-open-command "/usr/local/bin/mark")
   (setq-default markdown-open-command "/usr/bin/formiko -p")
   )
 
-
 (add-hook 'markdown-mode-hook 'auto-fill-mode)
+(add-hook 'markdown-mode-hook (lambda ()
+                                (set-face-attribute 'markdown-code-face nil :inherit 'default)
+                                (set-face-attribute 'markdown-table-face nil :inherit 'default)))
 
 ;; =====================================================================
 ;; PDF Tools
@@ -956,9 +995,14 @@
     (* (max steps 1)
        c-basic-offset)))
 
+(defun use-linux-style ()
+  (setq indent-tabs-mode t)
+  (setq show-trailing-whitespace t)
+  (c-set-style "linux-tabs-only"))
+
 (add-hook 'c-mode-common-hook
           (lambda ()
-            ;; Add kernel style
+            ;; Add kernel style; not used by default
             (c-add-style
              "linux-tabs-only"
              '("linux" (c-offsets-alist
@@ -970,11 +1014,8 @@
           (lambda ()
             (let ((filename (buffer-file-name)))
               ;; Enable kernel mode for the appropriate files
-              (when 'current-c-project-directory
-                (setq indent-tabs-mode t)
-                (setq show-trailing-whitespace t)
-                (c-set-style "linux-tabs-only")))))
-
+              (when (bound-and-true-p current-c-project-directory)
+                (use-linux-style)))))
 
 ;; =====================================================================
 ;; Customization
