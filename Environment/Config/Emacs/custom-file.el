@@ -21,7 +21,7 @@
  '(mode-line-percent-position nil)
  '(mode-line-position-column-line-format '("%l:%c"))
  '(package-selected-packages
-   '(quelpa basic-mode direnv darktooth-theme kanagawa-themes kuronami-theme dts-mode ivy-hydra flx counsel ivy swiper "ivy" clang-format backup-walker gnu-elpa-keyring-update sr-speedbar xcscope lsp-ui bats-mode buffer-move pdf-tools timu-rouge-theme company-auctex cdlatex auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
+   '(lsp-treemacs treemacs treemacs-magit treemacs-projectile flycheck-rtags rtags flycheck-clang-analyzer systemd quelpa basic-mode direnv darktooth-theme kanagawa-themes kuronami-theme dts-mode ivy-hydra flx counsel ivy swiper "ivy" clang-format backup-walker gnu-elpa-keyring-update sr-speedbar xcscope lsp-ui bats-mode buffer-move pdf-tools timu-rouge-theme company-auctex cdlatex auctex graphviz-dot-mode bison-mode c-eldoc project xref lsp-mode flycheck-clang-tidy material-theme speed-type scala-mode graphql-mode yaml-mode python-black company-jedi tern-auto-complete tern darkroom kotlin-mode spacemacs-theme spacegray-theme jedi python-environment auto-complete js2-mode go-mode slime-company slime solarized-theme gruvbox-theme company-c-headers company sublimity writeroom-mode csv-mode sphinx-doc sphinx-mode flycheck-pycheckers pyvenv ein color-theme-sanityinc-tomorrow web-beautify lua-mode smex web-mode simp railscasts-theme php-mode pandoc-mode markdown-mode magit less-css-mode flycheck-pos-tip))
  '(safe-local-variable-values
    '((c-offsets-alist
       (arglist-close . c-lineup-arglist-tabs-only)
@@ -49,7 +49,13 @@
      (c-label-minimum-indentation . 0)
      (current-c-project-directory . "/home/rick/Repositories/linux")
      (current-c-project-directory . "/data/Projects/bootlin-course/linux")
-     (current-c-project-directory "/data/Projects/bootlin-course/linux")))
+     (current-c-project-directory "/data/Projects/bootlin-course/linux")
+     (markdown-command . "pandoc --metadata title=cstdlib
+                          --from=markdown+grid_tables
+                          --toc --highlight-style=kate
+                          --to=html --standalone
+                          --css=cstdlib.css
+                          --self-contained --")))
  '(warning-suppress-types '((comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
